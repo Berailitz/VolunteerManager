@@ -91,8 +91,8 @@ class Manager(object):
                 time.sleep(interval * random.random())
             else:
                 time.sleep(interval)
-        with open("volunteer_list.json", 'w') as json_file:
-            json.dump(volunteer_list, json_file)
+        with open("volunteer_list.json", 'w', encoding='utf8') as json_file:
+            json.dump(volunteer_list, json_file, ensure_ascii=False)
         logging.info("[Success]Scanning completed.")
         return volunteer_list
 
@@ -136,6 +136,7 @@ class Manager(object):
             else:
                 member_info.append('')
             member_info.append(member_item.select("td")[8].text)
+            member_info = list(map(lambda text: text.strip(), member_info))
             volunteer_list.append(member_info)
             logging.info("[Success]Scanning: " + '|'.join(map(str, member_info)))
         return volunteer_list
