@@ -1,0 +1,51 @@
+##add a volunteer
+###Raw Code:
+```
+function invite_select(stype){
+    var uid=[];
+    $('.chklist').each(function(){
+        if($(this).attr('checked')){
+            uid.push($(this).val());
+        }
+    });
+    if(uid.length==0) {
+        C.alert.alert({height:120,content:'请选择志愿者'});
+        return false;
+    }
+    window.parent.invite(stype,uid);
+}
+
+function invite(stype,uid){
+    $.post('opp.my.php?m=invite&item=recruit&opp_id='+$('input[name=opp_id]').val()+'&job_id='+$('input[name=job_id]').val(), {stype:stype,uid:uid}, function(data) {
+        try{
+            var ret=$.evalJSON(data);
+            C.alert.alert({butok:'邀请完毕',butcancel:'继续邀请',cancel_show:1,content:ret.msg,funcOk:function(){
+                    window.location.reload();
+            }
+            });
+        }catch(e){alert(e.message+data);}
+    });
+}
+```
+###Modified Code:
+```
+function MyInvite(ProjectID = 0, JobID = 0, VolunteerIDs = []){
+    if(uid.length==0) {
+        console.log("No volunteer specifed to be added.")
+        return false;
+    } else {
+        $.post(
+            'http://www.bv2008.cn/opp.my.php?m=invite&item=recruit&opp_id=' + ProjectID + '&job_id=' + JobID,
+            {stype:'local', uid: VolunteerIDs},
+            function(RawResponse) {
+                try{
+                    var ResponseJSON = $.evalJSON(RawResponse);
+                    console.log("Succeeded inviting @ " + VolunteerIDs + " " + ResponseJSON.msg)
+                }
+                catch(e){
+                	console.log("Failed to invite @ " + VolunteerIDs + " " + e.message);}
+            }
+        );
+    }
+}
+```
