@@ -84,8 +84,9 @@ class Manager(object):
         max_page = int(main_soup.select(".pagebar a")[-1].text)
         volunteer_count = int(main_soup.select(".ptpage")[0].text.split(' ')[4])
         logging.info("[Success]Scanning " + str(volunteer_count) + " volunteers @ " + str(max_page) + " pages.")
-        for index in range(1, max_page + 1):
-            current_page = self.get(url + str(index))
+        for page_index in range(1, max_page + 1):
+            current_page = self.get(url + str(page_index))
+            logging.info("[Success]Get page " + str(page_index) + ".")
             volunteer_list = volunteer_list + self.prase_list_soap(BeautifulSoup(current_page.text, "lxml"))
             if is_random:
                 time.sleep(interval * random.random())
