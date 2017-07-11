@@ -28,7 +28,7 @@ class Manager(object):
     """Manage volunteers on bv2008"""
     def __init__(self):
         self.my_session = requests.Session()
-        self.login()
+        # self.login()
 
     def post(self, url, referer='', **kw):
         '''customized post'''
@@ -62,11 +62,12 @@ class Manager(object):
         get_response.encoding = "utf-8-sig"
         return get_response
 
-    def login(self, username="scsfire", encrypted_password=""):
+    def login(self, username, encrypted_password):
         '''login with default password'''
-        if not encrypted_password:
-            encrypted_password = r"VsNl91lWRJpjkVCTVL4j/pa2w1Ij+U0JqNHIoWCYiGZy5+246J+1UDIs+aplYoH4DiHVfk+jkzGDijqc6ZLsb8mhrj"
-            encrypted_password = encrypted_password + r"WOO/CdZ7tD5rn5+Wd6yFgXnRoiaZGAiaAxiPONZuVce11IyOyISchMapiV8b4G8GyREbEg+pcRuhz5Y3Q="
+        if not username or not encrypted_password:
+            logging.error("[Failed]No username or password specified.")
+            exit()
+            return False
         url = r'http://www.bv2008.cn/app/user/login.php?m=login'
         payload = {"uname": username, "upass": encrypted_password,}
         response = self.post(url, data=payload)
@@ -74,6 +75,7 @@ class Manager(object):
             logging.info("[Succeed]Login in")
         else:
             logging.info("[Failed]Login in" + response.json()['msg'])
+        return True
 
     def scan(self, interval=0.5, is_random=1):
         '''scan for all volunteers'''
@@ -173,7 +175,13 @@ class Manager(object):
 def main():
     '''main function'''
     set_logger("log.txt")
+    encrypted_password = r"VsNl91lWRJpjkVCTVL4j/pa2w1Ij+U0JqNHIoWCYiGZy5+246J+1UDIs+aplYoH4DiHVfk+jkzGDijqc6ZLsb8mhrj"
+    encrypted_password = encrypted_password + r"WOO/CdZ7tD5rn5+Wd6yFgXnRoiaZGAiaAxiPONZuVce11IyOyISchMapiV8b4G8GyREbEg+pcRuhz5Y3Q="
     my_manager = Manager()
-    my_manager.scan()
+    my_manager.login("scsfire", encrypted_password)
+    hours = my_manager.get(r"http://www.bv2008.cn/app/opp/opp.my.php?item=hour&job_id=1112895&opp_id=844088&type=hlist&manage_type=0")
+    hour_soup = BeautifulSoup(hours, "lxml")
+    hour_soup.find("a")
+    # my_manager.scan()
 
 main()
