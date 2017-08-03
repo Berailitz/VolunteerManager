@@ -21,12 +21,20 @@ body
 
 #main-div
 {
-    padding: 20px 5% 0 5%;
+    padding: 30px 5% 0 5%;
 }
 
-#note
+#record-table
 {
-    word-break: break-all;
-    word-wrap: break-word;
-    font-size: 15px;
+    /* overflow: hidden; */
+     /* height: 100%; */
+    /* width: 100%; */
+     /* overflow-x: auto; */
+    /* overflow-y: auto; */
+    /* min-height: 200px; */
+}
+
+#card-title
+{
+    padding-bottom: 0;
 }

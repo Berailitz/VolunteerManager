@@ -2,7 +2,7 @@
 
 let allJobNameList = {'': []};
 const COLUMN_NAMES = ['学号', '姓名', '时长', '志愿项目', '工作项目', '活动日期', '备注', '录入状态'];
-let container = document.getElementById('record-table');
+let container = $('#record-table')[0];
 let jobNameList = [];
 let projectNameList = [];
 let tableLines = Array();
@@ -51,8 +51,10 @@ let htmlTable = new Handsontable(container, {
   contextMenu: true,
   data: tableLines,
   manualColumnResize: true,
+  renderAllRows: true,
   rowHeaders: true,
   sortIndicator: true,
+  stretchH: 'all',
   afterChange: function (changes, source) {
     let rowCount = this.countRows();
     // console.log(rowCount);
@@ -176,6 +178,7 @@ function submitAll() {
     };
   });
   htmlTable.loadData(tableLines);
+  resetCurcor();
 }
 
 function tranferToItem(lineList) {
