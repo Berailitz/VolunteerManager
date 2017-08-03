@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Test</title>
+    <script src="jquery.js"></script>
+    <!-- <link href="bootstrap-theme.css" rel="stylesheet"> -->
+    <link href="bootstrap.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-default">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">志愿时长管理系统</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="#">信息查询</a></li>
+            <li class="active"><a href="#">时长录入</a></li>
+            <li><a href="#">时长查询</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+    <div id="main-div" class="row">
+        <div class="col-md-9">
+            <div id="record-table"></div>
+        </div>
+        <div id='left-panel' class="col-md-3">
+            <div id="note" class="panel panel-default">
+                <div id="note-heading" class="panel-heading">
+                    <h3 class="panel-title text-center"><b>使用说明</b></h3>
+                </div>
+                <div class="panel-body">
+                    <p>1.右上角登陆右上角登陆右上角登陆右上角登陆右上角登陆</p>
+                    <p>2.右上角登陆右上角登陆右上角登陆右上角登陆右上角登陆右上角登陆右上角登陆</p>
+                </div>
+            </div>
+            <div id='buttons'>
+                <button id="submit-btn" class="mdl-button mdl-js-button mdl-button--primary mdl-js-ripple-effect" type="submit" onclick="submitAll()">全部录入</button>
+                <button id="reset-btn" class="mdl-button mdl-js-button mdl-button--accent mdl-js-ripple-effect" type="reset" onclick="resetTable()">清空表格</button>
+            </div>
+        </div>
+    </div>
+    <link href="handsontable.full.css" rel="stylesheet">
+    <script src="handsontable.full.js"></script>
+    <script src="bootstrap.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <script src="pikaday.js"></script>
+    <link href="pikaday.css" rel="stylesheet">
+    <script src="moment.js"></script>
+    <script src="record.js"></script>
+    <link href="record.css" rel="stylesheet">
+</body>
+</html>
