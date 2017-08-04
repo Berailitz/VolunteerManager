@@ -17,21 +17,21 @@ let htmlTable = new Handsontable(container, {
     },
     {
       data: 'working_time',
-      type: 'numeric'
+      type: 'numeric',
     },
     {
       data: 'project_name',
       type: 'dropdown',
       source: function (query, process) {
-        process(projectNameList)
-      }
+        process(projectNameList);
+      },
     },
     {
       data: 'job_name',
       type: 'dropdown',
       source: function (query, process) {
         process(jobNameList);
-      }
+      },
     },
     {
       data: 'job_date',
@@ -43,7 +43,7 @@ let htmlTable = new Handsontable(container, {
     },
     {
       data: 'record_status',
-      readOnly: true
+      readOnly: true,
     },
   ],
   columnSorting: true,
@@ -141,14 +141,16 @@ function loadOnlineData(page, length) {
   $.getJSON("https://own.ohhere.xyz/records",{
     'page': page,
     'length': length
-  }, function(rawLines) {
-      // console.log(rawLines);
+  }, function(rawResponse) {
+      // console.log(rawResponse);
       tableLines.splice(0, tableLines.length);
-      $.each(rawLines['data'], function(LineIndex, rawLine) {
-        tableLines[LineIndex] = JSON.parse(rawLine).concat(['未录入']);
-        // console.log(line);
+      $.each(rawResponse['data'], function(LineIndex, rawLine) {
+        rawLine.record_status = '已录入';
+        tableLines[LineIndex] = rawLine
+        console.log(rawLine);
       });
       htmlTable.loadData(tableLines);
+      htmlTable.render();
       appendRow(1);
     });
 }
