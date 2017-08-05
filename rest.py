@@ -1,9 +1,11 @@
 #!/usr/env/python3
 # -*- coding: UTF-8 -*-
-import json
+
+import datetime
 from flask import Flask, request
 from flask_restful import Resource, Api, reqparse
 from flask_sqlalchemy import SQLAlchemy
+import json
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://xh:xh@localhost/xh?charset=utf8'
@@ -42,7 +44,7 @@ class Record(db.Model):
     record_note = db.Column(db.String(40))
     operator_id = db.Column(db.Integer)
     operation_date = db.Column(db.Date, server_default=db.func.current_timestamp())
-    blank1 = db.Column(db.Integer)
+    record_status = db.Column(db.Integer)
 
     def __init__(self, user_id, project_id, job_id, job_date, working_time, record_note, operator_id=0):
         self.user_id = user_id
@@ -65,6 +67,7 @@ class Volunteer(db.Model):
     volunteer_id = db.Column(db.Integer)
     username = db.Column(db.String(20))
     student_id = db.Column(db.String(20))
+    class_index = db.Column(db.String(12))
     legal_name = db.Column(db.String(40))
     phone = db.Column(db.String(20))
     email = db.Column(db.String(50))
@@ -72,7 +75,6 @@ class Volunteer(db.Model):
     age = db.Column(db.Integer)
     volunteer_time = db.Column(db.Float)
     note = db.Column(db.String(50))
-    blank2 = db.Column(db.Integer)
     def __repr__(self):
         return '<Volunteer %r>' % self.legal_name
 
@@ -85,12 +87,14 @@ def get_arg(current, default):
     else:
         return default
 
-def item_to_json(item, removed=set()):
+def item_to_dict(item, removed=set()):
     item_dict = item.__dict__.copy()
     del item_dict['_sa_instance_state']
     for removed_attr in removed:
         del item_dict[removed_attr]
-    return json.dumps(item_dict, ensure_ascii=False)
+    for key in item_dict.keys():
+        item_dict[key] = str(item_dict[key])
+    return item_dict
 
 class volunteer_api(Resource):
     def get(self):
@@ -103,24 +107,33 @@ class volunteer_api(Resource):
         args = parser.parse_args()
         student_id = get_arg(args['student_id'], '')
         legal_name = get_arg(args['legal_name'], '')
-        length = get_arg(args['length'], 20)
+        length = get_arg(args['length'], 200)
         page_index = get_arg(args['page'], 1) - 1
-        # length = int(request.args.get('length', ''))
-        volunteer_all = Volunteer.query.filter(Volunteer.student_id==student_id).filter(Volunteer.legal_name==legal_name).all()
-        volunteer_list = list(map(item_to_json, volunteer_all, [set(['blank2'])] * len(volunteer_all)))
-        print((length * page_index, length * (page_index + 1)))
-        return {'data': volunteer_list[length * page_index:length * (page_index + 1)]}
+        try:
+            the_volunteer = Volunteer.query.filter(Volunteer.student_id==student_id).filter(Volunteer.legal_name==legal_name).one()
+        except Exception as e:
+            return {'status': 1, 'data': {'info': {}, 'msg': '查无此人', 'records': []}}
+        volunteer_dict = item_to_dict(the_volunteer, set())
+        the_records = Record.query.filter(Record.user_id==the_volunteer.user_id).all()
+        record_list = list(map(item_to_dict, the_records, [set()] * len(the_records)))
+        for record_index in range(len(record_list)):
+            try:
+                project_name = Job.query.filter(Job.project_id==record_list[record_index]['project_id']).one().project_name
+                job_name = Job.query.filter(Job.job_id==record_list[record_index]['job_id']).one().job_name
+                operator_name = Volunteer.query.filter(Volunteer.user_id==record_list[record_index]['operator_id']).one().legal_name
+                record_list[record_index]['project_name'] = project_name
+                record_list[record_index]['job_name'] = job_name
+                record_list[record_index]['operator_name'] = operator_name
+            except Exception as e:
+                print(e)
+        # print((length * page_index, length * (page_index + 1)))
+        return {'status': 0, 'data': {'info': volunteer_dict, 'records': record_list[length * page_index:length * (page_index + 1)]}}
 
 class job_api(Resource):
     def get(self):
         parser = reqparse.RequestParser()
-        # parser.add_argument('length', type=int)
-        # parser.add_argument('page', type=int)
         parser.add_argument('project_name', type=str)
         args = parser.parse_args()
-        # length = get_arg(args['length'], 20)
-        # page_index = get_arg(args['page'], 1) - 1
-        # length = int(request.args.get('length', ''))
         print(args)
         job_all = Job.query.filter(Job.project_name==args['project_name']).all()
         job_list = list(map(lambda job_item: job_item.job_name, job_all))
@@ -129,13 +142,6 @@ class job_api(Resource):
 class project_api(Resource):
     def get(self):
         # print(request.args)
-        # parser = reqparse.RequestParser()
-        # parser.add_argument('length', type=int)
-        # parser.add_argument('page', type=int)
-        # args = parser.parse_args()
-        # length = get_arg(args['length'], 100)
-        # page_index = get_arg(args['page'], 1) - 1
-        # length = int(request.args.get('length', ''))
         project_all = Job.query.order_by(Job.project_name).all()
         distinct_list = list(set(map(lambda pro: pro.project_name, project_all)))
         print(distinct_list)
@@ -151,7 +157,7 @@ class record_api(Resource):
         page_index = get_arg(args['page'], 1) - 1
         # length = int(request.args.get('length', ''))
         record_all = Record.query.all()
-        record_list = list(map(item_to_json, record_all, [set(['blank1'])] * len(record_all)))
+        record_list = list(map(item_to_dict, record_all, [set()] * len(record_all)))
         return {'data': record_list[length * page_index:length * (page_index + 1)]}
     def post(self):
         parser = reqparse.RequestParser()
@@ -159,13 +165,6 @@ class record_api(Resource):
         raw_args = parser.parse_args()
         print(raw_args)
         args = json.loads(raw_args['data'])
-        # login_json = json.loads(args['secret'].replace('\'', '\"'))
-        # vol_list = Volunteer.query.filter(Volunteer.student_id==args['student_id']).filter(Volunteer.legal_name==args['legal_name']).all()
-        # job_list = Job.query.filter(Job.job_name==args['job_name']).filter(Job.project_name==args['project_name']).all()
-        # # print(Job.query.all()[0].job_name==args['job_name'])
-        # # print(Job.query.all()[0].project_name==args['project_name'])
-        # print(the_job)
-        # print(len(the_job))
         try:
             the_vol = Volunteer.query.filter(Volunteer.student_id==args['student_id']).filter(Volunteer.legal_name==args['legal_name']).one()
         except Exception as e:
@@ -174,10 +173,6 @@ class record_api(Resource):
             the_job = Job.query.filter(Job.project_name==args['project_name']).filter(Job.job_name==args['job_name']).one()
         except Exception as e:
             return {'status': 1, 'data': {'msg': '查无此项目'}}
-        # if len(vol_list) != 1:
-        #     return {'status': 1, 'data': {'msg': '查无此人'}}
-        # elif len(job_list) != 1:
-        #     return {'status': 1, 'data': {'msg': '查无此项目'}}
         new_rec = Record(the_vol.user_id, the_job.project_id, the_job.job_id, args['job_date'], args['working_time'], args['record_note'])
         new_rec.operator_id = the_vol.user_id
         # new_rec.operation_date = None
