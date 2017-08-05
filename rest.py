@@ -105,7 +105,7 @@ def item_to_dict(item, removed=set()):
         item_dict[key] = str(item_dict[key])
     return item_dict
 
-def query_items(table_object, valid_key_list, arg_dict, query_type, target_key_list=[]):
+def query_items(table_object, valid_key_list, arg_dict, target_key_list=[]):
     table_query = table_object.query
     logging.info(arg_dict)
     if not target_key_list:
@@ -113,29 +113,29 @@ def query_items(table_object, valid_key_list, arg_dict, query_type, target_key_l
     for (key, value) in arg_dict.items():
         if value and key in valid_key_list:
             table_query = table_query.filter(getattr(table_object, key)==value)
-    if query_type == 'one':
+    if arg_dict['query_type'] == 'one':
         return table_query.one()
-    if query_type == 'page':
-        return table_query.paginate(get_arg(['page'], 1), get_arg(['length'], 20), False).items
-    if query_type == 'all':
+    if arg_dict['query_type'] == 'page':
+        return table_query.paginate(get_arg(arg_dict['page'], 1), get_arg(arg_dict['length'], 200), False).items
+    if arg_dict['query_type'] == 'all':
         return table_query.all()
 
-def get_volunteers(arg_dict, query_type, target_key_list=[]):
+def get_volunteers(arg_dict, target_key_list=[]):
     volunteer_keys = ['user_id', 'volunteer_id', 'username', 'student_id', 'legal_name', 'phone', 'email', 'gender', 'age', 'volunteer_time', 'note']
     # logging.info(arg_dict)
     return query_items(Volunteer, volunteer_keys, arg_dict, query_type, target_key_list)
 
-def get_records(arg_dict, query_type, target_key_list=[]):
+def get_records(arg_dict, target_key_list=[]):
     record_keys = ['record_id', 'user_id', 'project_id', 'job_id', 'job_date', 'working_time', 'record_note', 'operator_id', 'operation_date', 'record_status']
     # logging.info(arg_dict)
     return query_items(Record, record_keys, arg_dict, query_type, target_key_list)
 
-def get_projects(arg_dict, query_type, target_key_list=[]):
+def get_projects(arg_dict, target_key_list=[]):
     record_keys = ['project_id', 'project_name', 'job_id', 'job_name', 'job_start', 'job_end', 'director', 'location', 'note']
     # logging.info(arg_dict)
     return query_items(Job, record_keys, arg_dict, query_type, target_key_list)
 
-def get_jobs(arg_dict, query_type, target_key_list=[]):
+def get_jobs(arg_dict, target_key_list=[]):
     record_keys = ['project_id', 'project_name', 'job_id', 'job_name', 'job_start', 'job_end', 'director', 'location', 'note']
     # logging.info(arg_dict)
     return query_items(Job, record_keys, arg_dict, query_type, target_key_list)
@@ -150,19 +150,19 @@ class volunteer_api(Resource):
         parser.add_argument('legal_name', type=str)
         args = parser.parse_args()
         try:
-            the_volunteer = get_volunteers(args, 'one')
+            the_volunteer = get_volunteers(arg)
         except Exception as e:
             logging.exception(e)
             return {'status': 1, 'data': {'info': {}, 'msg': '查无此人', 'records': []}}
         volunteer_dict = item_to_dict(the_volunteer, set())
-        the_records = get_records(args, 'all')
+        the_records = get_records(args)
         record_list = list(map(item_to_dict, the_records, [set()] * len(the_records)))
         for record_index in range(len(record_list)):
             logging.info(record_list[record_index])
             try:
-                project_name = get_jobs({'project_id': record_list[record_index]['project_id']}, 'one', ['project_id']).project_name
-                job_name = get_jobs({'job_id': record_list[record_index]['job_id']}, 'one', ['job_id']).job_name
-                operator_name = get_volunteers({'user_id': record_list[record_index]['operator_id']}, 'one', ['user_id']).legal_name
+                project_name = get_jobs({'project_id': record_list[record_index]['project_id']}, ['project_id']).project_name
+                job_name = get_jobs({'job_id': record_list[record_index]['job_id']}, ['job_id']).job_name
+                operator_name = get_volunteers({'user_id': record_list[record_index]['operator_id']}, ['user_id']).legal_name
                 record_list[record_index]['project_name'] = project_name
                 record_list[record_index]['job_name'] = job_name
                 record_list[record_index]['operator_name'] = operator_name
@@ -177,14 +177,18 @@ class job_api(Resource):
         parser.add_argument('project_name', type=str)
         args = parser.parse_args()
         logging.info(args)
-        job_all = get_jobs(args, 'all')
+        job_all = get_jobs(args)
         job_list = list(map(lambda job_item: job_item.job_name, job_all))
         return {'data': job_list}
 
 class project_api(Resource):
     def get(self):
         # logging.info(request.args)
-        project_all = get_projects({}, 'all')
+        parser = reqparse.RequestParser()
+        parser.add_argument('project_name', type=str)
+        parser.add_argument('job_name', type=str)
+        args = parser.parse_args()
+        project_all = get_projects(args)
         distinct_list = list(set(map(lambda pro: pro.project_name, project_all)))
         logging.info(distinct_list)
         return {'data': distinct_list}
@@ -194,16 +198,16 @@ class record_api(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('length', type=int)
         parser.add_argument('page', type=int)
+        parser.add_argument('project_name', type=str)
+        parser.add_argument('job_name', type=str)
         args = parser.parse_args()
-        length = get_arg(args['length'], 20)
-        page_index = get_arg(args['page'], 1)
         # # length = int(request.args.get('length', ''))
         # record_query = Record.query
         # record_all = record_query.paginate(page_index, length, False).items
         # logging.info(Record.query.paginate(page_index, length, False).items)
-        record_all = get_records(args, 'page')
+        record_all = get_records(args)
         record_list = list(map(item_to_dict, record_all, [set()] * len(record_all)))
-        return {'data': record_list}
+        return {'data': {'records': record_list}}
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('data', type=str)
@@ -211,11 +215,11 @@ class record_api(Resource):
         logging.info(raw_args)
         args = json.loads(raw_args['data'])
         try:
-            the_vol = get_volunteers(args, 'one', ['student_id', 'legal_name'])
+            the_vol = get_volunteers(args, ['student_id', 'legal_name'])
         except Exception as e:
             return {'status': 1, 'data': {'msg': '查无此人'}}
         try:
-            the_job = get_jobs(args, 'one')
+            the_job = get_jobs(args)
         except Exception as e:
             return {'status': 1, 'data': {'msg': '查无此项目'}}
         new_rec = Record(the_vol.user_id, the_job.project_id, the_job.job_id, args['job_date'], args['working_time'], args['record_note'])
