@@ -72,8 +72,6 @@ class Record(db.Model):
     def __repr__(self):
         return '<Record %r>' % self.record_id
 
-rec = Record
-
 class Volunteer(db.Model):
     '''vlounteer object'''
     __tablename__ = 'volunteers'
@@ -91,9 +89,6 @@ class Volunteer(db.Model):
     note = db.Column(db.String(50))
     def __repr__(self):
         return '<Volunteer %r>' % self.legal_name
-
-vol = Volunteer
-vol_all = vol.query.all()
 
 def get_arg(current, default):
     if current:
