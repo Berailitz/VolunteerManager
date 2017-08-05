@@ -110,9 +110,11 @@ def item_to_dict(item, removed=set()):
         item_dict[key] = str(item_dict[key])
     return item_dict
 
-def query_items(table_object, valid_key_list, arg_dict, query_type):
+def query_items(table_object, valid_key_list, arg_dict, query_type, target_key_list=[]):
     table_query = table_object.query
     logging.info(arg_dict)
+    if not target_key_list:
+        target_key_list = arg_dict.keys()
     for (key, value) in arg_dict.items():
         if value and key in valid_key_list:
             table_query = table_query.filter(getattr(table_object, key)==value)
@@ -123,25 +125,25 @@ def query_items(table_object, valid_key_list, arg_dict, query_type):
     if query_type == 'all':
         return table_query.all()
 
-def get_volunteers(arg_dict, query_type):
+def get_volunteers(arg_dict, query_type, target_key_list=[]):
     volunteer_keys = ['user_id', 'volunteer_id', 'username', 'student_id', 'legal_name', 'phone', 'email', 'gender', 'age', 'volunteer_time', 'note']
     # logging.info(arg_dict)
-    return query_items(Volunteer, volunteer_keys, arg_dict, query_type)
+    return query_items(Volunteer, volunteer_keys, arg_dict, query_type, target_key_list)
 
-def get_records(arg_dict, query_type):
+def get_records(arg_dict, query_type, target_key_list=[]):
     record_keys = ['record_id', 'user_id', 'project_id', 'job_id', 'job_date', 'working_time', 'record_note', 'operator_id', 'operation_date', 'record_status']
     # logging.info(arg_dict)
-    return query_items(Record, record_keys, arg_dict, query_type)
+    return query_items(Record, record_keys, arg_dict, query_type, target_key_list)
 
-def get_projects(arg_dict, query_type):
+def get_projects(arg_dict, query_type, target_key_list=[]):
     record_keys = ['project_id', 'project_name', 'job_id', 'job_name', 'job_start', 'job_end', 'director', 'location', 'note']
     # logging.info(arg_dict)
-    return query_items(Job, record_keys, arg_dict, query_type)
+    return query_items(Job, record_keys, arg_dict, query_type, target_key_list)
 
-def get_jobs(arg_dict, query_type):
+def get_jobs(arg_dict, query_type, target_key_list=[]):
     record_keys = ['project_id', 'project_name', 'job_id', 'job_name', 'job_start', 'job_end', 'director', 'location', 'note']
     # logging.info(arg_dict)
-    return query_items(Job, record_keys, arg_dict, query_type)
+    return query_items(Job, record_keys, arg_dict, query_type, target_key_list)
 
 class volunteer_api(Resource):
     def get(self):
@@ -163,9 +165,9 @@ class volunteer_api(Resource):
         for record_index in range(len(record_list)):
             logging.info(record_list[record_index])
             try:
-                project_name = get_jobs({'project_id': record_list[record_index]['project_id']}, 'one').project_name
-                job_name = get_jobs({'job_id': record_list[record_index]['job_id']}, 'one').job_name
-                operator_name = get_volunteers({'user_id': record_list[record_index]['operator_id']}, 'one').legal_name
+                project_name = get_jobs({'project_id': record_list[record_index]['project_id']}, 'one', ['project_id']).project_name
+                job_name = get_jobs({'job_id': record_list[record_index]['job_id']}, 'one', ['job_id']).job_name
+                operator_name = get_volunteers({'user_id': record_list[record_index]['operator_id']}, 'one', ['user_id']).legal_name
                 record_list[record_index]['project_name'] = project_name
                 record_list[record_index]['job_name'] = job_name
                 record_list[record_index]['operator_name'] = operator_name
@@ -214,7 +216,7 @@ class record_api(Resource):
         logging.info(raw_args)
         args = json.loads(raw_args['data'])
         try:
-            the_vol = get_volunteers(args, 'one')
+            the_vol = get_volunteers(args, 'one', ['student_id', 'legal_name'])
         except Exception as e:
             return {'status': 1, 'data': {'msg': '查无此人'}}
         try:
