@@ -7,12 +7,11 @@ from flask_restful import Resource, Api, reqparse
 from flask_sqlalchemy import SQLAlchemy
 import json
 import logging
-from flask.ext.sqlalchemy import orm
+from flask_sqlalchemy import orm
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://xh:xh@localhost/xh?charset=utf8'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-app.config['DEBUG']=True
 app.config.update(RESTFUL_JSON=dict(ensure_ascii=False))
 db = SQLAlchemy(app)
 api = Api(app)
@@ -91,6 +90,19 @@ class Volunteer(db.Model):
     def __repr__(self):
         return '<Volunteer %r>' % self.legal_name
 
+def parse_all_args(parser):
+    parser.add_argument('job_id', type=int)
+    parser.add_argument('legal_name', type=str)
+    parser.add_argument('length', type=int)
+    parser.add_argument('page', type=int)
+    parser.add_argument('project_id', type=int)
+    parser.add_argument('project_name', type=str)
+    parser.add_argument('query_type', type=str)
+    parser.add_argument('student_id', type=str)
+    parser.add_argument('query_type', type=str)
+    parser.add_argument('user_id', type=int)
+    return parser.parse_args()
+
 def get_arg(current, default):
     if current:
         return current
@@ -139,10 +151,10 @@ def get_records(arg_dict, target_key_list=[]):
     # logging.info(arg_dict)
     return query_items(Record, record_keys, arg_dict, target_key_list)
 
-def get_projects(arg_dict, target_key_list=[]):
-    project_keys = ['project_id', 'project_name', 'job_id', 'job_name', 'job_start', 'job_end', 'director', 'location', 'note']
-    # logging.info(arg_dict)
-    return query_items(Job, project_keys, arg_dict, target_key_list)
+# def get_projects(arg_dict, target_key_list=[]):
+#     project_keys = ['project_id', 'project_name', 'job_id', 'job_name', 'job_start', 'job_end', 'director', 'location', 'note']
+#     # logging.info(arg_dict)
+#     return query_items(Job, project_keys, arg_dict, target_key_list)
 
 def get_jobs(arg_dict, target_key_list=[]):
     job_keys = ['project_id', 'project_name', 'job_id', 'job_name', 'job_start', 'job_end', 'director', 'location', 'note']
@@ -158,13 +170,7 @@ def check_NoResultFound(args, e):
 
 class volunteer_api(Resource):
     def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('length', type=int)
-        parser.add_argument('page', type=int)
-        parser.add_argument('student_id', type=str)
-        parser.add_argument('legal_name', type=str)
-        parser.add_argument('query_type', type=str)
-        args = parser.parse_args()
+        args = parse_all_args(reqparse.RequestParser())
         try:
             the_volunteer = get_volunteers(args)
         except Exception as e:
@@ -177,13 +183,7 @@ class volunteer_api(Resource):
 
 class job_api(Resource):
     def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('project_name', type=str)
-        parser.add_argument('job_id', type=str)
-        parser.add_argument('project_id', type=str)
-        parser.add_argument('query_type', type=str)
-        args = parser.parse_args()
-        logging.info(args)
+        args = parse_all_args(reqparse.RequestParser())
         try:
             job_all = get_jobs(args)
         except Exception as e:
@@ -192,36 +192,21 @@ class job_api(Resource):
         job_list = list(map(lambda job_item: job_item.job_name, job_all))
         return {'data': job_list}
 
-class project_api(Resource):
-    def get(self):
-        parser = reqparse.RequestParser()
-        # parser.add_argument('project_name', type=str)
-        # parser.add_argument('job_name', type=str)
-        parser.add_argument('job_id', type=int)
-        parser.add_argument('project_id', type=int)
-        parser.add_argument('query_type', type=str)
-        args = parser.parse_args()
-        try:
-            project_all = get_projects(args)
-        except Exception as e:
-            if not check_NoResultFound(args, e):
-                logging.exception(e)
-        distinct_list = list(set(map(lambda pro: pro.project_name, project_all)))
-        logging.info(distinct_list)
-        return {'data': distinct_list}
+# class project_api(Resource):
+#     def get(self):
+#         args = parse_all_args(reqparse.RequestParser())
+#         try:
+#             project_all = get_projects(args)
+#         except Exception as e:
+#             if not check_NoResultFound(args, e):
+#                 logging.exception(e)
+#         distinct_list = list(set(map(lambda pro: pro.project_name, project_all)))
+#         logging.info(distinct_list)
+#         return {'data': distinct_list}
 
 class record_api(Resource):
     def get(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('length', type=int)
-        parser.add_argument('page', type=int)
-        parser.add_argument('student_id', type=str)
-        parser.add_argument('project_id', type=int)
-        parser.add_argument('legal_name', type=str)
-        parser.add_argument('job_id', type=int)
-        parser.add_argument('user_id', type=int)
-        parser.add_argument('query_type', type=str)
-        args = parser.parse_args()
+        args = parse_all_args(reqparse.RequestParser())
         record_all = get_records(args)
         if not type(record_all) == list:
             record_all = [record_all]
@@ -276,7 +261,7 @@ class relationship_api(Resource):
 
 api.add_resource(volunteer_api, '/volunteers')
 api.add_resource(job_api, '/jobs')
-api.add_resource(project_api, '/projects')
+# api.add_resource(project_api, '/projects')
 api.add_resource(record_api, '/records')
 api.add_resource(relationship_api, '/relationship')
 
