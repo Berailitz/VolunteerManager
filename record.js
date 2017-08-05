@@ -118,7 +118,7 @@ function getTestRecordline() {
 }
 
 function iniConf() {
-  $.getJSON('https://own.ohhere.xyz/projects', {}, function (raw_response) {
+  $.getJSON('https://own.ohhere.xyz/projects', {'query_type': 'all'}, function (raw_response) {
     // console.log(raw_response);
     projectNameList = projectNameList.concat(raw_response['data'])
     iniJobNameList();
@@ -128,7 +128,8 @@ function iniConf() {
 function iniJobNameList() {
   $.each(projectNameList, function (nameIndex, nameText) {
     $.getJSON("https://own.ohhere.xyz/jobs", {
-        'project_name': nameText
+        'project_name': nameText,
+        'query_type': 'all',
       }, function (raw_data) {
         // console.log(raw_data['data']);
         allJobNameList[nameText] = raw_data['data'];
@@ -140,7 +141,8 @@ function iniJobNameList() {
 function loadOnlineData(page, length) {
   $.getJSON("https://own.ohhere.xyz/records",{
     'page': page,
-    'length': length
+    'length': length,
+    'query_type': 'page',
   }, function(rawResponse) {
       // console.log(rawResponse);
       tableLines.splice(0, tableLines.length);

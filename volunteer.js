@@ -37,10 +37,11 @@ function search() {
   $.getJSON("https://own.ohhere.xyz/volunteers", {
     'student_id': student_id,
     'legal_name': legal_name,
+    'query_type': 'all',
   }, function (rawResponse) {
     console.log(rawResponse['data']);
     tableLines.splice(0, tableLines.length);
-    if (rawResponse['data'].length == 0) {
+    if (rawResponse['status'] == 1) {
       tableLines = [[]];
       $('#student-id-box')[0].focus();
       showToast('ERROR: 查无此人');
@@ -58,12 +59,14 @@ function search() {
     htmlTable.loadData(tableLines);
     htmlTable.render();
   });
+  showToast('查询中', 800);
 }
 
 function loadData(page, length) {
   $.getJSON("https://own.ohhere.xyz/volunteers", {
     'page': page,
-    'length': length
+    'length': length,
+    'query_type': 'page'
   }, function (rawResponse) {
     console.log(rawResponse);
     tableLines.splice(0, tableLines.length);
@@ -85,12 +88,16 @@ function resetTable() {
     $('#' + infoName.replace('_', '-') + '-box').parent().removeClass('is-dirty');
     $('#' + infoName.replace('_', '-') + '-box')[0].value = '';
   })
+  $('#student-id-box')[0].value = '';
+  $('#legal-name-box')[0].value = '';
+  $('#student-id-box')[0].focus();
 }
 
-function showToast(messageText) {
+function showToast(messageText, timeout=2000) {
   $('#snackbar')[0].MaterialSnackbar.showSnackbar(
     {
-      message: messageText,
+      'message': messageText,
+      'timeout': timeout,
     }
   );
 }
