@@ -7,6 +7,7 @@ from flask_restful import Resource, Api, reqparse
 from flask_sqlalchemy import SQLAlchemy
 import json
 import logging
+from flask.ext.sqlalchemy import orm
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://xh:xh@localhost/xh?charset=utf8'
@@ -148,6 +149,13 @@ def get_jobs(arg_dict, target_key_list=[]):
     # logging.info(arg_dict)
     return query_items(Job, job_keys, arg_dict, target_key_list)
 
+def check_NoResultFound(args, e):
+    if args['query_type'] == 'one' and isinstance(e, orm.exc.NoResultFound):
+        logging.info(str(e) + ' @ ' + str(args))
+        return True
+    else:
+        return False
+
 class volunteer_api(Resource):
     def get(self):
         parser = reqparse.RequestParser()
@@ -160,7 +168,8 @@ class volunteer_api(Resource):
         try:
             the_volunteer = get_volunteers(args)
         except Exception as e:
-            logging.exception(e)
+            if not check_NoResultFound(args, e):
+                logging.exception(e)
             return {'status': 1, 'data': {'info': {}, 'msg': '查无此人', 'records': []}}
         volunteer_dict = item_to_dict(the_volunteer, set())
         # logging.info((length * page_index, length * (page_index + 1)))
@@ -175,7 +184,11 @@ class job_api(Resource):
         parser.add_argument('query_type', type=str)
         args = parser.parse_args()
         logging.info(args)
-        job_all = get_jobs(args)
+        try:
+            job_all = get_jobs(args)
+        except Exception as e:
+            if not check_NoResultFound(args, e):
+                logging.exception(e)
         job_list = list(map(lambda job_item: job_item.job_name, job_all))
         return {'data': job_list}
 
@@ -188,7 +201,11 @@ class project_api(Resource):
         parser.add_argument('project_id', type=int)
         parser.add_argument('query_type', type=str)
         args = parser.parse_args()
-        project_all = get_projects(args)
+        try:
+            project_all = get_projects(args)
+        except Exception as e:
+            if not check_NoResultFound(args, e):
+                logging.exception(e)
         distinct_list = list(set(map(lambda pro: pro.project_name, project_all)))
         logging.info(distinct_list)
         return {'data': distinct_list}
@@ -198,10 +215,11 @@ class record_api(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('length', type=int)
         parser.add_argument('page', type=int)
+        parser.add_argument('student_id', type=str)
         parser.add_argument('project_id', type=int)
-        # parser.add_argument('project_name', type=str)
+        parser.add_argument('legal_name', type=str)
         parser.add_argument('job_id', type=int)
-        # parser.add_argument('job_name', type=str)
+        parser.add_argument('user_id', type=int)
         parser.add_argument('query_type', type=str)
         args = parser.parse_args()
         record_all = get_records(args)
