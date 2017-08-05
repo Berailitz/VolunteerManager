@@ -106,12 +106,18 @@ def item_to_dict(item, removed=set()):
     return item_dict
 
 def query_items(table_object, valid_key_list, arg_dict, target_key_list=[]):
+    logging.info(valid_key_list)
     table_query = table_object.query
     logging.info(arg_dict)
     if not target_key_list:
         target_key_list = arg_dict.keys()
+    if not 'query_type' in arg_dict.keys():
+        arg_dict['query_type'] = 'all'
     for (key, value) in arg_dict.items():
         if value and key in valid_key_list:
+            logging.info(key)
+            logging.info(value)
+            logging.info(table_query.all())
             table_query = table_query.filter(getattr(table_object, key)==value)
     if arg_dict['query_type'] == 'one':
         return table_query.one()
@@ -119,26 +125,28 @@ def query_items(table_object, valid_key_list, arg_dict, target_key_list=[]):
         return table_query.paginate(get_arg(arg_dict['page'], 1), get_arg(arg_dict['length'], 200), False).items
     if arg_dict['query_type'] == 'all':
         return table_query.all()
+    if arg_dict['query_type'] == 'first':
+        return table_query.first()
 
 def get_volunteers(arg_dict, target_key_list=[]):
     volunteer_keys = ['user_id', 'volunteer_id', 'username', 'student_id', 'legal_name', 'phone', 'email', 'gender', 'age', 'volunteer_time', 'note']
     # logging.info(arg_dict)
-    return query_items(Volunteer, volunteer_keys, arg_dict, query_type, target_key_list)
+    return query_items(Volunteer, volunteer_keys, arg_dict, target_key_list)
 
 def get_records(arg_dict, target_key_list=[]):
     record_keys = ['record_id', 'user_id', 'project_id', 'job_id', 'job_date', 'working_time', 'record_note', 'operator_id', 'operation_date', 'record_status']
     # logging.info(arg_dict)
-    return query_items(Record, record_keys, arg_dict, query_type, target_key_list)
+    return query_items(Record, record_keys, arg_dict, target_key_list)
 
 def get_projects(arg_dict, target_key_list=[]):
-    record_keys = ['project_id', 'project_name', 'job_id', 'job_name', 'job_start', 'job_end', 'director', 'location', 'note']
+    project_keys = ['project_id', 'project_name', 'job_id', 'job_name', 'job_start', 'job_end', 'director', 'location', 'note']
     # logging.info(arg_dict)
-    return query_items(Job, record_keys, arg_dict, query_type, target_key_list)
+    return query_items(Job, project_keys, arg_dict, target_key_list)
 
 def get_jobs(arg_dict, target_key_list=[]):
-    record_keys = ['project_id', 'project_name', 'job_id', 'job_name', 'job_start', 'job_end', 'director', 'location', 'note']
+    job_keys = ['project_id', 'project_name', 'job_id', 'job_name', 'job_start', 'job_end', 'director', 'location', 'note']
     # logging.info(arg_dict)
-    return query_items(Job, record_keys, arg_dict, query_type, target_key_list)
+    return query_items(Job, job_keys, arg_dict, target_key_list)
 
 class volunteer_api(Resource):
     def get(self):
@@ -148,6 +156,7 @@ class volunteer_api(Resource):
         parser.add_argument('page', type=int)
         parser.add_argument('student_id', type=str)
         parser.add_argument('legal_name', type=str)
+        parser.add_argument('query_type', type=str)
         args = parser.parse_args()
         try:
             the_volunteer = get_volunteers(arg)
@@ -175,6 +184,9 @@ class job_api(Resource):
     def get(self):
         parser = reqparse.RequestParser()
         parser.add_argument('project_name', type=str)
+        parser.add_argument('job_id', type=str)
+        parser.add_argument('project_id', type=str)
+        parser.add_argument('query_type', type=str)
         args = parser.parse_args()
         logging.info(args)
         job_all = get_jobs(args)
@@ -187,6 +199,7 @@ class project_api(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('project_name', type=str)
         parser.add_argument('job_name', type=str)
+        parser.add_argument('query_type', type=str)
         args = parser.parse_args()
         project_all = get_projects(args)
         distinct_list = list(set(map(lambda pro: pro.project_name, project_all)))
@@ -200,6 +213,7 @@ class record_api(Resource):
         parser.add_argument('page', type=int)
         parser.add_argument('project_name', type=str)
         parser.add_argument('job_name', type=str)
+        parser.add_argument('query_type', type=str)
         args = parser.parse_args()
         # # length = int(request.args.get('length', ''))
         # record_query = Record.query
@@ -207,6 +221,7 @@ class record_api(Resource):
         # logging.info(Record.query.paginate(page_index, length, False).items)
         record_all = get_records(args)
         record_list = list(map(item_to_dict, record_all, [set()] * len(record_all)))
+        logging.info(record_list)
         return {'data': {'records': record_list}}
     def post(self):
         parser = reqparse.RequestParser()
@@ -230,10 +245,27 @@ class record_api(Resource):
         db.session.commit()
         return {'status': 0, 'data': {'msg': '已录入'}}
 
+class relationship_api(Resource):
+    def get(self):
+        project_id_dict = dict()
+        project_name_dict = dict()
+        distinct_projects = dict(set(map(lambda pro: (pro.project_id, pro.project_name), get_projects({'query_type': 'all'}))))
+        for single_project_id in distinct_projects.keys():
+            distinct_jobs = dict(set(map(lambda job: (job.job_id, job.job_name),
+                get_jobs({'project_name': distinct_projects[single_project_id], 'query_type': 'all'}))))
+            project_id_dict[single_project_id] = {
+                'project_name': distinct_projects[single_project_id],
+                'job_id_dict': dict((single_job_id, distinct_jobs[single_job_id]) for single_job_id in distinct_jobs.keys()),
+                'job_name_dict': dict((distinct_jobs[single_job_id], single_job_id) for single_job_id in distinct_jobs.keys())
+            }
+            project_name_dict[distinct_projects[single_project_id]] = single_project_id
+        return {'status': 0, 'data': {'project_id_dict': project_id_dict, 'project_name_dict': project_name_dict}}
+
 api.add_resource(volunteer_api, '/volunteers')
 api.add_resource(job_api, '/jobs')
 api.add_resource(project_api, '/projects')
 api.add_resource(record_api, '/records')
+api.add_resource(relationship_api, '/relationship')
 
 if __name__ == '__main__':
     setLogging('log.txt')
