@@ -77,6 +77,19 @@ class Manager(object):
             logging.info("[Failed]Login in" + response.json()['msg'])
         return True
 
+    @staticmethod
+    def translate_json(raw_list):
+        '''remove quotation mark'''
+        new_list = list()
+        for line in raw_list:
+            line[0] = int(line[0])
+            line[1] = str2int(line[1])
+            line[5] = str2int(line[5])
+            line[8] = str2int(line[8])
+            line[9] = float(line[9])
+            new_list.append(line)
+        return new_list
+
     def scan(self, interval=0.5, is_random=1):
         '''scan for all volunteers'''
         volunteer_list = list()
@@ -95,7 +108,7 @@ class Manager(object):
             else:
                 time.sleep(interval)
         with open("volunteer_list.json", 'w', encoding='utf8') as json_file:
-            json.dump(volunteer_list, json_file, ensure_ascii=False)
+            json.dump(self.translate_json(volunteer_list), json_file, ensure_ascii=False)
         logging.info("[Success]Scanning completed.")
         return volunteer_list
 
@@ -116,7 +129,7 @@ class Manager(object):
                 member_info.append('')
                 member_info.append(str(member_item.select("td")[2].contents[-1]))
             else:
-                member_info.append(str(member_item.select("td")[-1].contents[0]))
+                member_info.append(str(member_item.select("td")[2].contents[0]))
                 member_info.append('')
             member_info.append(member_item.select("td")[3].text)
             # print(len(member_item.select("td")[4].contents))
