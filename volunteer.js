@@ -1,5 +1,11 @@
 'use strict;'
 
+const getRelationship = new Promise((resolve, reject) => {
+  $.getJSON('https://own.ohhere.xyz/relationship', {}, raw_response => {
+    relationshipDict = raw_response['data'];
+    resolve();
+  });
+});
 let COLUMN_NAMES = ['记录ID', '志愿项目', '工作项目', '工作日期', '时长', '记录备注', '录入人', '录入时间'];
 let tableLines = [];
 let container = $('#volunteer-table')[0];
@@ -24,12 +30,24 @@ let htmlTable = new Handsontable(container, {
   readOnly: true,
   rowHeaders: true,
   sortIndicator: true,
-  stretchH: 'all',
+  stretchH: 'all'
 });
+let relationshipDict = {};
+const project_id_to_name = project_id => relationshipDict['project_id_dict'][String(project_id)]['project_name'];
+const project_name_to_id = project_name => relationshipDict['project_name_dict'][project_name];
+const job_id_to_name = (project_id, job_id) => relationshipDict['project_id_dict'][String(project_id)]['job_id_dict'][String(job_id)];
+const job_name_to_id = (project_id, job_name) => relationshipDict['project_id_dict'][String(project_id)]['job_name_dict'][job_name];
+
+function decodeLine(rawLine) {
+  rawLine['project_name'] = project_id_to_name(rawLine['project_id']);
+  rawLine['job_name'] = job_id_to_name(rawLine['project_id'], rawLine['job_id']);
+  return rawLine;
+}
 
 function search() {
   let student_id = $('#student-id-box')[0].value;
   let legal_name = $('#legal-name-box')[0].value;
+  resetTable();
   if (student_id && !$.isNumeric(student_id)) {
     showToast('ERROR: 学号不为整数');
     return;
@@ -37,7 +55,7 @@ function search() {
   $.getJSON("https://own.ohhere.xyz/volunteers", {
     'student_id': student_id,
     'legal_name': legal_name,
-    'query_type': 'all',
+    'query_type': 'one',
   }, function (rawResponse) {
     console.log(rawResponse['data']);
     tableLines.splice(0, tableLines.length);
@@ -50,9 +68,15 @@ function search() {
         $('#' + infoName.replace('_', '-') + '-box').parent().addClass('is-dirty');
         $('#' + infoName.replace('_', '-') + '-box')[0].value = rawResponse['data']['info'][infoName];
       });
-      $.each(rawResponse['data']['records'], function (line_index, raw_line) {
-        tableLines[line_index] = raw_line;
-        // console.log(tableLines[line_index]);
+      $.getJSON('https://own.ohhere.xyz/records', {
+        'student_id': student_id,
+        'legal_name': legal_name,
+        'query_type': 'all'
+      }, function (rawResponse) {
+        $.each(rawResponse['data']['records'], function (line_index, raw_line) {
+          tableLines[line_index] = decodeLine(raw_line);
+          // console.log(tableLines[line_index]);
+        });
       });
       htmlTable.selectCell(0, 0);
     }
@@ -88,8 +112,8 @@ function resetTable() {
     $('#' + infoName.replace('_', '-') + '-box').parent().removeClass('is-dirty');
     $('#' + infoName.replace('_', '-') + '-box')[0].value = '';
   })
-  $('#student-id-box')[0].value = '';
-  $('#legal-name-box')[0].value = '';
+  // $('#student-id-box')[0].value = '';
+  // $('#legal-name-box')[0].value = '';
   $('#student-id-box')[0].focus();
 }
 

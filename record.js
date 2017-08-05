@@ -1,10 +1,19 @@
 'use strict;'
 
+const getRelationship = new Promise((resolve, reject) => {
+  $.getJSON('https://own.ohhere.xyz/relationship', {}, raw_response => {
+    relationshipDict = raw_response['data'];
+    resolve();
+  });
+});
+const project_id_to_name = project_id => relationshipDict['project_id_dict'][String(project_id)]['project_name'];
+const project_name_to_id = project_name => relationshipDict['project_name_dict'][project_name];
+const job_id_to_name = (project_id, job_id) => relationshipDict['project_id_dict'][String(project_id)]['job_id_dict'][String(job_id)];
+const job_name_to_id = (project_id, job_name) => relationshipDict['project_id_dict'][String(project_id)]['job_name_dict'][job_name];
 let allJobNameList = {'': []};
 const COLUMN_NAMES = ['学号', '姓名', '时长', '志愿项目', '工作项目', '活动日期', '备注', '录入状态'];
 let container = $('#record-table')[0];
-let jobNameList = [];
-let projectNameList = [];
+let relationshipDict = {};
 let tableLines = Array();
 let htmlTable = new Handsontable(container, {
   colHeaders: COLUMN_NAMES,
@@ -23,7 +32,7 @@ let htmlTable = new Handsontable(container, {
       data: 'project_name',
       type: 'dropdown',
       source: function (query, process) {
-        process(projectNameList);
+        process(relationshipDict['project_name_dict']);
       },
     },
     {
@@ -70,7 +79,7 @@ let htmlTable = new Handsontable(container, {
     if (left == right && up == down && right == 4) {
       let currentProjectName = tableLines[up]['project_name'];
       // console.log(allJobNameList[currentProjectName]);
-      jobNameList = allJobNameList[currentProjectName];
+      jobNameList = relationshipDict['project_id_dict'][String(project_name_to_id(currentProjectName))]['job_name_dict'];
       // console.log(jobNameList);
     }
   },
@@ -108,34 +117,32 @@ function checkEmpty(LineData) {
   return isLineEmpty;
 }
 
+function checkFull(LineData) {
+  let isLineFull = true;
+  let exception_index = 'record_status' in LineData ? 'record_status' : 7;
+  $.each(LineData, function (index, value) {
+    // console.log(index, value);
+    if (!value && index != exception_index) {
+      isLineFull = false;
+    }
+  });
+  // console.log('isLineEmpty: ' + isLineEmpty)
+  return isLineFull;
+}
+
 function deleteRow(rowCount = 1, afterIndex = htmlTable.countRows() - 1) {
   tableLines.splice(afterIndex, rowCount);
   htmlTable.loadData(tableLines);
 }
 
+function encodeLine(rawLine) {
+  rawLine['project_id'] = project_name_to_id(rawLine['project_name']);
+  rawLine['job_id'] = job_name_to_id(rawLine['project_id'], rawLine['job_name']);
+  return rawLine;
+}
+
 function getTestRecordline() {
   return new RecordLine('2012110649', "徐盈盈", 1, "a", "a", "2017-08-16", "aa", "");
-}
-
-function iniConf() {
-  $.getJSON('https://own.ohhere.xyz/projects', {'query_type': 'all'}, function (raw_response) {
-    // console.log(raw_response);
-    projectNameList = projectNameList.concat(raw_response['data'])
-    iniJobNameList();
-  });
-}
-
-function iniJobNameList() {
-  $.each(projectNameList, function (nameIndex, nameText) {
-    $.getJSON("https://own.ohhere.xyz/jobs", {
-        'project_name': nameText,
-        'query_type': 'all',
-      }, function (raw_data) {
-        // console.log(raw_data['data']);
-        allJobNameList[nameText] = raw_data['data'];
-        htmlTable.loadData(tableLines);
-      });
-  });
 }
 
 function loadOnlineData(page, length) {
@@ -167,18 +174,33 @@ function resetTable() {
   resetCurcor()
 }
 
+function showToast(messageText, timeout=2000) {
+  $('#snackbar')[0].MaterialSnackbar.showSnackbar(
+    {
+      'message': messageText,
+      'timeout': timeout,
+    }
+  );
+}
+
 function submitAll() {
+  showToast('正在录入', 700);
   $.each(tableLines, function (LineIndex, LineData) {
     // console.log(LineData['record_status'] == '未录入' && !checkEmpty(LineData));
     if (LineData['record_status'] != '已录入' && !checkEmpty(LineData)) {
-      LineData['record_status'] = '正在录入';
-      htmlTable.loadData(tableLines);
-      $.post("https://own.ohhere.xyz/records", {
-        'data': JSON.stringify(LineData)
-      }, function (SubmitResponse, TextStatus, jqXHR) {
-        // console.log(SubmitResponse['data']);
-        LineData['record_status'] = SubmitResponse['data']['msg'];
-      });
+      if (!checkFull(LineData)) {
+        showToast(`ERROR: 第 ${LineIndex + 1} 行未填完`, 800);
+        LineData['record_status'] = '需补充信息';
+      } else {
+        LineData['record_status'] = '正在录入';
+        htmlTable.loadData(tableLines);
+        $.post("https://own.ohhere.xyz/records", {
+          'data': JSON.stringify(encodeLine(LineData))
+        }, function (SubmitResponse, TextStatus, jqXHR) {
+          // console.log(SubmitResponse['data']);
+          LineData['record_status'] = SubmitResponse['data']['msg'];
+        });
+      };
     };
   });
   htmlTable.loadData(tableLines);
@@ -189,7 +211,6 @@ function tranferToItem(lineList) {
   return new RecordLine(...lineList);
 }
 
-iniConf();
 appendRow(1);
 tableLines[0] = getTestRecordline();
 resetCurcor()
