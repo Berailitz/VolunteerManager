@@ -5,7 +5,7 @@ import datetime
 from flask import Flask
 from flask_restful import Resource, Api, reqparse
 from flask_sqlalchemy import SQLAlchemy, orm
-from flask.ext.bcrypt import Bcrypt
+from flask_bcrypt import Bcrypt
 import functools
 import hashlib
 import json
