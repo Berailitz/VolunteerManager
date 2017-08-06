@@ -212,7 +212,8 @@ def check_password(username, password):
     try:
         admin = get_tokens({'username': username, 'query_type': 'one'}, ['username'])
         logging.info('username: %r, password: %r.', username, password)
-        return bcrypt.check_password_hash(admin.password, password)
+        if bcrypt.check_password_hash(admin.password, password):
+            return admin
     except Exception as e:
         if not check_NoResultFound(e, {'username': username, 'query_type': 'one'}):
             logging.exception(e)
