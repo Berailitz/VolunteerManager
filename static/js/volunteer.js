@@ -1,7 +1,7 @@
 'use strict;'
 
 const getRelationship = new Promise((resolve, reject) => {
-  $.getJSON('https://own.ohhere.xyz/relationship', {}, raw_response => {
+  $.getJSON('https://own.ohhere.xyz/api/relationship', {}, raw_response => {
     relationshipDict = raw_response['data'];
     resolve();
   });
@@ -50,9 +50,10 @@ function search() {
   resetTable();
   if (student_id && !$.isNumeric(student_id)) {
     showToast('ERROR: 学号不为整数');
+    $('#student-id-box')[0].focus();
     return;
   }
-  $.getJSON("https://own.ohhere.xyz/volunteers", {
+  $.getJSON("https://own.ohhere.xyz/api/volunteers", {
     'student_id': student_id,
     'legal_name': legal_name,
     'query_type': 'one',
@@ -62,32 +63,36 @@ function search() {
     if (rawResponse['status'] == 1) {
       tableLines = [[]];
       $('#student-id-box')[0].focus();
-      showToast('ERROR: 查无此人');
+      showToast('ERROR: 查无此人', 800);
     } else {
       $.each(infoList, function (infoIndex, infoName) {
         $('#' + infoName.replace('_', '-') + '-box').parent().addClass('is-dirty');
         $('#' + infoName.replace('_', '-') + '-box')[0].value = rawResponse['data']['info'][infoName];
       });
-      $.getJSON('https://own.ohhere.xyz/records', {
-        'student_id': student_id,
-        'legal_name': legal_name,
+      $.getJSON('https://own.ohhere.xyz/api/records', {
+        'user_id': rawResponse['data']['info']['user_id'],
         'query_type': 'all'
       }, function (rawResponse) {
+        console.log(rawResponse['data']['records']);
+        if (rawResponse['data']['records'].length == 0) {
+          showToast('ERROR: 查无记录', 800);
+          $('#student-id-box')[0].focus();
+          return;
+        }
         $.each(rawResponse['data']['records'], function (line_index, raw_line) {
           tableLines[line_index] = decodeLine(raw_line);
           // console.log(tableLines[line_index]);
         });
       });
+      htmlTable.render();
       htmlTable.selectCell(0, 0);
     }
-    htmlTable.loadData(tableLines);
-    htmlTable.render();
   });
   showToast('查询中', 800);
 }
 
 function loadData(page, length) {
-  $.getJSON("https://own.ohhere.xyz/volunteers", {
+  $.getJSON("https://own.ohhere.xyz/api/volunteers", {
     'page': page,
     'length': length,
     'query_type': 'page'
@@ -114,7 +119,6 @@ function resetTable() {
   })
   // $('#student-id-box')[0].value = '';
   // $('#legal-name-box')[0].value = '';
-  $('#student-id-box')[0].focus();
 }
 
 function showToast(messageText, timeout=2000) {

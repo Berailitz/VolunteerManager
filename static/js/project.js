@@ -1,7 +1,7 @@
 'use strict;'
 
 const getRelationship = new Promise((resolve, reject) => {
-  $.getJSON('https://own.ohhere.xyz/relationship', {}, raw_response => {
+  $.getJSON('https://own.ohhere.xyz/api/relationship', {}, raw_response => {
     relationshipDict = raw_response['data'];
     resolve();
   });
@@ -79,7 +79,7 @@ function search() {
   if (job_name != '所有岗位') {
       payload['job_id'] = job_name_to_id(payload['project_id'], job_name);
   }
-  $.getJSON("https://own.ohhere.xyz/records", payload, function (rawResponse) {
+  $.getJSON("https://own.ohhere.xyz/api/records", payload, function (rawResponse) {
     let count = rawResponse['data']['records'].length;
     tableLines.splice(0, count);
     // $.each(infoList, function (infoIndex, infoName) {
@@ -102,7 +102,7 @@ function search() {
 }
 
 function loadData(page, length) {
-  $.getJSON("https://own.ohhere.xyz/volunteers", {
+  $.getJSON("https://own.ohhere.xyz/api/volunteers", {
     'page': page,
     'length': length,
     'query_type': 'all',

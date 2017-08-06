@@ -1,7 +1,7 @@
 'use strict;'
 
 const getRelationship = new Promise((resolve, reject) => {
-  $.getJSON('https://own.ohhere.xyz/relationship', {}, raw_response => {
+  $.getJSON('https://own.ohhere.xyz/api/relationship', {}, raw_response => {
     relationshipDict = raw_response['data'];
     resolve();
   });
@@ -146,7 +146,7 @@ function getTestRecordline() {
 }
 
 function loadOnlineData(page, length) {
-  $.getJSON("https://own.ohhere.xyz/records",{
+  $.getJSON("https://own.ohhere.xyz/api/records",{
     'page': page,
     'length': length,
     'query_type': 'page',
@@ -194,7 +194,7 @@ function submitAll() {
       } else {
         LineData['record_status'] = '正在录入';
         htmlTable.loadData(tableLines);
-        $.post("https://own.ohhere.xyz/records", {
+        $.post("https://own.ohhere.xyz/api/records", {
           'data': JSON.stringify(encodeLine(LineData))
         }, function (SubmitResponse, TextStatus, jqXHR) {
           // console.log(SubmitResponse['data']);
