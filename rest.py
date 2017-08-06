@@ -331,11 +331,11 @@ class relationship_api(Resource):
             project_name_dict[projects_id_2_name[single_project_id]] = single_project_id
         return {'status': 0, 'data': {'project_id_dict': project_id_dict, 'project_name_dict': project_name_dict}}
 
-api.add_resource(token_api, '/tokens')
-api.add_resource(volunteer_api, '/volunteers')
-api.add_resource(job_api, '/jobs')
-api.add_resource(record_api, '/records')
-api.add_resource(relationship_api, '/relationship')
+api.add_resource(token_api, '/api/tokens')
+api.add_resource(volunteer_api, '/api/volunteers')
+api.add_resource(job_api, '/api/jobs')
+api.add_resource(record_api, '/api/records')
+api.add_resource(relationship_api, '/api/relationship')
 
 if __name__ == '__main__':
     setLogging('log.txt')
