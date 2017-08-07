@@ -6,7 +6,6 @@ from api_handle import api, init_api, job_api, record_api, relationship_api, tok
 from auth_handle import bcrypt
 from config import AppConfig
 from tables import db
-import logging
 
 def createApp():
     app = Flask(__name__)
