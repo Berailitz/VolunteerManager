@@ -195,7 +195,7 @@
             "type": "python",
             "request": "attach",
             "localRoot": "${workspaceRoot}",
-            "remoteRoot": "/data/wwwroot/xh",
+            "remoteRoot": "/data/wwwroot/VolunteerManager/",
             "port": 989,
             "secret": "passw0",
             "host": "ohhere.xyz"
