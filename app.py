@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 from flask import Flask
-from api_handle import get_api, init_api
+from api_handle import get_api
 from auth_handle import bcrypt
 from config import AppConfig
 from main import main_blueprint
