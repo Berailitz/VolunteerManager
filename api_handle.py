@@ -12,7 +12,8 @@ import logging
 
 api = Api()
 
-def init_api():
+def init_api(api):
+    logging.info('init_api')
     api.add_resource(token_api, '/api/tokens')
     api.add_resource(volunteer_api, '/api/volunteers')
     api.add_resource(job_api, '/api/jobs')
