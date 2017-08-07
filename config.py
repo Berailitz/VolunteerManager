@@ -5,6 +5,7 @@ class AppConfig:
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://xh:xh@localhost/xh?charset=utf8'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
+    TEMPLATES_AUTO_RELOAD = True
     
     @staticmethod
     def init_app(app):
