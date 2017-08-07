@@ -11,7 +11,7 @@ from . import createApp
 def main():
     set_logger('log.txt')
     app = createApp()
-    app.run()
+    app.run(debug=True)
 
 if __name__ == '__main__':
     main()
