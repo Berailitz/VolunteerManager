@@ -7,7 +7,7 @@ from auth_handle import bcrypt
 from config import AppConfig
 from tables import db
 
-def createApp():
+def create_app():
     app = Flask(__name__)
     app.config.from_object(AppConfig)
     api.init_app(app)
