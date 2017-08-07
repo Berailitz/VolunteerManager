@@ -195,10 +195,10 @@
             "type": "python",
             "request": "attach",
             "localRoot": "${workspaceRoot}",
-            "remoteRoot": "${workspaceRoot}",
-            "port": 3000,
-            "secret": "my_secret",
-            "host": "localhost"
+            "remoteRoot": "/data/wwwroot/xh",
+            "port": 989,
+            "secret": "passw0",
+            "host": "ohhere.xyz"
         }
     ]
 }
