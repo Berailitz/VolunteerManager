@@ -1,8 +1,8 @@
 #!/usr/env/python3
 # -*- coding: UTF-8 -*-
 
-from app import createApp
 from mess import set_logger
+from . import createApp
 # import ptvsd
 
 # ptvsd.enable_attach("passw0", address=('0.0.0.0', 989))
