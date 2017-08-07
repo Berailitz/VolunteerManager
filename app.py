@@ -9,7 +9,6 @@ from main import main_blueprint
 from mess import fun_logger
 from tables import db
 
-@fun_logger('test start')
 def create_app():
     app = Flask(__name__)
     app.config.from_object(AppConfig)
