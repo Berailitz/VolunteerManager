@@ -4,7 +4,7 @@
 from auth_handle import authenticate
 from flask_restful import Resource, Api, reqparse
 from mess import fun_logger, generate_random_string
-from restful_handle import parse_all_args
+from restful_helper import parse_all_args
 from sql_handle import item_to_dict, get_jobs, get_records, get_tokens, get_volunteers, check_NoResultFound
 from tables import db, Record
 import json
