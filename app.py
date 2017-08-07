@@ -15,6 +15,5 @@ def createApp():
     init_api(api)
     bcrypt.init_app(app)
     db.init_app(app)
-    logging.info(app.config)
     AppConfig.init_app(app)
     return app
