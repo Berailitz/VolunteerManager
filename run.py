@@ -11,7 +11,7 @@ ptvsd.enable_attach("passw0", address=('0.0.0.0', 989))
 def main():
     set_logger('log.txt')
     app = createApp()
-    app.run(debug=True)
+    app.run()
 
 if __name__ == '__main__':
     main()
