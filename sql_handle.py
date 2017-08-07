@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 from flask_sqlalchemy import orm
-from restful_handle import get_arg
+from restful_helper import get_arg
 from tables import Token, Job, Record, Volunteer
 import logging
 
