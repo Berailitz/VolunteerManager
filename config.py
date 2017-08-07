@@ -8,4 +8,4 @@ class AppConfig:
     
     @staticmethod
     def init_app(app):
-        app.config['RESTFUL_JSON']['ensure_ascii'] = False
+        app.config.update(RESTFUL_JSON=dict(ensure_ascii=False))
