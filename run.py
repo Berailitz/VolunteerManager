@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 from mess import set_logger
-from . import create_app
+from app import create_app
 # import ptvsd
 
 # ptvsd.enable_attach("passw0", address=('0.0.0.0', 989))
