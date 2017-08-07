@@ -10,9 +10,9 @@ from tables import db
 def createApp():
     app = Flask(__name__)
     app.config.from_object(AppConfig)
-    AppConfig.init_app(app)
     api.init_app(app)
     init_api(api)
     bcrypt.init_app(app)
     db.init_app(app)
+    AppConfig.init_app(app)
     return app
