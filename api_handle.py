@@ -12,6 +12,13 @@ import logging
 
 api = Api()
 
+def init_api(api):
+    api.add_resource(token_api, '/api/tokens')
+    api.add_resource(volunteer_api, '/api/volunteers')
+    api.add_resource(job_api, '/api/jobs')
+    api.add_resource(record_api, '/api/records')
+    api.add_resource(relationship_api, '/api/relationship')
+
 class token_api(Resource):
     def get(self):
         parser = reqparse.RequestParser()
