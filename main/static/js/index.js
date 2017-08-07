@@ -24,7 +24,7 @@ function login() {
         domain: 'own.ohhere.xyz',
         secure: true
       });
-      window.location.href = 'https://own.ohhere.xyz/record.html';
+      window.location.href = 'https://own.ohhere.xyz/record';
     }
   })
 }
