@@ -6,8 +6,10 @@ from api_handle import api, init_api
 from auth_handle import bcrypt
 from config import AppConfig
 from main import main_blueprint
+from mess import fun_logger
 from tables import db
 
+@fun_logger('test start')
 def create_app():
     app = Flask(__name__)
     app.config.from_object(AppConfig)
