@@ -3,10 +3,10 @@
 
 from app import createApp
 from mess import set_logger
-import ptvsd
+# import ptvsd
 
-ptvsd.enable_attach("passw0", address=('0.0.0.0', 989))
-ptvsd.wait_for_attach()
+# ptvsd.enable_attach("passw0", address=('0.0.0.0', 989))
+# ptvsd.wait_for_attach()
 
 def main():
     set_logger('log.txt')
