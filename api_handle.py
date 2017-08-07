@@ -10,16 +10,14 @@ from tables import db, Record
 import json
 import logging
 
-api = Api()
-
-@fun_logger('test start')
-def init_api(api):
-    logging.info('init_api')
+def get_api():
+    api = Api()
     api.add_resource(token_api, '/api/tokens')
     api.add_resource(volunteer_api, '/api/volunteers')
     api.add_resource(job_api, '/api/jobs')
     api.add_resource(record_api, '/api/records')
     api.add_resource(relationship_api, '/api/relationship')
+    return api
 
 class token_api(Resource):
     def get(self):
