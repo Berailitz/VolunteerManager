@@ -12,7 +12,7 @@ import logging
 def main():
     set_logger('log.txt')
     app = create_app()
-    logging.info('@fun_logger('test start')')
+    logging.info('test start')
     app.run(debug=True)
 
 if __name__ == '__main__':
