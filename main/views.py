@@ -2,21 +2,24 @@
 # -*- coding: UTF-8 -*-
 
 from flask import render_template
-from . import main_blueprint
+from flask import Blueprint
 
-@main_blueprint.route('/')
-@main_blueprint.route('/index')
+def create_main_blueprint():
+    main_blueprint = Blueprint('main', __name__, template_folder='templates')
+    main_blueprint.add_url_rule('/', 'index', show_index_page)
+    main_blueprint.add_url_rule('/project', 'project', show_project_page)
+    main_blueprint.add_url_rule('/record', 'record', show_record_page)
+    main_blueprint.add_url_rule('/volunteer', 'volunteer', show_volunteer_page)
+    return main_blueprint
+
 def show_index_page():
     return render_template('index.html')
 
-@main_blueprint.route('/project')
 def show_project_page():
     return render_template('project.html')
 
-@main_blueprint.route('/record')
 def show_record_page():
     return render_template('record.html')
 
-@main_blueprint.route('/volunteer')
 def show_volunteer_page():
     return render_template('volunteer.html')

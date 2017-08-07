@@ -10,7 +10,7 @@ from tables import db, Record
 import json
 import logging
 
-def get_api():
+def create_api():
     api = Api()
     api.add_resource(token_api, '/api/tokens')
     api.add_resource(volunteer_api, '/api/volunteers')
