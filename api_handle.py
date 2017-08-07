@@ -12,6 +12,7 @@ import logging
 
 api = Api()
 
+@fun_logger('test start')
 def init_api(api):
     logging.info('init_api')
     api.add_resource(token_api, '/api/tokens')
