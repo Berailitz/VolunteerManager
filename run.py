@@ -6,7 +6,7 @@ from mess import set_logger
 import ptvsd
 
 ptvsd.enable_attach("passw0", address=('0.0.0.0', 989))
-#ptvsd.wait_for_attach()
+ptvsd.wait_for_attach()
 
 def main():
     set_logger('log.txt')
