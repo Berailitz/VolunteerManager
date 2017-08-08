@@ -6,7 +6,7 @@ import functools
 import logging
 from flask import redirect, request, make_response
 from flask_bcrypt import Bcrypt
-from .mess import generate_random_string
+from .mess import fun_logger, generate_random_string
 from .sql_handle import get_tokens, check_NoResultFound
 from .tables import db
 
@@ -70,6 +70,7 @@ def check_cookie(request):
         logging.info(key_error)
         return None
 
+@fun_logger('login')
 def admin_only(public_view='/'):
     '''decorated functions should NEVER change table `tokens`'''
     def decorator(func):
@@ -86,6 +87,7 @@ def admin_only(public_view='/'):
         return wrapper
     return decorator
 
+@fun_logger('login')
 def guest_only(restricted_view='/record'):
     '''decorated functions should NEVER change table `tokens`'''
     def decorator(func):
