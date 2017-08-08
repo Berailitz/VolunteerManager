@@ -4,7 +4,9 @@
 import datetime
 import logging
 from flask_bcrypt import Bcrypt
+from mess import generate_random_string
 from sql_handle import get_tokens, check_NoResultFound
+from tables import db
 
 bcrypt = Bcrypt()
 def check_token(token):
@@ -41,3 +43,12 @@ def authenticate(**credential):
         return check_password(credential['username'], credential['password'])
     else:
         return False
+
+def update_token(**credential):
+    admin = authenticate(**credential)
+    if admin:
+        admin.token = generate_random_string(64)
+        db.session.commit()
+        return admin.token
+    else:
+        return None

@@ -1,8 +1,7 @@
 #!/usr/env/python3
 # -*- coding: UTF-8 -*-
 
-from flask import render_template
-from flask import Blueprint
+from flask import Blueprint, render_template
 
 def create_main_blueprint():
     main_blueprint = Blueprint('main', __name__, template_folder='templates')
