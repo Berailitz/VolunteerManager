@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>志愿活动记录管理 - {{ page_title }}</title>
+    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="//code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <script defer src="//code.getmdl.io/1.3.0/material.min.js"></script>
+    <script src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="//cdn.bootcss.com/js-cookie/2.1.4/js.cookie.min.js"></script>
+    <link {{ "href=/"static//css" ~ page_url ~ ".css/"" }} rel="stylesheet">
+</head>
+
+<body>
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+        <header class="mdl-layout__header">
+            <div class="mdl-layout__header-row">
+                <span class="mdl-layout-title">志愿活动记录管理</span>
+                <div class="mdl-layout-spacer"></div>
+            </div>
+        </header>
+        <div class="mdl-layout__drawer">
+            <span class="mdl-layout-title">志愿活动记录管理</span>
+            <nav class="mdl-navigation">
+                <a class="mdl-navigation__link" href="/volunteer">志愿者信息查询</a>
+                <a class="mdl-navigation__link" href="/record">志愿时长录入</a>
+                <a class="mdl-navigation__link" href="/project">志愿项目管理</a>
+            </nav>
+        </div>
+        <main class="mdl-layout__content">
+            {% block main_div %}{% endblock %}
+        </main>
+        <div id="snackbar" aria-live="assertive" aria-atomic="true" aria-relevant="text" class="mdl-snackbar mdl-js-snackbar">
+            <div class="mdl-snackbar__text"></div>
+            <button type="button" class="mdl-snackbar__action"></button>
+        </div>
+    </div>
+    <footer>
+        {% block page_footer %}{% endblock %}
+        <script {{ "src=/"static//js" ~ page_url ~ ".js/"" }}></script>
+    </footer>
+</body>
+</html>
