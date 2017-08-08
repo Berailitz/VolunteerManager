@@ -2,8 +2,8 @@
 # -*- coding: UTF-8 -*-
 
 from flask_sqlalchemy import orm
-from restful_helper import get_arg
-from tables import Token, Job, Record, Volunteer
+from .restful_helper import get_arg
+from .tables import Token, Job, Record, Volunteer
 import logging
 
 def item_to_dict(item, const_removed={}):

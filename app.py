@@ -2,12 +2,12 @@
 # -*- coding: UTF-8 -*-
 
 from flask import Flask
-from api_handle import create_api
-from auth_handle import bcrypt
-from config import AppConfig
-from main.views import create_main_blueprint
-from mess import fun_logger
-from tables import db
+from .api_handle import create_api
+from .auth_handle import bcrypt
+from .config import AppConfig
+from .main.views import create_main_blueprint
+from .mess import fun_logger
+from .tables import db
 import logging
 
 def create_app():
