@@ -1,7 +1,7 @@
 #!/usr/env/python3
 # -*- coding: UTF-8 -*-
 
-from auth_handle import update_token
+from auth_handle import get_current_user
 from flask_restful import Resource, Api, reqparse
 from mess import fun_logger, generate_random_string
 from restful_helper import parse_all_args
@@ -27,7 +27,7 @@ class token_api(Resource):
         parser.add_argument('token', type=str)
         args = parser.parse_args()
         # login_time = time.strftime('%Y-%m-%d %H:%M:%S',)
-        new_token = update_token(**args)
+        new_token = get_current_user(**args).token
         if new_token:
             return {'status': 0, 'data': {'token': new_token}}
         else:
