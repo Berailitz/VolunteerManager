@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 from flask import Flask
+from flask_debugtoolbar import DebugToolbarExtension
 from .api_handle import create_api
 from .auth_handle import bcrypt
 from .config import AppConfig
@@ -13,6 +14,7 @@ import logging
 def create_app():
     app = Flask(__name__)
     app.config.from_object(AppConfig)
+    toolbar = DebugToolbarExtension(app)
     api = create_api()
     api.init_app(app)
     bcrypt.init_app(app)
