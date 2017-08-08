@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 from flask import Flask
+from werkzeug.debug import DebuggedApplication
 from .api_handle import create_api
 from .auth_handle import bcrypt
 from .config import AppConfig
@@ -12,6 +13,7 @@ import logging
 
 def create_app():
     app = Flask(__name__)
+    app = DebuggedApplication(app, pin_security=False)
     app.config.from_object(AppConfig)
     api = create_api()
     api.init_app(app)
