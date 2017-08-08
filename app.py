@@ -2,7 +2,6 @@
 # -*- coding: UTF-8 -*-
 
 from flask import Flask
-from werkzeug.debug import DebuggedApplication
 from .api_handle import create_api
 from .auth_handle import bcrypt
 from .config import AppConfig
@@ -23,5 +22,4 @@ def create_app():
     app.register_blueprint(main_blueprint)
     logging.info('%r', app.view_functions)
     logging.info('%r', app.url_map)
-    app = DebuggedApplication(app, pin_security=False)
     return app
