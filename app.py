@@ -13,7 +13,6 @@ import logging
 
 def create_app():
     app = Flask(__name__)
-    app = DebuggedApplication(app, pin_security=False)
     app.config.from_object(AppConfig)
     api = create_api()
     api.init_app(app)
@@ -24,4 +23,5 @@ def create_app():
     app.register_blueprint(main_blueprint)
     logging.info('%r', app.view_functions)
     logging.info('%r', app.url_map)
+    app = DebuggedApplication(app, pin_security=False)
     return app
