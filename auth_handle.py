@@ -78,11 +78,10 @@ def admin_only(public_view='/'):
         def wrapper(*args, **kw):
             admin = check_cookie(request)
             if admin:
-                response = make_response(redirect(public_view))
+                response = func(*args, **kw)
                 response.set_cookie('token', admin.token, max_age=604800, secure=True)
             else:
-                response = func(*args, **kw)
-                logging.info('%r', response)
+                response = make_response(redirect(public_view))
                 response.set_cookie('token', '', max_age=604800, secure=True)
             return response
         return wrapper
