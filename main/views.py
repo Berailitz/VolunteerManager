@@ -16,17 +16,17 @@ def create_main_blueprint():
 @fun_logger('login')
 @guest_only()
 def show_index_page():
-    return make_response(render_template('index.html'))
+    return make_response(render_template('index.html', page_url='/index', page_title='登录'))
 
 @admin_only()
 @fun_logger('login')
 def show_project_page():
-    return make_response(render_template('project.html'))
+    return make_response(render_template('project.html', page_url='/project', page_title='志愿项目管理'))
 
 @admin_only()
 def show_record_page():
-    return make_response(render_template('record.html'))
+    return make_response(render_template('record.html', page_url='/record', page_title='志愿时长录入'))
 
 @admin_only()
 def show_volunteer_page():
-    return make_response(render_template('volunteer.html'))
+    return make_response(render_template('volunteer.html', page_url='/volunteer', page_title='志愿者信息查询'))
