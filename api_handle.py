@@ -68,8 +68,14 @@ class record_api(Resource):
         for record_index in range(len(record_all)):
             # logging.info(record_list[record_index])
             try:
-                operator_name = get_volunteers({'user_id': record_all[record_index].operator_id, 'query_type': 'one'}, ['user_id']).legal_name
+                operator = get_volunteers({'user_id': record_all[record_index].operator_id, 'query_type': 'one'}, ['user_id'])
+                operator_name = operator.legal_name
+                volunteer = get_volunteers({'user_id': record_all[record_index].user_id, 'query_type': 'one'}, ['user_id'])
+                legal_name = volunteer.legal_name
+                student_id = volunteer.student_id
                 record_all[record_index].operator_name = operator_name
+                record_all[record_index].legal_name = legal_name
+                record_all[record_index].student_id = student_id
             except Exception as e:
                 if not check_NoResultFound(e, args):
                     logging.exception(e)
