@@ -3,6 +3,7 @@
 
 from .mess import set_logger
 from .app import create_app
+import logging
 # import ptvsd
 
 # ptvsd.enable_attach("passw0", address=('0.0.0.0', 989))
@@ -10,6 +11,7 @@ from .app import create_app
 
 def main():
     set_logger('log.txt')
+    logging.info('start...')
     app = create_app()
     app.run(debug=True)
 
