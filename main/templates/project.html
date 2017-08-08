@@ -1,111 +1,70 @@
-<!DOCTYPE html>
-<html lang="zh-cmn-Hans">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>志愿活动记录管理 - 志愿项目管理</title>
-    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="//code.getmdl.io/1.3.0/material.indigo-pink.min.css">
-    <script defer src="//code.getmdl.io/1.3.0/material.min.js"></script>
-    <link rel="stylesheet" href="static/css/getmdl-select.min.css">
-    <script defer src="static/js/getmdl-select.min.js"></script>
-</head>
-
-<body>
-    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
-        <header class="mdl-layout__header">
-            <div class="mdl-layout__header-row">
-                <span class="mdl-layout-title">志愿时长管理系统</span>
-                <div class="mdl-layout-spacer"></div>
-            </div>
-        </header>
-        <div class="mdl-layout__drawer">
-            <span class="mdl-layout-title">志愿时长管理系统</span>
-            <nav class="mdl-navigation">
-                <a class="mdl-navigation__link" href="#">志愿者信息查询</a>
-                <a class="mdl-navigation__link" href="#">志愿时长录入</a>
-                <a class="mdl-navigation__link" href="#">志愿项目管理</a>
-            </nav>
-        </div>
-        <main class="mdl-layout__content">
-            <div class="page-content">
-                <div id="main-div" class="mdl-grid">
-                    <div class="mdl-cell mdl-cell--9-col">
-                        <!-- <div id="info-card" class="mdl-card mdl-shadow--2dp">
-                            <div class="mdl-card__supporting-text">
-                                <div id="info-title" class="mdl-card__title">
-                                    <h2 class="mdl-card__title-text">项目信息</h2>
-                                </div>
-                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                                    <input readonly class="mdl-textfield__input" type="text" id="job-start-box">
-                                    <label class="mdl-textfield__label" for="job-start-box">开始时间</label>
-                                </div>
-                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                                    <input readonly class="mdl-textfield__input" type="text" id="job-end-box">
-                                    <label class="mdl-textfield__label" for="job-end-box">结束时间</label>
-                                </div>
-                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                                    <input readonly class="mdl-textfield__input" type="text" id="director-box">
-                                    <label class="mdl-textfield__label" for="director-box">负责人</label>
-                                </div>
-                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                                    <input readonly class="mdl-textfield__input" type="text" id="location-box">
-                                    <label class="mdl-textfield__label" for="location-box">活动地址</label>
-                                </div>
-                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                                    <input readonly class="mdl-textfield__input" type="text" id="note-box">
-                                    <label class="mdl-textfield__label" for="note-box">备注</label>
-                                </div>
-                            </div>
-                        </div> -->
-                        <div id="volunteer-table"></div>
+{% extends "layout.html" %}
+{% block main_div %}
+<div class="page-content">
+    <div id="main-div" class="mdl-grid">
+        <div class="mdl-cell mdl-cell--9-col">
+            <!-- <div id="info-card" class="mdl-card mdl-shadow--2dp">
+                <div class="mdl-card__supporting-text">
+                    <div id="info-title" class="mdl-card__title">
+                        <h2 class="mdl-card__title-text">项目信息</h2>
                     </div>
-                    <div id='left-panel' class="mdl-cell mdl-cell--3-col">
-                        <div class="mdl-card mdl-shadow--2dp">
-                            <div class="mdl-card__supporting-text">
-                                <form action="#">
-                                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fullwidth">
-                                        <input id="project-name-input" class="mdl-textfield__input" type="text" id="project-name-box" value="选择志愿项目" readonly tabIndex="1" onchange="setJobNameMenu(this.value);">
-                                        <label for="project-name-box" class="mdl-textfield__label">项目</label>
-                                        <ul id="project-name-menu" for="project-name-box" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
-                                            <li class="mdl-menu__item" data-project-index="project-0">所有志愿项目</li>
-                                        </ul>
-                                    </div>
-                                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fullwidth">
-                                        <input id="job-name-input" class="mdl-textfield__input" type="text" id="job-name-box" value="所有岗位" readonly tabIndex="2">
-                                        <label for="job-name-box" class="mdl-textfield__label">岗位</label>
-                                        <ul id="job-name-menu" for="job-name-box" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
-                                             <li class="mdl-menu__item" data-job-index="job-0">所有岗位</li>
-                                        </ul>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="mdl-card__actions mdl-card--border">
-                                <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="search();">查询记录</button>
-                                <!-- <button class="mdl-button mdl-js-button mdl-button--accent mdl-js-ripple-effect" onclick="resetTable();">清空</button> -->
-                            </div>
-                        </div>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <input readonly class="mdl-textfield__input" type="text" id="job-start-box">
+                        <label class="mdl-textfield__label" for="job-start-box">开始时间</label>
+                    </div>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <input readonly class="mdl-textfield__input" type="text" id="job-end-box">
+                        <label class="mdl-textfield__label" for="job-end-box">结束时间</label>
+                    </div>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <input readonly class="mdl-textfield__input" type="text" id="director-box">
+                        <label class="mdl-textfield__label" for="director-box">负责人</label>
+                    </div>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <input readonly class="mdl-textfield__input" type="text" id="location-box">
+                        <label class="mdl-textfield__label" for="location-box">活动地址</label>
+                    </div>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <input readonly class="mdl-textfield__input" type="text" id="note-box">
+                        <label class="mdl-textfield__label" for="note-box">备注</label>
                     </div>
                 </div>
+            </div> -->
+            <div id="volunteer-table"></div>
+        </div>
+        <div id='left-panel' class="mdl-cell mdl-cell--3-col">
+            <div class="mdl-card mdl-shadow--2dp">
+                <div class="mdl-card__supporting-text">
+                    <form action="#">
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fullwidth">
+                            <input id="project-name-input" class="mdl-textfield__input" type="text" id="project-name-box" value="选择志愿项目" readonly tabIndex="1" onchange="setJobNameMenu(this.value);">
+                            <label for="project-name-box" class="mdl-textfield__label">项目</label>
+                            <ul id="project-name-menu" for="project-name-box" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
+                                <li class="mdl-menu__item" data-project-index="project-0">所有志愿项目</li>
+                            </ul>
+                        </div>
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fullwidth">
+                            <input id="job-name-input" class="mdl-textfield__input" type="text" id="job-name-box" value="所有岗位" readonly tabIndex="2">
+                            <label for="job-name-box" class="mdl-textfield__label">岗位</label>
+                            <ul id="job-name-menu" for="job-name-box" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
+                                    <li class="mdl-menu__item" data-job-index="job-0">所有岗位</li>
+                            </ul>
+                        </div>
+                    </form>
+                </div>
+                <div class="mdl-card__actions mdl-card--border">
+                    <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="search();">查询记录</button>
+                    <!-- <button class="mdl-button mdl-js-button mdl-button--accent mdl-js-ripple-effect" onclick="resetTable();">清空</button> -->
+                </div>
             </div>
-        </main>
-        <div id="snackbar" aria-live="assertive" aria-atomic="true" aria-relevant="text" class="mdl-snackbar mdl-js-snackbar">
-            <div class="mdl-snackbar__text"></div>
-            <button type="button" class="mdl-snackbar__action"></button>
         </div>
     </div>
-
-    <footer>
-        <link href="//cdn.bootcss.com/handsontable/0.34.0/handsontable.full.min.css" rel="stylesheet">
-        <script src="//static/js/handsontable.full.js"></script> 
-        <script src="//cdn.bootcss.com/pikaday/1.6.1/pikaday.min.js"></script>
-        <link href="//cdn.bootcss.com/pikaday/1.6.1/css/pikaday.min.css" rel="stylesheet">
-        <script src="//cdn.bootcss.com/moment.js/2.18.1/locale/zh-cn.js"></script>
-        <link href="static/css/project.css" rel="stylesheet">
-        <script src="static/js/project.js"></script>
-    </footer>
-</body>
-
-</html>
+</div>
+{% endblock %}
+{% block page_footer %}
+    <link href="//cdn.bootcss.com/handsontable/0.34.0/handsontable.full.min.css" rel="stylesheet">
+    <script src="//static/js/handsontable.full.js"></script> 
+    <script src="//cdn.bootcss.com/pikaday/1.6.1/pikaday.min.js"></script>
+    <link href="//cdn.bootcss.com/pikaday/1.6.1/css/pikaday.min.css" rel="stylesheet">
+    <script src="//cdn.bootcss.com/moment.js/2.18.1/locale/zh-cn.js"></script>
+{% endblock %}
