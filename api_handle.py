@@ -35,7 +35,7 @@ class token_api(Resource):
 
 class volunteer_api(Resource):
     @load_token()
-    def get(self):
+    def get(self, admin):
         args = parse_all_args(reqparse.RequestParser())
         try:
             the_volunteer = get_volunteers(args)
@@ -50,7 +50,7 @@ class volunteer_api(Resource):
 
 class job_api(Resource):
     @load_token()
-    def get(self):
+    def get(self, admin):
         args = parse_all_args(reqparse.RequestParser())
         try:
             job_all = get_jobs(args)
@@ -63,7 +63,7 @@ class job_api(Resource):
 
 class record_api(Resource):
     @load_token()
-    def get(self):
+    def get(self, admin):
         args = parse_all_args(reqparse.RequestParser())
         record_all = get_records(args)
         if not type(record_all) == list:
@@ -87,7 +87,7 @@ class record_api(Resource):
         logging.info(record_list)
         return {'data': {'records': record_list}}
     @load_token()
-    def post(self):
+    def post(self, admin):
         parser = reqparse.RequestParser()
         parser.add_argument('data', type=str)
         raw_args = parser.parse_args()
@@ -116,7 +116,7 @@ class record_api(Resource):
 
 class relationship_api(Resource):
     @load_token()
-    def get(self):
+    def get(self, admin):
         project_id_dict = dict()
         project_name_dict = dict()
         projects_id_2_name = dict(set(map(lambda pro: (pro.project_id, pro.project_name), get_jobs({'query_type': 'all'}))))
