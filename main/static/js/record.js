@@ -185,7 +185,7 @@ function submitAll() {
           'data': JSON.stringify(encodeLine(LineData)),
           'token': Cookies.get('token')
         }, function (SubmitResponse, TextStatus, jqXHR) {
-          if (rawResponse['status']) {
+          if (SubmitResponse['status']) {
             showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
           } else {
             // console.log(SubmitResponse['data']);
