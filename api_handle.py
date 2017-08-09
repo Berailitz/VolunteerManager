@@ -27,9 +27,9 @@ class token_api(Resource):
         parser.add_argument('token', type=str)
         args = parser.parse_args()
         # login_time = time.strftime('%Y-%m-%d %H:%M:%S',)
-        new_token = get_current_user(**args).token
-        if new_token:
-            return {'status': 0, 'token': new_token}
+        admin = get_current_user(**args)
+        if admin:
+            return {'status': 0, 'token': get_current_user(**args).token}
         else:
             return {'status': 1}
 
