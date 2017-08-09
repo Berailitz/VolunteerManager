@@ -42,11 +42,11 @@ function search() {
     'query_type': 'one',
     'token': Cookies.get('token')
   }, function (rawResponse) {
+    setToken(rawResponse['token']);
     if (rawResponse['status']) {
       showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
     } else {
       console.log(rawResponse['data']);
-      setToken(rawResponse['token']);
       tableLines.splice(0, tableLines.length);
       if (rawResponse['status'] == 1) {
         tableLines = [[]];
@@ -62,11 +62,11 @@ function search() {
           'query_type': 'all',
           'token': Cookies.get('token')
         }, function (rawResponse) {
+          setToken(rawResponse['token']);
           if (rawResponse['status']) {
             showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
           } else {
             console.log(rawResponse['data']['records']);
-            setToken(rawResponse['token']);
             if (rawResponse['data']['records'].length == 0) {
               showToast('ERROR: 查无记录', 800);
               $('#student-id-box')[0].focus();
@@ -93,6 +93,7 @@ function loadData(page, length) {
     'query_type': 'page',
     'token': Cookies.get('token')
   }, function (rawResponse) {
+    setToken(rawResponse['token']);
     if (rawResponse['status']) {
       showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
     } else {

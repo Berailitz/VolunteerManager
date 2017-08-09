@@ -142,11 +142,11 @@ function loadOnlineData(page, length) {
     'query_type': 'page',
     'token': Cookies.get('token')
   }, function(rawResponse) {
+      setToken(rawResponse['token']);
       if (rawResponse['status']) {
         showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
       } else {
         // console.log(rawResponse);
-        setToken(rawResponse['token']);
         tableLines.splice(0, tableLines.length);
         $.each(rawResponse['data'], function(LineIndex, rawLine) {
           rawLine.record_status = '已录入';
@@ -187,12 +187,12 @@ function submitAll() {
           'dataType': 'json',
           'data': {'data': JSON.stringify(encodeLine(LineData)), 'token': Cookies.get('token')},
           'success': function (rawResponse, TextStatus, jqXHR) {
+            setToken(rawResponse['token']);
             if (rawResponse['status']) {
               showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
               LineData['record_status'] = rawResponse['data']['msg'];
             } else {
               // console.log(rawResponse['data']);
-              setToken(rawResponse['token']);
               LineData['record_status'] = rawResponse['data']['msg'];
             }
             htmlTable.loadData(tableLines);
