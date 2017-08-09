@@ -193,6 +193,7 @@ function submitAll() {
             setToken(rawResponse['token']);
             LineData['record_status'] = rawResponse['data']['msg'];
           }
+          htmlTable.loadData(tableLines);
         });
       };
     };
