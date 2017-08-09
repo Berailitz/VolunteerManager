@@ -23,7 +23,7 @@ function search() {
       rawRecord = decodeLine(rawRecord);
       $.each(infoList, function (infoIndex, infoName) {
         $('#' + infoName.replace('_', '-') + '-box').parent().addClass('is-dirty');
-        $('#' + infoName.replace('_', '-') + '-box')[0].value = rawRecord[infoName];
+        $('#' + infoName.replace('_', '-') + '-box')[0].value = rawRecord[infoName] ? rawRecord[infoName] : '';
       });
     }
   });
