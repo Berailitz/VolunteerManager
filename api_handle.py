@@ -71,8 +71,8 @@ class record_api(Resource):
         for record_index in range(len(record_all)):
             # logging.info(record_list[record_index])
             try:
-                operator = get_volunteers({'user_id': record_all[record_index].operator_id, 'query_type': 'one'}, ['user_id'])
-                operator_name = operator.legal_name
+                operator = get_tokens({'admin_id': record_all[record_index].operator_id, 'query_type': 'one'}, ['admin_id'])
+                operator_name = operator.username
                 volunteer = get_volunteers({'user_id': record_all[record_index].user_id, 'query_type': 'one'}, ['user_id'])
                 legal_name = volunteer.legal_name
                 student_id = volunteer.student_id
@@ -109,7 +109,7 @@ class record_api(Resource):
                 raise e
             return {'status': 1, 'data': {'msg': '查无此项目'}}
         new_rec = Record(the_vol.user_id, the_job.project_id, the_job.job_id, args['job_date'], args['working_time'], args['record_note'])
-        new_rec.operator_id = the_vol.user_id
+        new_rec.operator_id = admin.admin_id
         db.session.add(new_rec)
         db.session.commit()
         return {'status': 0, 'data': {'msg': '已录入'}}
