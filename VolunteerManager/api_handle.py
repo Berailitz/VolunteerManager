@@ -91,6 +91,40 @@ class record_api(Resource):
         record_list = list(map(item_to_dict, record_all, [set()] * len(record_all)))
         logging.info(record_list)
         return {'data': {'records': record_list}}
+
+    @load_token(False)
+    def post(admin, self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('data', type=str)
+        raw_args = parser.parse_args()
+        logging.info(raw_args)
+        args = json.loads(raw_args['data'])
+        args['query_type'] = 'one'
+        try:
+            the_rec = get_records(args, ['record_id'])
+        except Exception as e:
+            if not check_NoResultFound(e, args):
+                logging.exception(e)
+                raise e
+            return {'status': 1, 'data': {'msg': '查无记录'}}
+        try:
+            the_job = get_jobs(args)
+            the_vol = get_volunteers(args)
+        except Exception as e:
+            if not check_NoResultFound(e, args):
+                logging.exception(e)
+                raise e
+            return {'status': 1, 'data': {'msg': '志愿项目或志愿者参数错误'}}
+        the_rec.user_id = the_vol.user_id
+        the_rec.project_id = the_job.project_id
+        the_rec.job_id = the_job.job_id
+        the_rec.job_date = args['job_date']
+        the_rec.working_time = args['working_time']
+        the_rec.record_note = args['record_note']
+        the_rec.operator_id = admin.admin_id
+        db.session.commit()
+        return {'status': 0, 'data': {'msg': f'已更新(ID:{the_rec.record_id})'}}
+
     @load_token(False)
     def put(admin, self):
         parser = reqparse.RequestParser()
