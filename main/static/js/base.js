@@ -2,7 +2,7 @@
 
 let relationshipDict = {};
 
-function showToast(messageText, timeout=2000) {
+function showToast(messageText, timeout=1000) {
   $('#snackbar')[0].MaterialSnackbar.showSnackbar(
     {
       'message': messageText,
