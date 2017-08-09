@@ -30,3 +30,7 @@ def show_record_page():
 @admin_only()
 def show_volunteer_page():
     return make_response(render_template('volunteer.html', page_url='/volunteer', page_title='志愿者信息查询'))
+
+@admin_only()
+def show_download_page():
+    return make_response(render_template('download.html', page_url='/download', page_title='表格下载'))
