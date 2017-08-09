@@ -120,7 +120,7 @@ def load_token(update_token=True, error_status_code=1):
                 response_dict = func(admin, *args, **kw)
                 response_dict['token'] = admin.token
             else:
-                response_dict = {'status': error_status_code}
+                response_dict = {'status': error_status_code, 'data': {'msg': '鉴权失败'}}
             return response_dict
         return wrapper
     return decorator
