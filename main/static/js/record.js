@@ -184,13 +184,13 @@ function submitAll() {
         $.post("/api/records", {
           'data': JSON.stringify(encodeLine(LineData)),
           'token': Cookies.get('token')
-        }, function (SubmitResponse, TextStatus, jqXHR) {
-          if (SubmitResponse['status']) {
+        }, function (rawResponse, TextStatus, jqXHR) {
+          if (rawResponse['status']) {
             showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
           } else {
-            // console.log(SubmitResponse['data']);
-            setToken(SubmitResponse['token']);
-            LineData['record_status'] = SubmitResponse['data']['msg'];
+            // console.log(rawResponse['data']);
+            setToken(rawResponse['token']);
+            LineData['record_status'] = rawResponse['data']['msg'];
           }
         });
       };
