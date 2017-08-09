@@ -7,6 +7,7 @@ class AppConfig():
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     TEMPLATES_AUTO_RELOAD = True
     SECRET_KEY = '67gyubinjmokl,pl'
+    DOWNLOAD_PATH = 'main/static/temp'
 
     @staticmethod
     def init_app(app):
