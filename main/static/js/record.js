@@ -142,17 +142,21 @@ function loadOnlineData(page, length) {
     'query_type': 'page',
     'token': Cookies.get('token')
   }, function(rawResponse) {
-      // console.log(rawResponse);
-      setToken(rawResponse['token']);
-      tableLines.splice(0, tableLines.length);
-      $.each(rawResponse['data'], function(LineIndex, rawLine) {
-        rawLine.record_status = '已录入';
-        tableLines[LineIndex] = rawLine
-        console.log(rawLine);
-      });
-      htmlTable.loadData(tableLines);
-      htmlTable.render();
-      appendRow(1);
+      if (rawResponse['status']) {
+        showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
+      } else {
+        // console.log(rawResponse);
+        setToken(rawResponse['token']);
+        tableLines.splice(0, tableLines.length);
+        $.each(rawResponse['data'], function(LineIndex, rawLine) {
+          rawLine.record_status = '已录入';
+          tableLines[LineIndex] = rawLine
+          console.log(rawLine);
+        });
+        htmlTable.loadData(tableLines);
+        htmlTable.render();
+        appendRow(1);
+      }
     });
 }
 
@@ -181,9 +185,13 @@ function submitAll() {
           'data': JSON.stringify(encodeLine(LineData)),
           'token': Cookies.get('token')
         }, function (SubmitResponse, TextStatus, jqXHR) {
-          // console.log(SubmitResponse['data']);
-          setToken(SubmitResponse['token']);
-          LineData['record_status'] = SubmitResponse['data']['msg'];
+          if (rawResponse['status']) {
+            showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
+          } else {
+            // console.log(SubmitResponse['data']);
+            setToken(SubmitResponse['token']);
+            LineData['record_status'] = SubmitResponse['data']['msg'];
+          }
         });
       };
     };

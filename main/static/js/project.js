@@ -69,23 +69,27 @@ function search() {
       payload['job_id'] = job_name_to_id(payload['project_id'], job_name);
   }
   $.getJSON("/api/records", payload, function (rawResponse) {
-    let count = rawResponse['data']['records'].length;
-    tableLines.splice(0, count);
-    // $.each(infoList, function (infoIndex, infoName) {
-    //   $('#' + infoName.replace('_', '-') + '-box').parent().addClass('is-dirty');
-    //   $('#' + infoName.replace('_', '-') + '-box')[0].value = rawResponse['data']['info'][infoName];
-    // });
-    if (count) {
-      $.each(rawResponse['data']['records'], function (line_index, raw_line) {
-        tableLines[line_index] = decodeLine(raw_line);
-        // console.log(tableLines[line_index]);
-      });
-      htmlTable.selectCell(0, 0);
+    if (rawResponse['status']) {
+      showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
     } else {
-      showToast('ERROR: 查无记录');
+      let count = rawResponse['data']['records'].length;
+      tableLines.splice(0, count);
+      // $.each(infoList, function (infoIndex, infoName) {
+      //   $('#' + infoName.replace('_', '-') + '-box').parent().addClass('is-dirty');
+      //   $('#' + infoName.replace('_', '-') + '-box')[0].value = rawResponse['data']['info'][infoName];
+      // });
+      if (count) {
+        $.each(rawResponse['data']['records'], function (line_index, raw_line) {
+          tableLines[line_index] = decodeLine(raw_line);
+          // console.log(tableLines[line_index]);
+        });
+        htmlTable.selectCell(0, 0);
+      } else {
+        showToast('ERROR: 查无记录');
+      }
+      htmlTable.loadData(tableLines);
+      htmlTable.render();
     }
-    htmlTable.loadData(tableLines);
-    htmlTable.render();
   });
   showToast('查询中', 800);
 }
@@ -97,14 +101,18 @@ function loadData(page, length) {
     'query_type': 'all',
     'token': Cookies.get('token')
   }, function (rawResponse) {
-    console.log(rawResponse);
-    tableLines.splice(0, tableLines.length);
-    $.each(rawResponse['data'], function (lineIndex, rawLine) {
-      tableLines[lineIndex] = decodeLine(rawLine);
-      // console.log(line);
-    });
-    htmlTable.render();
-    htmlTable.selectCell(0, 0);
+    if (rawResponse['status']) {
+      showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
+    } else {
+      console.log(rawResponse);
+      tableLines.splice(0, tableLines.length);
+      $.each(rawResponse['data'], function (lineIndex, rawLine) {
+        tableLines[lineIndex] = decodeLine(rawLine);
+        // console.log(line);
+      });
+      htmlTable.render();
+      htmlTable.selectCell(0, 0);
+    }
   });
 }
 
