@@ -8,7 +8,7 @@ function download() {
         '志愿项目原始表格': 'jobs'
     };
     export_type = type_dict[$('#table-name-input')[0].value];
-    $.getJSON(`/api/download/${export_type}`, {'token': Cookies.get('token')}, function (rawData) {
+    $.getJSON('/api/download/', {'token': Cookies.get('token')}, function (rawData) {
         if (rawData['status']) {
             showToast('ERROR: 下载失败');
         } else {
@@ -19,7 +19,7 @@ function download() {
     });
 }
 
-function clear() {
+function cleanup() {
     $.ajax({
         url: '/api/download',
         type: 'DELETE',
