@@ -187,6 +187,7 @@ function submitAll() {
         }, function (rawResponse, TextStatus, jqXHR) {
           if (rawResponse['status']) {
             showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
+            LineData['record_status'] = rawResponse['data']['msg'];
           } else {
             // console.log(rawResponse['data']);
             setToken(rawResponse['token']);
