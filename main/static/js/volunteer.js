@@ -42,7 +42,7 @@ function search() {
     $('#student-id-box')[0].focus();
     return;
   }
-  $.getJSON("https://own.ohhere.xyz/api/volunteers", {
+  $.getJSON("/api/volunteers", {
     'student_id': student_id,
     'legal_name': legal_name,
     'query_type': 'one',
@@ -60,7 +60,7 @@ function search() {
         $('#' + infoName.replace('_', '-') + '-box').parent().addClass('is-dirty');
         $('#' + infoName.replace('_', '-') + '-box')[0].value = rawResponse['data']['info'][infoName];
       });
-      $.getJSON('https://own.ohhere.xyz/api/records', {
+      $.getJSON('/api/records', {
         'user_id': rawResponse['data']['info']['user_id'],
         'query_type': 'all',
         'token': Cookies.get('token')
@@ -85,7 +85,7 @@ function search() {
 }
 
 function loadData(page, length) {
-  $.getJSON("https://own.ohhere.xyz/api/volunteers", {
+  $.getJSON("/api/volunteers", {
     'page': page,
     'length': length,
     'query_type': 'page',

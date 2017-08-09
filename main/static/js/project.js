@@ -68,7 +68,7 @@ function search() {
   if (job_name != '所有岗位') {
       payload['job_id'] = job_name_to_id(payload['project_id'], job_name);
   }
-  $.getJSON("https://own.ohhere.xyz/api/records", payload, function (rawResponse) {
+  $.getJSON("/api/records", payload, function (rawResponse) {
     let count = rawResponse['data']['records'].length;
     tableLines.splice(0, count);
     // $.each(infoList, function (infoIndex, infoName) {
@@ -91,7 +91,7 @@ function search() {
 }
 
 function loadData(page, length) {
-  $.getJSON("https://own.ohhere.xyz/api/volunteers", {
+  $.getJSON("/api/volunteers", {
     'page': page,
     'length': length,
     'query_type': 'all',

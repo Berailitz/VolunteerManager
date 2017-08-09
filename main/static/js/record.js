@@ -136,7 +136,7 @@ function getTestRecordline() {
 }
 
 function loadOnlineData(page, length) {
-  $.getJSON("https://own.ohhere.xyz/api/records",{
+  $.getJSON("/api/records",{
     'page': page,
     'length': length,
     'query_type': 'page',
@@ -177,7 +177,7 @@ function submitAll() {
       } else {
         LineData['record_status'] = '正在录入';
         htmlTable.loadData(tableLines);
-        $.post("https://own.ohhere.xyz/api/records", {
+        $.post("/api/records", {
           'data': JSON.stringify(encodeLine(LineData)),
           'token': Cookies.get('token')
         }, function (SubmitResponse, TextStatus, jqXHR) {
