@@ -19,3 +19,8 @@ body
 {
     padding-bottom: 0;
 }
+
+.mdl-card,.mdl-card__supporting-text
+{
+    overflow: initial;
+}
