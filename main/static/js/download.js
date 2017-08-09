@@ -8,7 +8,7 @@ function download() {
         '志愿项目原始表格': 'jobs'
     };
     export_type = type_dict[$('#table-name-input')[0].value];
-    $.getJSON('/api/download/', {'token': Cookies.get('token')}, function (rawData) {
+    $.getJSON('/api/download', {'token': Cookies.get('token')}, function (rawData) {
         if (rawData['status']) {
             showToast('ERROR: 下载失败');
         } else {
@@ -25,11 +25,10 @@ function cleanup() {
         type: 'DELETE',
         data: {'token': Cookies.get('token')},
         success: function (rawResponse) {
-            responseJSON = JSON.parse(rawResponse);
-            if (responseJSON['status']) {
+            if (rawData['status']) {
                 showToast('清除成功');
             } else {
-                showToast(`ERROR: 清除失败: ${responseJSON['data']['msg']}`);
+                showToast(`ERROR: 清除失败: ${rawData['data']['msg']}`);
             }
         }
     });
