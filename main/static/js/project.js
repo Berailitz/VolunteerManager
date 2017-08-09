@@ -73,6 +73,7 @@ function search() {
       showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
     } else {
       let count = rawResponse['data']['records'].length;
+      setToken(rawResponse['token']);
       tableLines.splice(0, count);
       // $.each(infoList, function (infoIndex, infoName) {
       //   $('#' + infoName.replace('_', '-') + '-box').parent().addClass('is-dirty');
