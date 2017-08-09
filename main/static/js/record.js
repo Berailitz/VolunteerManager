@@ -211,7 +211,7 @@ function submitAll() {
           'token': Cookies.get('token')
         }, function (SubmitResponse, TextStatus, jqXHR) {
           // console.log(SubmitResponse['data']);
-          set_token(rawResponse['token']);
+          set_token(SubmitResponse['token']);
           LineData['record_status'] = SubmitResponse['data']['msg'];
         });
       };
