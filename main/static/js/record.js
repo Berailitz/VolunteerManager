@@ -201,7 +201,7 @@ function submitAll() {
     // console.log(LineData['record_status'] == '未录入' && !checkEmpty(LineData));
     if (LineData['record_status'] != '已录入' && !checkEmpty(LineData)) {
       if (!checkFull(LineData)) {
-        showToast(`ERROR: 第 ${LineIndex + 1} 行未填完`, 800);
+        showToast(`ERROR: #${LineIndex + 1} 需补充信息`, 800);
         LineData['record_status'] = '需补充信息';
       } else {
         LineData['record_status'] = '正在录入';
