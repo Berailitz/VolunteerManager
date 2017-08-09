@@ -9,6 +9,7 @@ def parse_all_args(parser):
     parser.add_argument('project_id', type=int)
     parser.add_argument('project_name', type=str)
     parser.add_argument('query_type', type=str)
+    parser.add_argument('record_id', type=int)
     parser.add_argument('student_id', type=str)
     parser.add_argument('query_type', type=str)
     parser.add_argument('user_id', type=int)

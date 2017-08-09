@@ -181,19 +181,22 @@ function submitAll() {
       } else {
         LineData['record_status'] = '正在录入';
         htmlTable.loadData(tableLines);
-        $.post("/api/records", {
-          'data': JSON.stringify(encodeLine(LineData)),
-          'token': Cookies.get('token')
-        }, function (rawResponse, TextStatus, jqXHR) {
-          if (rawResponse['status']) {
-            showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
-            LineData['record_status'] = rawResponse['data']['msg'];
-          } else {
-            // console.log(rawResponse['data']);
-            setToken(rawResponse['token']);
-            LineData['record_status'] = rawResponse['data']['msg'];
+        $.ajax({
+          'url': "/api/records",
+          'type': 'PUT',
+          'dataType': 'json',
+          'data': encodeLine(LineData),
+          'success': function (rawResponse, TextStatus, jqXHR) {
+            if (rawResponse['status']) {
+              showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
+              LineData['record_status'] = rawResponse['data']['msg'];
+            } else {
+              // console.log(rawResponse['data']);
+              setToken(rawResponse['token']);
+              LineData['record_status'] = rawResponse['data']['msg'];
+            }
+            htmlTable.loadData(tableLines);
           }
-          htmlTable.loadData(tableLines);
         });
       };
     };
