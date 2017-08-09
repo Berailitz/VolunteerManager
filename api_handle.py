@@ -91,7 +91,7 @@ class record_api(Resource):
         record_list = list(map(item_to_dict, record_all, [set()] * len(record_all)))
         logging.info(record_list)
         return {'data': {'records': record_list}}
-    @load_token()
+    @load_token(False)
     def post(admin, self):
         parser = reqparse.RequestParser()
         parser.add_argument('data', type=str)
