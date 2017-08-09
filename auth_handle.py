@@ -117,6 +117,7 @@ def load_token(update_token=True, error_status_code=1):
             if admin:
                 if update_token:
                     admin.token = generate_random_string(32)
+                    db.session.commit()
                 response_dict = func(admin, *args, **kw)
                 response_dict['token'] = admin.token
             else:
