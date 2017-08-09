@@ -70,7 +70,13 @@ class record_api(Resource):
     @load_token()
     def get(admin, self):
         args = parse_all_args(reqparse.RequestParser())
-        record_all = get_records(args)
+        try:
+            record_all = get_records(args)
+        except Exception as e:
+            if not check_NoResultFound(e, args):
+                logging.exception(e)
+                raise e
+            return {'status': 1, 'data': {'msg': '查无此记录'}}
         if not type(record_all) == list:
             record_all = [record_all]
         for record_index in range(len(record_all)):
@@ -106,7 +112,7 @@ class record_api(Resource):
             if not check_NoResultFound(e, args):
                 logging.exception(e)
                 raise e
-            return {'status': 1, 'data': {'msg': '查无记录'}}
+            return {'status': 1, 'data': {'msg': '查无此记录'}}
         try:
             the_job = get_jobs(args)
             the_vol = get_volunteers(args)
