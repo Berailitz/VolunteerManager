@@ -112,7 +112,7 @@ function checkFull(LineData) {
   let exception_index = 'record_status' in LineData ? 'record_status' : 7;
   $.each(LineData, function (index, value) {
     // console.log(index, value);
-    if (!value && index != exception_index) {
+    if (!value && index != exception_index && index != 'job_id' && index != 'project_id') {
       isLineFull = false;
     }
   });
