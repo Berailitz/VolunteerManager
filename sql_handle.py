@@ -64,7 +64,7 @@ def check_NoResultFound(e, args=None):
     else:
         return False
 
-def export_to_excel(export_type, folder_path='main/static/temp', sql_url=AppConfig.SQLALCHEMY_DATABASE_URI):
+def export_to_excel(export_type, folder_path=AppConfig.DOWNLOAD_PATH, sql_url=AppConfig.SQLALCHEMY_DATABASE_URI):
     engine = create_engine(sql_url)
     ALL_QUERY = "SELECT `record_id`, `records`.`user_id`, `project_name`, `job_name`, `job_date`, `working_time`, `record_note`, `operation_date`, `tokens`.`username`, `record_status`, `legal_name`, `student_id` FROM `records` LEFT JOIN `volunteers` ON `records`.`user_id` = `volunteers`.`user_id` LEFT JOIN `tokens` ON `records`.`operator_id` = `tokens`.`admin_id` LEFT JOIN `jobs` ON `records`.`project_id` = `jobs`.`project_id` AND `records`.`job_id` = `jobs`.`job_id`"
     if export_type == 'all_in_one':
@@ -72,7 +72,8 @@ def export_to_excel(export_type, folder_path='main/static/temp', sql_url=AppConf
     else:
         data_frame = pandas.read_sql_table(export_type, engine)
     current_time = time.strftime('%Y%m%d%H%M%S',time.localtime(time.time()))
+    module_dir = os.path.split(os.path.realpath(__file__))
     filename = '%r_%r_%r.xlsx' % (export_type, current_time, generate_random_string(6))
-    real_path = path.join(folder_path, filename)
+    real_path = path.join(module_dir, folder_path, filename)
     data_frame.to_excel(real_path, sheet_name='records')
     return filename
