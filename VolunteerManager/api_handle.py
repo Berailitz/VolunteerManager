@@ -92,7 +92,7 @@ class record_api(Resource):
         logging.info(record_list)
         return {'data': {'records': record_list}}
     @load_token(False)
-    def post(admin, self):
+    def put(admin, self):
         parser = reqparse.RequestParser()
         parser.add_argument('data', type=str)
         raw_args = parser.parse_args()
