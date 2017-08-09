@@ -11,6 +11,7 @@ def create_main_blueprint():
     main_blueprint.add_url_rule('/project', 'project', show_project_page)
     main_blueprint.add_url_rule('/record', 'record', show_record_page)
     main_blueprint.add_url_rule('/volunteer', 'volunteer', show_volunteer_page)
+    main_blueprint.add_url_rule('/download', 'download', show_download_page)
     return main_blueprint
 
 @fun_logger('login')
