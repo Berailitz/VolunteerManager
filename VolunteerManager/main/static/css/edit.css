@@ -1,0 +1,41 @@
+body
+{
+    font-family: '黑体';
+}
+
+#main-div
+{
+    font-family: '等线';
+}
+
+#buttons
+{
+    /* margin: 5px; */
+    /* margin-left: 20px; */
+}
+
+#submit-btn, #reset-btn
+{
+    font-size: 15px;
+}
+
+#main-div
+{
+    padding: 30px 5% 0 5%;
+}
+
+#info-card
+{
+      width: 100%; 
+}
+
+#info-title
+{
+    padding-top: 10px;
+    padding-bottom: 11px;
+}
+
+#card-title
+{
+    padding-bottom: 0;
+}
