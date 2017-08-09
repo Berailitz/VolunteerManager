@@ -115,6 +115,7 @@ def load_token(update_token=True, error_status_code=1):
             parser = reqparse.RequestParser()
             parser.add_argument('token', type=str)
             logging.info('%r', request.args)
+            logging.info('%r', request.data)
             logging.info(parser.parse_args())
             admin = get_arg(parser.parse_args()['token'], None, lambda token: check_token(token))
             if admin:
