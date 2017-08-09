@@ -9,6 +9,14 @@ function showToast(messageText, timeout=2000) {
   );
 }
 
+function set_token(token) {
+  Cookies.set('token', token, {
+    expires: 7,
+    domain: 'own.ohhere.xyz',
+    secure: true
+  });
+}
+
 function login() {
   $.getJSON('https://own.ohhere.xyz/api/tokens', {
     'username': document.getElementById('username-box').value,
@@ -19,11 +27,7 @@ function login() {
       document.getElementById('username-box').focus();
     } else {
       showToast('登录成功');
-      Cookies.set('token', rawData['data']['token'], {
-        expires: 7,
-        domain: 'own.ohhere.xyz',
-        secure: true
-      });
+      set_token(rawData['data']['token']);
       window.location.href = 'https://own.ohhere.xyz/record';
     }
   })

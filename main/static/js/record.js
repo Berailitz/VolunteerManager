@@ -1,11 +1,21 @@
 'use strict;'
 
+function set_token(token) {
+  Cookies.set('token', token, {
+    expires: 7,
+    domain: 'own.ohhere.xyz',
+    secure: true
+  });
+}
+
 const getRelationship = new Promise((resolve, reject) => {
-  $.getJSON('https://own.ohhere.xyz/api/relationship', {}, raw_response => {
+  $.getJSON('https://own.ohhere.xyz/api/relationship', {'token': Cookies.get('token')}, raw_response => {
     relationshipDict = raw_response['data'];
+    set_token(raw_response['token']);
     resolve();
   });
 });
+
 const project_id_to_name = project_id => relationshipDict['project_id_dict'][String(project_id)]['project_name'];
 const project_name_to_id = project_name => relationshipDict['project_name_dict'][project_name];
 const job_id_to_name = (project_id, job_id) => relationshipDict['project_id_dict'][String(project_id)]['job_id_dict'][String(job_id)];
@@ -150,8 +160,10 @@ function loadOnlineData(page, length) {
     'page': page,
     'length': length,
     'query_type': 'page',
+    'token': Cookies.get('token')
   }, function(rawResponse) {
       // console.log(rawResponse);
+      set_token(rawResponse['token']);
       tableLines.splice(0, tableLines.length);
       $.each(rawResponse['data'], function(LineIndex, rawLine) {
         rawLine.record_status = '已录入';
@@ -195,9 +207,11 @@ function submitAll() {
         LineData['record_status'] = '正在录入';
         htmlTable.loadData(tableLines);
         $.post("https://own.ohhere.xyz/api/records", {
-          'data': JSON.stringify(encodeLine(LineData))
+          'data': JSON.stringify(encodeLine(LineData)),
+          'token': Cookies.get('token')
         }, function (SubmitResponse, TextStatus, jqXHR) {
           // console.log(SubmitResponse['data']);
+          set_token(rawResponse['token']);
           LineData['record_status'] = SubmitResponse['data']['msg'];
         });
       };

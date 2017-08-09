@@ -14,8 +14,8 @@ def parse_all_args(parser):
     parser.add_argument('user_id', type=int)
     return parser.parse_args()
 
-def get_arg(current, default):
+def get_arg(current, default=None, call_back=lambda arg: arg):
     if current:
-        return current
+        return call_back(current)
     else:
         return default
