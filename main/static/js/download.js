@@ -13,7 +13,7 @@ function download() {
             showToast('ERROR: 下载失败');
         } else {
             showToast('下载中');
-            set_token(rawData['token']);
+            setToken(rawData['token']);
             document.location.href = rawData['data']['download_url'];
         }
     });
@@ -29,7 +29,7 @@ function cleanup() {
                 showToast(`ERROR: 清除失败: ${rawData['data']['msg']}`);
             } else {
                 showToast('清除成功');
-                set_token(rawData['token']);
+                setToken(rawData['token']);
             }
         }
     });

@@ -143,7 +143,7 @@ function loadOnlineData(page, length) {
     'token': Cookies.get('token')
   }, function(rawResponse) {
       // console.log(rawResponse);
-      set_token(rawResponse['token']);
+      setToken(rawResponse['token']);
       tableLines.splice(0, tableLines.length);
       $.each(rawResponse['data'], function(LineIndex, rawLine) {
         rawLine.record_status = '已录入';
@@ -182,7 +182,7 @@ function submitAll() {
           'token': Cookies.get('token')
         }, function (SubmitResponse, TextStatus, jqXHR) {
           // console.log(SubmitResponse['data']);
-          set_token(SubmitResponse['token']);
+          setToken(SubmitResponse['token']);
           LineData['record_status'] = SubmitResponse['data']['msg'];
         });
       };

@@ -11,7 +11,7 @@ function login() {
       document.getElementById('username-box').focus();
     } else {
       showToast('登录成功', 800);
-      set_token(rawData['token']);
+      setToken(rawData['token']);
       window.location.href = '/record';
     }
   })

@@ -11,7 +11,7 @@ function showToast(messageText, timeout=2000) {
   );
 }
 
-function set_token(token) {
+function setToken(token) {
   Cookies.set('token', token, {
     expires: 7,
     secure: true
@@ -21,7 +21,7 @@ function set_token(token) {
 const getRelationship = new Promise((resolve, reject) => {
   $.getJSON('/api/relationship', {'token': Cookies.get('token')}, raw_response => {
     relationshipDict = raw_response['data'];
-    set_token(raw_response['token']);
+    setToken(raw_response['token']);
     resolve();
   });
 });
