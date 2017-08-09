@@ -48,37 +48,45 @@ function search() {
     'query_type': 'one',
     'token': Cookies.get('token')
   }, function (rawResponse) {
-    console.log(rawResponse['data']);
-    setToken(rawResponse['token']);
-    tableLines.splice(0, tableLines.length);
-    if (rawResponse['status'] == 1) {
-      tableLines = [[]];
-      $('#student-id-box')[0].focus();
-      showToast('ERROR: 查无此人', 800);
+    if (rawResponse['status']) {
+      showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
     } else {
-      $.each(infoList, function (infoIndex, infoName) {
-        $('#' + infoName.replace('_', '-') + '-box').parent().addClass('is-dirty');
-        $('#' + infoName.replace('_', '-') + '-box')[0].value = rawResponse['data']['info'][infoName];
-      });
-      $.getJSON('/api/records', {
-        'user_id': rawResponse['data']['info']['user_id'],
-        'query_type': 'all',
-        'token': Cookies.get('token')
-      }, function (rawResponse) {
-        console.log(rawResponse['data']['records']);
-        setToken(rawResponse['token']);
-        if (rawResponse['data']['records'].length == 0) {
-          showToast('ERROR: 查无记录', 800);
-          $('#student-id-box')[0].focus();
-          return;
-        }
-        $.each(rawResponse['data']['records'], function (line_index, raw_line) {
-          tableLines[line_index] = decodeLine(raw_line);
-          // console.log(tableLines[line_index]);
+      console.log(rawResponse['data']);
+      setToken(rawResponse['token']);
+      tableLines.splice(0, tableLines.length);
+      if (rawResponse['status'] == 1) {
+        tableLines = [[]];
+        $('#student-id-box')[0].focus();
+        showToast('ERROR: 查无此人', 800);
+      } else {
+        $.each(infoList, function (infoIndex, infoName) {
+          $('#' + infoName.replace('_', '-') + '-box').parent().addClass('is-dirty');
+          $('#' + infoName.replace('_', '-') + '-box')[0].value = rawResponse['data']['info'][infoName];
         });
-      });
-      htmlTable.render();
-      htmlTable.selectCell(0, 0);
+        $.getJSON('/api/records', {
+          'user_id': rawResponse['data']['info']['user_id'],
+          'query_type': 'all',
+          'token': Cookies.get('token')
+        }, function (rawResponse) {
+          if (rawResponse['status']) {
+            showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
+          } else {
+            console.log(rawResponse['data']['records']);
+            setToken(rawResponse['token']);
+            if (rawResponse['data']['records'].length == 0) {
+              showToast('ERROR: 查无记录', 800);
+              $('#student-id-box')[0].focus();
+              return;
+            }
+            $.each(rawResponse['data']['records'], function (line_index, raw_line) {
+              tableLines[line_index] = decodeLine(raw_line);
+              // console.log(tableLines[line_index]);
+            });
+          }
+        });
+        htmlTable.render();
+        htmlTable.selectCell(0, 0);
+      }
     }
   });
   showToast('查询中', 800);
@@ -91,15 +99,19 @@ function loadData(page, length) {
     'query_type': 'page',
     'token': Cookies.get('token')
   }, function (rawResponse) {
-    console.log(rawResponse);
-    setToken(rawResponse['token']);
-    tableLines.splice(0, tableLines.length);
-    $.each(rawResponse['data'], function (lineIndex, rawLine) {
-      tableLines[lineIndex] = rawLine;
-      // console.log(line);
-    });
-    htmlTable.render();
-    htmlTable.selectCell(0, 0);
+    if (rawResponse['status']) {
+      showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
+    } else {
+      console.log(rawResponse);
+      setToken(rawResponse['token']);
+      tableLines.splice(0, tableLines.length);
+      $.each(rawResponse['data'], function (lineIndex, rawLine) {
+        tableLines[lineIndex] = rawLine;
+        // console.log(line);
+      });
+      htmlTable.render();
+      htmlTable.selectCell(0, 0);
+    }
   });
 }
 
