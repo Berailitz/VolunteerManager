@@ -17,12 +17,13 @@ function search() {
     if (rawResponse['status']) {
       showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
     } else {
-      console.log(rawResponse['data']);
       setToken(rawResponse['token']);
-      rawResponse = decodeLine(rawResponse);
+      rawRecord = rawResponse['data']['records'][0]
+      console.log(rawRecord);
+      rawRecord = decodeLine(rawRecord);
       $.each(infoList, function (infoIndex, infoName) {
         $('#' + infoName.replace('_', '-') + '-box').parent().addClass('is-dirty');
-        $('#' + infoName.replace('_', '-') + '-box')[0].value = rawResponse['data']['info'][infoName];
+        $('#' + infoName.replace('_', '-') + '-box')[0].value = rawRecord[infoName];
       });
     }
   });
