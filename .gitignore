@@ -1,5 +1,7 @@
 log.txt
 test/
+main/static/temp/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -1,21 +1,5 @@
 'use strict;'
 
-function showToast(messageText, timeout=2000) {
-  $('#snackbar')[0].MaterialSnackbar.showSnackbar(
-    {
-      'message': messageText,
-      'timeout': timeout,
-    }
-  );
-}
-
-function set_token(token) {
-  Cookies.set('token', token, {
-    expires: 7,
-    secure: true
-  });
-}
-
 function login() {
   showToast('登录中', 700);
   $.getJSON('https://own.ohhere.xyz/api/tokens', {
