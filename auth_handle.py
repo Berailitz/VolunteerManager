@@ -114,9 +114,9 @@ def load_token(update_token=True, error_status_code=1):
             parser = reqparse.RequestParser()
             parser.add_argument('token', type=str)
             admin = get_arg(parser.parse_args()['token'], None, lambda token: check_token(token))
-            if update_token:
-                admin.token = generate_random_string(32)
             if admin:
+                if update_token:
+                    admin.token = generate_random_string(32)
                 response_dict = func(admin, *args, **kw)
                 response_dict['token'] = admin.token
             else:
