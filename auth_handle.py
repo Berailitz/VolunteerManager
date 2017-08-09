@@ -106,7 +106,7 @@ def guest_only(restricted_view='/record'):
         return wrapper
     return decorator
 
-def load_token(error_status_code=1):
+def load_token(update_token=True, error_status_code=1):
     '''decorated functions should NEVER change table `tokens`'''
     def decorator(func):
         @functools.wraps(func)
@@ -114,6 +114,8 @@ def load_token(error_status_code=1):
             parser = reqparse.RequestParser()
             parser.add_argument('token', type=str)
             admin = get_arg(parser.parse_args()['token'], None, lambda token: check_token(token))
+            if update_token:
+                admin.token = generate_random_string(32)
             if admin:
                 response_dict = func(admin, *args, **kw)
                 response_dict['token'] = admin.token
