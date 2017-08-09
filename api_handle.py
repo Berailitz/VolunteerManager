@@ -142,8 +142,12 @@ class excel_api(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('export_type', type=str)
         raw_args = parser.parse_args()
-        filename = export_to_excel(get_arg(raw_args['export_type'], None))
-        return {'status': 0, 'data': {'download_url': f'/static/temp/{filename}'}}
+        export_type = raw_args['export_type']
+        if export_type:
+            filename = export_to_excel(export_type)
+            return {'status': 0, 'data': {'download_url': f'/static/temp/{filename}'}}
+        else:
+            return {'status': 1, 'data': {'msg': '参数错误'}}
     @load_token()
     def delete(admin, self):
         module_dir = path.split(path.realpath(__file__))[0]
