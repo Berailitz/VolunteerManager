@@ -1,9 +1,10 @@
 #!/usr/env/python3
 # -*- coding: UTF-8 -*-
 
-from flask import Blueprint, make_response, render_template
+from flask import Blueprint, make_response, redirect, render_template
 from ..auth_handle import admin_only, guest_only
 from ..mess import fun_logger
+from ..sql_handle import export_to_excel
 
 def create_main_blueprint():
     main_blueprint = Blueprint('main', __name__, template_folder='templates')
@@ -12,6 +13,7 @@ def create_main_blueprint():
     main_blueprint.add_url_rule('/record', 'record', show_record_page)
     main_blueprint.add_url_rule('/volunteer', 'volunteer', show_volunteer_page)
     main_blueprint.add_url_rule('/download', 'download', show_download_page)
+    main_blueprint.add_url_rule('/download/<export_type>', 'download_excel', download_excel)
     return main_blueprint
 
 @fun_logger('login')
@@ -35,3 +37,7 @@ def show_volunteer_page():
 @admin_only()
 def show_download_page():
     return make_response(render_template('download.html', page_url='/download', page_title='表格下载'))
+
+def download_excel(export_type):
+    filename = export_to_excel(export_type)
+    return redirect(f'/static/temp/{filename}')

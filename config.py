@@ -1,7 +1,7 @@
 #!/usr/env/python3
 # -*- coding: UTF-8 -*-
 
-class AppConfig:
+class AppConfig():
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://xh:xh@localhost/xh?charset=utf8'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
