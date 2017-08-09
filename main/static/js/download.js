@@ -7,7 +7,7 @@ function download() {
         '志愿者信息原始表格': 'volunteers',
         '志愿项目原始表格': 'jobs'
     };
-    export_type = type_dict[$('#table-name-input')[0].value;
+    export_type = type_dict[$('#table-name-input')[0].value];
     $.getJSON(`/api/download/${export_type}`, {'token': Cookies.get('token')}, function (rawData) {
         if (rawData['status']) {
             showToast('ERROR: 下载失败');
