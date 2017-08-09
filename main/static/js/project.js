@@ -105,6 +105,7 @@ function loadData(page, length) {
       showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
     } else {
       console.log(rawResponse);
+      setToken(rawResponse['token']);
       tableLines.splice(0, tableLines.length);
       $.each(rawResponse['data'], function (lineIndex, rawLine) {
         tableLines[lineIndex] = decodeLine(rawLine);
