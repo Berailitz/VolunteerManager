@@ -117,7 +117,7 @@ class record_api(Resource):
         new_rec.operator_id = admin.admin_id
         db.session.add(new_rec)
         db.session.commit()
-        return {'status': 0, 'data': {'msg': '已录入'}}
+        return {'status': 0, 'data': {'msg': f'已录入(ID:{new_rec.record_id})'}}
 
 class relationship_api(Resource):
     @load_token()
