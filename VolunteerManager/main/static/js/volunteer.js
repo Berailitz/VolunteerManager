@@ -55,7 +55,7 @@ function search() {
       } else {
         $.each(infoList, function (infoIndex, infoName) {
           $('#' + infoName.replace('_', '-') + '-box').parent().addClass('is-dirty');
-          $('#' + infoName.replace('_', '-') + '-box')[0].value = rawResponse['data']['info'][infoName];
+          $('#' + infoName.replace('_', '-') + '-box')[0].value = rawResponse['data']['info'][infoName] ? rawResponse['data']['info'][infoName] : '';
         });
         $.getJSON('/api/records', {
           'user_id': rawResponse['data']['info']['user_id'],
