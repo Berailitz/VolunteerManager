@@ -8,10 +8,9 @@ body
     font-family: '等线';
 }
 
-#buttons
+#right-card
 {
-    /* margin: 5px; */
-    /* margin-left: 20px; */
+    min-height: 150px;
 }
 
 #submit-btn, #reset-btn
@@ -33,9 +32,4 @@ body
 {
     padding-top: 10px;
     padding-bottom: 11px;
-}
-
-#card-title
-{
-    padding-bottom: 0;
 }

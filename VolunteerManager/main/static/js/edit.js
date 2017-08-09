@@ -4,7 +4,6 @@ let infoList = ['legal_name', 'student_id', 'working_time', 'project_name', 'job
 
 function search() {
   let record_id = $('#record-id-box')[0].value;
-  resetTable();
   if (record_id && !$.isNumeric(record_id)) {
     showToast('ERROR: 记录不为整数');
     $('#student-id-box')[0].focus();
