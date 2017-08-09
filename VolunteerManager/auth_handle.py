@@ -106,7 +106,7 @@ def guest_only(restricted_view='/record'):
         return wrapper
     return decorator
 
-@fun_logger('login')
+# @fun_logger('login')
 def load_token(update_token=True, error_status_code=1):
     '''decorated functions should NEVER change table `tokens`'''
     def decorator(func):
@@ -114,8 +114,8 @@ def load_token(update_token=True, error_status_code=1):
         def wrapper(*args, **kw):
             parser = reqparse.RequestParser()
             parser.add_argument('token', type=str)
-            logging.info('%r', request.args)
-            logging.info('%r', request.data)
+            # logging.info('%r', request.args)
+            # logging.info('%r', request.data)
             logging.info(parser.parse_args())
             admin = get_arg(parser.parse_args()['token'], None, lambda token: check_token(token))
             if admin:
