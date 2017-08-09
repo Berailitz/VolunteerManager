@@ -3,7 +3,6 @@
 function set_token(token) {
   Cookies.set('token', token, {
     expires: 7,
-    domain: 'own.ohhere.xyz',
     secure: true
   });
 }
