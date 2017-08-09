@@ -1,6 +1,6 @@
 'use strict;'
 
-let infoList = ['legal_name', 'student_id', 'working_time', 'project_name', 'job_name', 'job_date', 'note'];
+let infoList = ['legal_name', 'student_id', 'working_time', 'project_name', 'job_name', 'job_date', 'note', 'operator_name', 'operator_date'];
 
 function search() {
   let record_id = $('#record-id-box')[0].value;
