@@ -1,14 +1,18 @@
 #!/usr/env/python3
 # -*- coding: UTF-8 -*-
 
-from .auth_handle import get_current_user, load_token
 from flask_restful import Resource, Api, reqparse
+from .auth_handle import get_current_user, load_token
+from .config import AppConfig
 from .mess import fun_logger, generate_random_string
-from .restful_helper import parse_all_args
-from .sql_handle import item_to_dict, get_jobs, get_records, get_tokens, get_volunteers, check_NoResultFound
+from .restful_helper import get_arg, parse_all_args
+from .sql_handle import export_to_excel, item_to_dict, get_jobs, get_records, get_tokens, get_volunteers, check_NoResultFound
 from .tables import db, Record
 import json
 import logging
+import os
+import os.path as path
+import shutil
 
 def create_api():
     api = Api()
@@ -17,6 +21,7 @@ def create_api():
     api.add_resource(job_api, '/api/jobs')
     api.add_resource(record_api, '/api/records')
     api.add_resource(relationship_api, '/api/relationship')
+    api.add_resource(excel_api, '/api/download')
     return api
 
 class token_api(Resource):
@@ -130,3 +135,23 @@ class relationship_api(Resource):
             }
             project_name_dict[projects_id_2_name[single_project_id]] = single_project_id
         return {'status': 0, 'data': {'project_id_dict': project_id_dict, 'project_name_dict': project_name_dict}}
+
+class excel_api(Resource):
+    @load_token()
+    def get(admin, self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('export_type', type=str)
+        raw_args = parser.parse_args()
+        filename = export_to_excel(get_arg(raw_args['export_type'], None))
+        return {'status': 0, 'data': {'download_url': f'/static/temp/{filename}'}}
+    @load_token()
+    def delete(admin, self):
+        module_dir = path.split(path.realpath(__file__))[0]
+        download_folder = AppConfig.DOWNLOAD_PATH
+        download_path = path.join(module_dir, download_folder)
+        try:
+            shutil.rmtree(download_path)
+            os.mkdir(download_path)
+            return {'status': 0}
+        except Exception as identifier:
+            return {'status': 1, 'data': {'msg': str(identifier)}}

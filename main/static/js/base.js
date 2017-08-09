@@ -1,6 +1,7 @@
 'use strict;'
 
 let relationshipDict = {};
+
 function showToast(messageText, timeout=2000) {
   $('#snackbar')[0].MaterialSnackbar.showSnackbar(
     {
