@@ -185,7 +185,7 @@ function submitAll() {
           'url': "/api/records",
           'type': 'PUT',
           'dataType': 'json',
-          'data': encodeLine(LineData),
+          'data': {'data': encodeLine(LineData), 'token': Cookies.get('token')},
           'success': function (rawResponse, TextStatus, jqXHR) {
             if (rawResponse['status']) {
               showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
