@@ -53,7 +53,7 @@ def get_current_user(**credential):
     '''check credential and return current user with new token'''
     admin = authenticate(**credential)
     if admin:
-        admin.token = generate_random_string(64)
+        admin.token = generate_random_string(32)
         db.session.commit()
         return admin
     else:
