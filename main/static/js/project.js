@@ -1,26 +1,10 @@
 'use strict;'
 
-function set_token(token) {
-  Cookies.set('token', token, {
-    expires: 7,
-    secure: true
-  });
-}
-
-const getRelationship = new Promise((resolve, reject) => {
-  $.getJSON('https://own.ohhere.xyz/api/relationship', {'token': Cookies.get('token')}, raw_response => {
-    relationshipDict = raw_response['data'];
-    set_token(raw_response['token']);
-    resolve();
-  });
-});
-
 const COLUMN_NAMES = ['记录ID', '姓名', '学号', '工作项目', '工作日期', '时长', '记录备注', '录入人', '录入时间'];
 let tableLines = [];
 let container = $('#volunteer-table')[0];
 let infoList = ['job_start', 'job_end', 'director', 'location', 'note'];
 let jobNameDict = {};
-let relationshipDict = {};
 let projectNameList = [];
 let htmlTable = new Handsontable(container, {
   colHeaders: COLUMN_NAMES,
@@ -45,10 +29,6 @@ let htmlTable = new Handsontable(container, {
   sortIndicator: true,
   stretchH: 'all',
 });
-const project_id_to_name = project_id => relationshipDict['project_id_dict'][String(project_id)]['project_name'];
-const project_name_to_id = project_name => relationshipDict['project_name_dict'][project_name];
-const job_id_to_name = (project_id, job_id) => relationshipDict['project_id_dict'][String(project_id)]['job_id_dict'][String(job_id)];
-const job_name_to_id = (project_id, job_name) => relationshipDict['project_id_dict'][String(project_id)]['job_name_dict'][job_name];
 
 function decodeLine(rawLine) {
   rawLine['project_name'] = project_id_to_name(rawLine['project_id']);
@@ -140,15 +120,6 @@ function resetTable() {
 //   $('#student-id-box')[0].value = '';
 //   $('#legal-name-box')[0].value = '';
 //   $('#student-id-box')[0].focus();
-}
-
-function showToast(messageText, timeout=2000) {
-  $('#snackbar')[0].MaterialSnackbar.showSnackbar(
-    {
-      'message': messageText,
-      'timeout': timeout,
-    }
-  );
 }
 
 iniConf();

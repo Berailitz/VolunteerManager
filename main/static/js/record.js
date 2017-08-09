@@ -1,29 +1,9 @@
 'use strict;'
 
-function set_token(token) {
-  Cookies.set('token', token, {
-    expires: 7,
-    secure: true
-  });
-}
-
-const getRelationship = new Promise((resolve, reject) => {
-  $.getJSON('https://own.ohhere.xyz/api/relationship', {'token': Cookies.get('token')}, raw_response => {
-    relationshipDict = raw_response['data'];
-    set_token(raw_response['token']);
-    resolve();
-  });
-});
-
-const project_id_to_name = project_id => relationshipDict['project_id_dict'][String(project_id)]['project_name'];
-const project_name_to_id = project_name => relationshipDict['project_name_dict'][project_name];
-const job_id_to_name = (project_id, job_id) => relationshipDict['project_id_dict'][String(project_id)]['job_id_dict'][String(job_id)];
-const job_name_to_id = (project_id, job_name) => relationshipDict['project_id_dict'][String(project_id)]['job_name_dict'][job_name];
 let allJobNameList = {'': []};
 let jobNameList = [];
 const COLUMN_NAMES = ['学号', '姓名', '时长', '志愿项目', '工作项目', '活动日期', '备注', '录入状态'];
 let container = $('#record-table')[0];
-let relationshipDict = {};
 let tableLines = Array();
 let htmlTable = new Handsontable(container, {
   colHeaders: COLUMN_NAMES,
@@ -184,15 +164,6 @@ function resetTable() {
   tableLines = [new RecordLine()];
   htmlTable.loadData(tableLines);
   resetCurcor()
-}
-
-function showToast(messageText, timeout=2000) {
-  $('#snackbar')[0].MaterialSnackbar.showSnackbar(
-    {
-      'message': messageText,
-      'timeout': timeout,
-    }
-  );
 }
 
 function submitAll() {
