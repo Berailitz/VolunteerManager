@@ -27,12 +27,6 @@ let htmlTable = new Handsontable(container, {
   // stretchH: 'all'
 });
 
-function decodeLine(rawLine) {
-  rawLine['project_name'] = project_id_to_name(rawLine['project_id']);
-  rawLine['job_name'] = job_id_to_name(rawLine['project_id'], rawLine['job_id']);
-  return rawLine;
-}
-
 function search() {
   let student_id = $('#student-id-box')[0].value;
   let legal_name = $('#legal-name-box')[0].value;

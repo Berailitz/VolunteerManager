@@ -31,6 +31,12 @@ const project_name_to_id = project_name => relationshipDict['project_name_dict']
 const job_id_to_name = (project_id, job_id) => relationshipDict['project_id_dict'][String(project_id)]['job_id_dict'][String(job_id)];
 const job_name_to_id = (project_id, job_name) => relationshipDict['project_id_dict'][String(project_id)]['job_name_dict'][job_name];
 
+function decodeLine(rawLine) {
+  rawLine['project_name'] = project_id_to_name(rawLine['project_id']);
+  rawLine['job_name'] = job_id_to_name(rawLine['project_id'], rawLine['job_id']);
+  return rawLine;
+}
+
 function logout() {
   Cookies.remove('token');
   document.location.href = '/';
