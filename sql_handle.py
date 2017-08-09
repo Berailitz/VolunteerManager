@@ -72,8 +72,8 @@ def export_to_excel(export_type, folder_path=AppConfig.DOWNLOAD_PATH, sql_url=Ap
     else:
         data_frame = pandas.read_sql_table(export_type, engine)
     current_time = time.strftime('%Y%m%d%H%M%S',time.localtime(time.time()))
-    module_dir = path.split(path.realpath(__file__))
-    filename = '%r_%r_%r.xlsx' % (export_type, current_time, generate_random_string(6))
+    module_dir = path.split(path.realpath(__file__))[0]
+    filename = '%s_%s_%s.xlsx' % (export_type, current_time, generate_random_string(6))
     real_path = path.join(module_dir, folder_path, filename)
     data_frame.to_excel(real_path, sheet_name='records')
     return filename
