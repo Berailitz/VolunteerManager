@@ -49,7 +49,7 @@ function search() {
     'token': Cookies.get('token')
   }, function (rawResponse) {
     console.log(rawResponse['data']);
-    set_token(rawResponse['token']);
+    setToken(rawResponse['token']);
     tableLines.splice(0, tableLines.length);
     if (rawResponse['status'] == 1) {
       tableLines = [[]];
@@ -66,7 +66,7 @@ function search() {
         'token': Cookies.get('token')
       }, function (rawResponse) {
         console.log(rawResponse['data']['records']);
-        set_token(rawResponse['token']);
+        setToken(rawResponse['token']);
         if (rawResponse['data']['records'].length == 0) {
           showToast('ERROR: 查无记录', 800);
           $('#student-id-box')[0].focus();
@@ -92,7 +92,7 @@ function loadData(page, length) {
     'token': Cookies.get('token')
   }, function (rawResponse) {
     console.log(rawResponse);
-    set_token(rawResponse['token']);
+    setToken(rawResponse['token']);
     tableLines.splice(0, tableLines.length);
     $.each(rawResponse['data'], function (lineIndex, rawLine) {
       tableLines[lineIndex] = rawLine;
