@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block main_div %}
+    <div id="main-div" class="mdl-grid">
+        <div class="mdl-card mdl-shadow--2dp">
+            <div class="mdl-card__title mdl-color--primary mdl-color-text--white">
+                <h2 class="mdl-card__title-text">Blalalaala</h2>
+            </div>
+            <div class="mdl-card__supporting-text">
+                <form action="#">
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fullwidth">
+                        <input id="table-name-input" class="mdl-textfield__input" type="text" id="table-name-box" value="活动记录补全版" readonly tabIndex="1">
+                        <label for="table-name-box" class="mdl-textfield__label">选择表格</label>
+                        <ul id="table-name-menu" for="table-name-box" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
+                            <li class="mdl-menu__item" data-table-index="table-0">活动记录补全版</li>
+                            <li class="mdl-menu__item" data-table-index="table-1">原始活动原始表格</li>
+                            <li class="mdl-menu__item" data-table-index="table-2">志愿者信息原始表格</li>
+                            <li class="mdl-menu__item" data-table-index="table-3">志愿项目原始表格</li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+            <div class="mdl-card__actions mdl-card--border">
+                <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="download();">下载</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block page_footer %}
+<link href="/static/css/getmdl-select.min.css" rel="stylesheet">
+<script src="/static/js/getmdl-select.min.js"></script>
+{% endblock %}
