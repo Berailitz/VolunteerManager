@@ -1,6 +1,6 @@
 log.txt
 test/
-main/static/temp/*
+VolunteerManager/main/static/temp/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
