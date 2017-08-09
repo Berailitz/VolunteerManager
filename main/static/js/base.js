@@ -32,4 +32,5 @@ const job_name_to_id = (project_id, job_name) => relationshipDict['project_id_di
 
 function logout() {
   Cookies.remove('token');
+  document.location.href('/')
 }
