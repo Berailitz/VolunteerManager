@@ -20,6 +20,7 @@ const project_name_to_id = project_name => relationshipDict['project_name_dict']
 const job_id_to_name = (project_id, job_id) => relationshipDict['project_id_dict'][String(project_id)]['job_id_dict'][String(job_id)];
 const job_name_to_id = (project_id, job_name) => relationshipDict['project_id_dict'][String(project_id)]['job_name_dict'][job_name];
 let allJobNameList = {'': []};
+let jobNameList = [];
 const COLUMN_NAMES = ['学号', '姓名', '时长', '志愿项目', '工作项目', '活动日期', '备注', '录入状态'];
 let container = $('#record-table')[0];
 let relationshipDict = {};
@@ -41,7 +42,7 @@ let htmlTable = new Handsontable(container, {
       data: 'project_name',
       type: 'dropdown',
       source: function (query, process) {
-        process(relationshipDict['project_name_dict']);
+        process(Object.keys(relationshipDict['project_name_dict']));
       },
     },
     {
@@ -88,7 +89,7 @@ let htmlTable = new Handsontable(container, {
     if (left == right && up == down && right == 4) {
       let currentProjectName = tableLines[up]['project_name'];
       // console.log(allJobNameList[currentProjectName]);
-      jobNameList = relationshipDict['project_id_dict'][String(project_name_to_id(currentProjectName))]['job_name_dict'];
+      jobNameList = Object.keys(relationshipDict['project_id_dict'][String(project_name_to_id(currentProjectName))]['job_name_dict']);
       // console.log(jobNameList);
     }
   },
