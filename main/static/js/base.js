@@ -29,3 +29,7 @@ const project_id_to_name = project_id => relationshipDict['project_id_dict'][Str
 const project_name_to_id = project_name => relationshipDict['project_name_dict'][project_name];
 const job_id_to_name = (project_id, job_id) => relationshipDict['project_id_dict'][String(project_id)]['job_id_dict'][String(job_id)];
 const job_name_to_id = (project_id, job_name) => relationshipDict['project_id_dict'][String(project_id)]['job_name_dict'][job_name];
+
+function logout() {
+  Cookies.remove('token');
+}
