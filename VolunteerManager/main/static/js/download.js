@@ -9,11 +9,11 @@ function download() {
     };
     export_type = type_dict[$('#table-name-input')[0].value];
     $.getJSON('/api/download', {'token': Cookies.get('token'), 'export_type': export_type}, function (rawData) {
+        setToken(rawResponse['token']);
         if (rawData['status']) {
             showToast('ERROR: 下载失败');
         } else {
             showToast('下载中');
-            setToken(rawData['token']);
             document.location.href = rawData['data']['download_url'];
         }
     });
@@ -25,11 +25,11 @@ function cleanup() {
         type: 'DELETE',
         data: {'token': Cookies.get('token')},
         success: function (rawData) {
+            setToken(rawResponse['token']);
             if (rawData['status']) {
                 showToast(`ERROR: 清除失败: ${rawData['data']['msg']}`);
             } else {
                 showToast('清除成功');
-                setToken(rawData['token']);
             }
         }
     });

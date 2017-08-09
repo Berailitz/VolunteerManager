@@ -63,11 +63,11 @@ function search() {
       payload['job_id'] = job_name_to_id(payload['project_id'], job_name);
   }
   $.getJSON("/api/records", payload, function (rawResponse) {
+    setToken(rawResponse['token']);
     if (rawResponse['status']) {
       showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
     } else {
       let count = rawResponse['data']['records'].length;
-      setToken(rawResponse['token']);
       tableLines.splice(0, count);
       // $.each(infoList, function (infoIndex, infoName) {
       //   $('#' + infoName.replace('_', '-') + '-box').parent().addClass('is-dirty');
@@ -96,6 +96,7 @@ function loadData(page, length) {
     'query_type': 'all',
     'token': Cookies.get('token')
   }, function (rawResponse) {
+    setToken(rawResponse['token']);
     if (rawResponse['status']) {
       showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
     } else {

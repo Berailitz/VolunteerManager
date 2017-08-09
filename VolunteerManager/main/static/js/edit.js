@@ -14,10 +14,10 @@ function search() {
     'query_type': 'one',
     'token': Cookies.get('token')
   }, function (rawResponse) {
+    setToken(rawResponse['token']);
     if (rawResponse['status']) {
       showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
     } else {
-      setToken(rawResponse['token']);
       rawRecord = rawResponse['data']['records'][0]
       console.log(rawRecord);
       rawRecord = decodeLine(rawRecord);
