@@ -27,8 +27,8 @@ function login() {
       showToast('ERROR: 用户名或密码错误');
       document.getElementById('username-box').focus();
     } else {
-      showToast('登录成功');
-      set_token(rawData['data']['token']);
+      showToast('登录成功', 800);
+      set_token(rawData['token']);
       window.location.href = 'https://own.ohhere.xyz/record';
     }
   })
