@@ -18,7 +18,7 @@ function set_token(token) {
 }
 
 const getRelationship = new Promise((resolve, reject) => {
-  $.getJSON('https://own.ohhere.xyz/api/relationship', {'token': Cookies.get('token')}, raw_response => {
+  $.getJSON('/api/relationship', {'token': Cookies.get('token')}, raw_response => {
     relationshipDict = raw_response['data'];
     set_token(raw_response['token']);
     resolve();
@@ -32,5 +32,5 @@ const job_name_to_id = (project_id, job_name) => relationshipDict['project_id_di
 
 function logout() {
   Cookies.remove('token');
-  document.location.href('/')
+  document.location.href = '/';
 }

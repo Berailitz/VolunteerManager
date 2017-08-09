@@ -2,7 +2,7 @@
 
 function login() {
   showToast('登录中', 700);
-  $.getJSON('https://own.ohhere.xyz/api/tokens', {
+  $.getJSON('/api/tokens', {
     'username': document.getElementById('username-box').value,
     'password': document.getElementById('password-box').value
   }, function (rawData) {
@@ -12,7 +12,7 @@ function login() {
     } else {
       showToast('登录成功', 800);
       set_token(rawData['token']);
-      window.location.href = 'https://own.ohhere.xyz/record';
+      window.location.href = '/record';
     }
   })
 }
