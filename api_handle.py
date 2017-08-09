@@ -1,7 +1,7 @@
 #!/usr/env/python3
 # -*- coding: UTF-8 -*-
 
-from .auth_handle import get_current_user
+from .auth_handle import get_current_user, load_token
 from flask_restful import Resource, Api, reqparse
 from .mess import fun_logger, generate_random_string
 from .restful_helper import parse_all_args
@@ -29,11 +29,12 @@ class token_api(Resource):
         # login_time = time.strftime('%Y-%m-%d %H:%M:%S',)
         new_token = get_current_user(**args).token
         if new_token:
-            return {'status': 0, 'data': {'token': new_token}}
+            return {'status': 0, 'token': new_token}
         else:
             return {'status': 1}
 
 class volunteer_api(Resource):
+    @load_token()
     def get(self):
         args = parse_all_args(reqparse.RequestParser())
         try:
@@ -48,6 +49,7 @@ class volunteer_api(Resource):
         return {'status': 0, 'data': {'info': volunteer_dict}}
 
 class job_api(Resource):
+    @load_token()
     def get(self):
         args = parse_all_args(reqparse.RequestParser())
         try:
@@ -60,6 +62,7 @@ class job_api(Resource):
         return {'data': job_list}
 
 class record_api(Resource):
+    @load_token()
     def get(self):
         args = parse_all_args(reqparse.RequestParser())
         record_all = get_records(args)
@@ -83,6 +86,7 @@ class record_api(Resource):
         record_list = list(map(item_to_dict, record_all, [set()] * len(record_all)))
         logging.info(record_list)
         return {'data': {'records': record_list}}
+    @load_token()
     def post(self):
         parser = reqparse.RequestParser()
         parser.add_argument('data', type=str)
@@ -111,6 +115,7 @@ class record_api(Resource):
         return {'status': 0, 'data': {'msg': '已录入'}}
 
 class relationship_api(Resource):
+    @load_token()
     def get(self):
         project_id_dict = dict()
         project_name_dict = dict()

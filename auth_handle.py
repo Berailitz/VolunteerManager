@@ -6,7 +6,9 @@ import functools
 import logging
 from flask import redirect, request, make_response
 from flask_bcrypt import Bcrypt
+from flask_restful import reqparse
 from .mess import fun_logger, generate_random_string
+from .restful_helper import get_arg
 from .sql_handle import get_tokens, check_NoResultFound
 from .tables import db
 
@@ -101,5 +103,22 @@ def guest_only(restricted_view='/record'):
                 response = func(*args, **kw)
                 response.set_cookie('token', '', max_age=604800, secure=True)
             return response
+        return wrapper
+    return decorator
+
+def load_token(error_status_code=1):
+    '''decorated functions should NEVER change table `tokens`'''
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kw):
+            parser = reqparse.RequestParser()
+            parser.add_argument('token', type=str)
+            admin = get_arg(parser.parse_args()['token'], None, lambda token: check_token(token))
+            if admin:
+                response_dict = func(admin, *args, **kw)
+                response_dict['token'] = admin.token
+            else:
+                response_dict = {'status': error_status_code}
+            return response_dict
         return wrapper
     return decorator

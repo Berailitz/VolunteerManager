@@ -1,11 +1,21 @@
 'use strict;'
 
+function set_token(token) {
+  Cookies.set('token', token, {
+    expires: 7,
+    domain: 'own.ohhere.xyz',
+    secure: true
+  });
+}
+
 const getRelationship = new Promise((resolve, reject) => {
-  $.getJSON('https://own.ohhere.xyz/api/relationship', {}, raw_response => {
+  $.getJSON('https://own.ohhere.xyz/api/relationship', {'token': Cookies.get('token')}, raw_response => {
     relationshipDict = raw_response['data'];
+    set_token(raw_response['token']);
     resolve();
   });
 });
+
 let COLUMN_NAMES = ['记录ID', '志愿项目', '工作项目', '工作日期', '时长', '记录备注', '录入人', '录入时间'];
 let tableLines = [];
 let container = $('#volunteer-table')[0];
@@ -57,8 +67,10 @@ function search() {
     'student_id': student_id,
     'legal_name': legal_name,
     'query_type': 'one',
+    'token': Cookies.get('token')
   }, function (rawResponse) {
     console.log(rawResponse['data']);
+    set_token(rawResponse['token']);
     tableLines.splice(0, tableLines.length);
     if (rawResponse['status'] == 1) {
       tableLines = [[]];
@@ -71,9 +83,11 @@ function search() {
       });
       $.getJSON('https://own.ohhere.xyz/api/records', {
         'user_id': rawResponse['data']['info']['user_id'],
-        'query_type': 'all'
+        'query_type': 'all',
+        'token': Cookies.get('token')
       }, function (rawResponse) {
         console.log(rawResponse['data']['records']);
+        set_token(rawResponse['token']);
         if (rawResponse['data']['records'].length == 0) {
           showToast('ERROR: 查无记录', 800);
           $('#student-id-box')[0].focus();
@@ -95,9 +109,11 @@ function loadData(page, length) {
   $.getJSON("https://own.ohhere.xyz/api/volunteers", {
     'page': page,
     'length': length,
-    'query_type': 'page'
+    'query_type': 'page',
+    'token': Cookies.get('token')
   }, function (rawResponse) {
     console.log(rawResponse);
+    set_token(rawResponse['token']);
     tableLines.splice(0, tableLines.length);
     $.each(rawResponse['data'], function (lineIndex, rawLine) {
       tableLines[lineIndex] = rawLine;
