@@ -26,9 +26,10 @@ function cleanup() {
         data: {'token': Cookies.get('token')},
         success: function (rawData) {
             if (rawData['status']) {
-                showToast('清除成功');
-            } else {
                 showToast(`ERROR: 清除失败: ${rawData['data']['msg']}`);
+            } else {
+                showToast('清除成功');
+                set_token(rawData['token']);
             }
         }
     });
