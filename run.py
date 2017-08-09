@@ -11,7 +11,7 @@ def main():
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
     logging.info('start...')
-    application.run(debug=True)
+    application.run(port=9020, debug=True)
 
 if __name__ == '__main__':
     main()
