@@ -17,13 +17,11 @@ def create_main_blueprint():
     main_blueprint.add_url_rule('/download', 'download', show_download_page)
     return main_blueprint
 
-@fun_logger('login')
 @guest_only()
 def show_index_page():
     return make_response(render_template('index.html', page_url='/index', page_title='登录'))
 
 @admin_only()
-@fun_logger('login')
 def show_project_page():
     return make_response(render_template('project.html', page_url='/project', page_title='志愿项目管理'))
 

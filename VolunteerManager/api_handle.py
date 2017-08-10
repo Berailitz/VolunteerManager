@@ -12,7 +12,7 @@ from flask_sqlalchemy import orm
 from .auth_handle import get_current_user, load_token
 from .config import AppConfig
 from .mess import fun_logger
-from .restful_helper import get_arg, parse_all_args
+from .restful_helper import parse_all_args
 from .sql_handle import export_to_excel, item_to_dict, get_jobs, get_records, get_tokens, get_volunteers
 from .tables import db, Record
 
@@ -43,8 +43,7 @@ class TokenApi(Resource):
         admin = get_current_user(**args)
         if admin:
             return {'status': 0, 'token': admin.token}
-        else:
-            return {'status': 1, 'data': {'msg': '鉴权失败'}}
+        return {'status': 1, 'data': {'msg': '鉴权失败'}}
 
 class VolunteerApi(Resource):
     """handle /api/volunteers"""
@@ -91,13 +90,13 @@ class RecordApi(Resource):
             return {'status': 1, 'data': {'msg': '查无此记录'}}
         if not isinstance(record_all, list):
             record_all = [record_all]
-        for record_index in range(len(record_all)):
+        for record_index, const_single_record in enumerate(record_all):
             # logging.info(record_list[record_index])
             try:
-                operator = get_tokens({'admin_id': record_all[record_index].operator_id}, 'one', ['admin_id'])
+                operator = get_tokens({'admin_id': const_single_record.operator_id}, 'one', ['admin_id'])
                 operator_name = operator.username
                 record_all[record_index].operator_name = operator_name
-                volunteer = get_volunteers({'user_id': record_all[record_index].user_id}, 'one', ['user_id'])
+                volunteer = get_volunteers({'user_id': const_single_record.user_id}, 'one', ['user_id'])
                 legal_name = volunteer.legal_name
                 record_all[record_index].legal_name = legal_name
                 student_id = volunteer.student_id
@@ -222,8 +221,7 @@ class ExcelApi(Resource):
                 logging.exception('%r', identifier)
                 return {'status': 1, 'data': {'msg': '%r' % (identifier, )}}
             return {'status': 0, 'data': {'download_url': f'/static/temp/{filename}'}}
-        else:
-            return {'status': 1, 'data': {'msg': '参数错误'}}
+        return {'status': 1, 'data': {'msg': '参数错误'}}
 
     @staticmethod
     @load_token()
