@@ -134,7 +134,7 @@ class RecordApi(Resource):
         except orm.exc.NoResultFound as identifier:
             logging.warning('%r', identifier)
             return {'status': 1, 'data': {'msg': '志愿项目或志愿者参数错误'}}
-        for key in ['job_date', 'working_time', 'record_note']:
+        for key in ['working_date', 'working_time', 'record_note']:
             if key in args and args[key]:
                 setattr(the_rec, key, args[key])
         the_rec.operator_id = admin.admin_id
@@ -160,7 +160,7 @@ class RecordApi(Resource):
         except orm.exc.NoResultFound as identifier:
             logging.warning('%r', identifier)
             return {'status': 1, 'data': {'msg': '查无此项目'}}
-        new_rec = Record(the_vol.user_id, the_job.project_id, the_job.job_id, args['job_date'], args['working_time'], args['record_note'])
+        new_rec = Record(the_vol.user_id, the_job.project_id, the_job.job_id, args['working_date'], args['working_time'], args['record_note'])
         new_rec.operator_id = admin.admin_id
         db.session.add(new_rec)
         db.session.commit()

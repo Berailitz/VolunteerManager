@@ -118,18 +118,18 @@ class Record(db.Model):
     user_id = db.Column(db.Integer)
     project_id = db.Column(db.Integer)
     job_id = db.Column(db.Integer)
-    job_date = db.Column(db.Date)
+    working_date = db.Column(db.Date)
     working_time = db.Column(db.Integer)
     record_note = db.Column(db.String(40))
     operator_id = db.Column(db.Integer)
-    operation_date = db.Column(db.Date)
+    operation_time = db.Column(db.Date)
     blank1 = db.Column(db.Integer)
 
-    def __init__(self, user_id, project_id, job_id, job_date, working_time, record_note, operator_id=0):
+    def __init__(self, user_id, project_id, job_id, working_date, working_time, record_note, operator_id=0):
         self.user_id = user_id
         self.project_id = project_id
         self.job_id = job_id
-        self.job_date = job_date
+        self.working_date = working_date
         self.working_time = working_time
         self.record_note = record_note
         self.operator_id = operator_id
@@ -239,7 +239,7 @@ class record_api(Resource):
             return {'status': 1, 'data': {'msg': '查无此人'}}
         elif len(the_job) == 1:
             return {'status': 1, 'data': {'msg': '查无此项目'}}
-        new_rec = Record(the_vol.user_id, the_job.project_id, the_job.job_id, args['job_date'], args['working_time'], args['record_note'])
+        new_rec = Record(the_vol.user_id, the_job.project_id, the_job.job_id, args['working_date'], args['working_time'], args['record_note'])
         Record.add(new_rec)
         return {'status': 0, 'data': {'msg': '已录入'}}
 

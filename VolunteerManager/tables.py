@@ -43,19 +43,19 @@ class Record(db.Model):
     user_id = db.Column(db.Integer)
     project_id = db.Column(db.Integer)
     job_id = db.Column(db.Integer)
-    job_date = db.Column(db.Date)
+    working_date = db.Column(db.Date)
     working_time = db.Column(db.Integer)
     record_note = db.Column(db.String(40))
     operator_id = db.Column(db.Integer)
-    operation_date = db.Column(db.DateTime, server_default=db.func.current_timestamp())
+    operation_time = db.Column(db.DateTime, server_default=db.func.current_timestamp())
     record_status = db.Column(db.Integer, server_default='1')
 
-    def __init__(self, user_id=0, project_id=0, job_id=0, job_date='', working_time=0, record_note='', operator_id=0):
+    def __init__(self, user_id=0, project_id=0, job_id=0, working_date='', working_time=0, record_note='', operator_id=0):
         """initialize a record object, default values may be invalid"""
         self.user_id = user_id
         self.project_id = project_id
         self.job_id = job_id
-        self.job_date = job_date
+        self.working_date = working_date
         self.working_time = working_time
         self.record_note = record_note
         self.operator_id = operator_id
