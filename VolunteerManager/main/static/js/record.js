@@ -149,7 +149,7 @@ function submitAll() {
   showToast('正在录入', 700);
   $.each(tableLines, function (LineIndex, LineData) {
     // console.log(LineData['record_status'] == '未录入' && !checkEmpty(LineData));
-    if (!checkEmpty(LineData && (!LineData['record_status'] || LineData['record_status'].slice(0, 3) != '已录入') )) {
+    if (!checkEmpty(LineData) && (!LineData['record_status'] || LineData['record_status'].slice(0, 3) != '已录入')) {
       if (!checkFull(LineData)) {
         showToast(`ERROR: #${LineIndex + 1} 需补充信息`, 800);
         LineData['record_status'] = '需补充信息';
