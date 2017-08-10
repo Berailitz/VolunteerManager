@@ -135,31 +135,6 @@ function getTestRecordline() {
   return new RecordLine('2012110649', "徐盈盈", 1, "a", "a", "2017-08-16", "aa", "");
 }
 
-function loadOnlineData(page, length) {
-  $.getJSON("/api/records",{
-    'page': page,
-    'length': length,
-    'query_type': 'page',
-    'token': Cookies.get('token')
-  }, function(RawData) {
-      setToken(RawData['token']);
-      if (RawData['status']) {
-        showToast(`ERROR: 查询失败: ${RawData['data']['msg']}`);
-      } else {
-        // console.log(RawData);
-        tableLines.splice(0, tableLines.length);
-        $.each(RawData['data'], function(LineIndex, rawLine) {
-          rawLine.record_status = '已录入';
-          tableLines[LineIndex] = rawLine
-          console.log(rawLine);
-        });
-        htmlTable.loadData(tableLines);
-        htmlTable.render();
-        appendRow(1);
-      }
-    });
-}
-
 function resetCurcor() {
   htmlTable.selectCell(0, 0);
 }
@@ -189,7 +164,7 @@ function submitAll() {
           'success': function (RawData, TextStatus, jqXHR) {
             setToken(RawData['token']);
             if (RawData['status']) {
-              showToast(`ERROR: 查询失败: ${RawData['data']['msg']}`);
+              showToast(`ERROR: #${LineIndex + 1}查询失败: ${RawData['data']['msg']}`);
               LineData['record_status'] = RawData['data']['msg'];
             } else {
               // console.log(RawData['data']);
