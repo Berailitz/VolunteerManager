@@ -1,6 +1,7 @@
 'use strict;'
 
 let infoList = ['legal_name', 'student_id', 'working_time', 'project_name', 'job_name', 'job_date', 'note', 'operator_name', 'operation_date'];
+let record_id;
 
 function encodeLine(rawLine) {
   rawLine['project_id'] = project_name_to_id(rawLine['project_name']);
@@ -20,7 +21,7 @@ function setJobNameMenu(project_name) {
     let job_names = relationshipDict['project_id_dict'][String(project_name_to_id(project_name))]['job_id_dict'];
     // console.log(project_name);
     $('#job-name-menu').empty();
-    $('#job-name-input')[0].value = job_names[0];
+    $('#job-name-input')[0].value = Object.keys(job_names)[0];
     $.each(job_names, (job_index, job_name) => $('#job-name-menu').append(`<li class="mdl-menu__item"  data-job-index="job-${job_index + 1}">${job_name}</li>`));
   } else {
     $('#job-name-menu').empty();
@@ -46,7 +47,7 @@ function showLegalName(params) {
 }
 
 function search() {
-  let record_id = $('#record-id-input')[0].value;
+  record_id = $('#record-id-input')[0].value;
   if (record_id && !$.isNumeric(record_id)) {
     showToast('ERROR: 记录ID不为整数');
     $('#record-id-input')[0].focus();
@@ -81,6 +82,7 @@ function update() {
       currentRecord[infoName] = currentValue;
     }
   });
+  currentRecord['record_id'] = record_id;
   currentRecord = encodeLine(currentRecord);
   $.post('/api/records', {
     'token': Cookies.get('token'),
