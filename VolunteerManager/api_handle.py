@@ -115,10 +115,10 @@ class record_api(Resource):
                 raise e
             return {'status': 1, 'data': {'msg': '查无此记录'}}
         try:
-            if args['student_id']:
+            if 'student_id' in args and args['student_id']:
                 the_vol = get_volunteers(args)
                 the_rec.user_id = the_vol.user_id
-            if args['job_id']:
+            if 'job_id' in args and args['job_id']:
                 the_job = get_jobs(args)
                 the_rec.project_id = the_job.project_id
                 the_rec.job_id = the_job.job_id

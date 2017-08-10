@@ -31,7 +31,7 @@ def query_items(table_object, valid_key_list, arg_dict, target_key_list=None):
     for (key, value) in arg_dict.items():
         if value and key in valid_key_list:
             table_query = table_query.filter(getattr(table_object, key)==value)
-            logging.info(table_query.all())
+            # logging.info(table_query.all())
     if arg_dict['query_type'] == 'one':
         return table_query.one()
     if arg_dict['query_type'] == 'page':
