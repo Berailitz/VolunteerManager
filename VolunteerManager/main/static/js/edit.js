@@ -16,7 +16,8 @@ function setProjectNameMenu() {
    getmdlSelect.init('.getmdl-select');
 }
 
-function setJobNameMenu(project_name) {
+function setJobNameMenu() {
+  project_name = $('#project-name-input')[0].value
   if (project_name) {
     let job_names = relationshipDict['project_id_dict'][String(project_name_to_id(project_name))]['job_id_dict'];
     // console.log(project_name);
@@ -74,6 +75,7 @@ function search() {
         $('#' + infoName.replace('_', '-') + '-input')[0].value = rawRecord[infoName] ? rawRecord[infoName] : '';
       });
     }
+    setJobNameMenu();
   });
   showToast('查询中', 800);
 }
