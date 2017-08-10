@@ -164,7 +164,7 @@ function submitAll() {
           'success': function (RawData, TextStatus, jqXHR) {
             setToken(RawData['token']);
             if (RawData['status']) {
-              showToast(`ERROR: #${LineIndex + 1}查询失败: ${RawData['data']['msg']}`);
+              showToast(`ERROR: #${LineIndex + 1}: ${RawData['data']['msg']}`);
               LineData['record_status'] = RawData['data']['msg'];
             } else {
               // console.log(RawData['data']);
