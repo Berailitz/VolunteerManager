@@ -87,14 +87,17 @@ class RecordApi(Resource):
             record_all = [record_all]
         for record_index in range(len(record_all)):
             # logging.info(record_list[record_index])
-            operator = get_tokens({'admin_id': record_all[record_index].operator_id, 'query_type': 'one'}, ['admin_id'])
-            operator_name = operator.username
-            volunteer = get_volunteers({'user_id': record_all[record_index].user_id, 'query_type': 'one'}, ['user_id'])
-            legal_name = volunteer.legal_name
-            student_id = volunteer.student_id
-            record_all[record_index].operator_name = operator_name
-            record_all[record_index].legal_name = legal_name
-            record_all[record_index].student_id = student_id
+            try:
+                operator = get_tokens({'admin_id': record_all[record_index].operator_id, 'query_type': 'one'}, ['admin_id'])
+                operator_name = operator.username
+                record_all[record_index].operator_name = operator_name
+                volunteer = get_volunteers({'user_id': record_all[record_index].user_id, 'query_type': 'one'}, ['user_id'])
+                legal_name = volunteer.legal_name
+                record_all[record_index].legal_name = legal_name
+                student_id = volunteer.student_id
+                record_all[record_index].student_id = student_id
+            except orm.exc.NoResultFound as identifier:
+                logging.warning('%r', identifier)
         record_list = list(map(item_to_dict, record_all, [set()] * len(record_all)))
         logging.info(record_list)
         return {'data': {'records': record_list}}
