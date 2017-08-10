@@ -187,7 +187,11 @@ class excel_api(Resource):
         raw_args = parser.parse_args()
         export_type = raw_args['export_type']
         if export_type:
-            filename = export_to_excel(export_type)
+            try:
+                filename = export_to_excel(export_type)
+            except Exception as identifier:
+                logging.exception(identifier)
+                return {'status': 1, 'data': {'msg': '%r' % (identifier, )}}
             return {'status': 0, 'data': {'download_url': f'/static/temp/{filename}'}}
         else:
             return {'status': 1, 'data': {'msg': '参数错误'}}
