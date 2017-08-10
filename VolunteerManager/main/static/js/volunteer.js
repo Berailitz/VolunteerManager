@@ -31,7 +31,15 @@ function search() {
   let student_id = $('#student-id-input')[0].value;
   let legal_name = $('#legal-name-input')[0].value;
   resetTable();
-  if (student_id && !$.isNumeric(student_id)) {
+  if (!student_id) {
+    showToast('请输入学号');
+    return;
+  }
+  if (!legal_name) {
+    showToast('请输入姓名');
+    return;
+  }
+  if (!$.isNumeric(student_id)) {
     showToast('ERROR: 学号不为整数');
     $('#student-id-input')[0].focus();
     return;
