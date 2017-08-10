@@ -99,7 +99,7 @@ class RecordApi(Resource):
             except orm.exc.NoResultFound as identifier:
                 logging.warning('%r', identifier)
         record_list = list(map(item_to_dict, record_all, [set()] * len(record_all)))
-        logging.info(record_list)
+        # logging.info(record_list)
         return {'data': {'records': record_list}}
 
     @load_token(False)
