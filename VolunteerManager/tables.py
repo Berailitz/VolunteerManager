@@ -1,6 +1,7 @@
+'''define all tables'''
 #!/usr/env/python3
 # -*- coding: UTF-8 -*-
- 
+
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -49,7 +50,8 @@ class Record(db.Model):
     operation_date = db.Column(db.DateTime, server_default=db.func.current_timestamp())
     record_status = db.Column(db.Integer)
 
-    def __init__(self, user_id, project_id, job_id, job_date, working_time, record_note, operator_id=0):
+    def __init__(self, user_id=0, project_id=0, job_id=0, job_date='', working_time=0, record_note='', operator_id=0):
+        '''initialize a record object, default values may be invalid'''
         self.user_id = user_id
         self.project_id = project_id
         self.job_id = job_id
@@ -76,5 +78,6 @@ class Volunteer(db.Model):
     age = db.Column(db.Integer)
     volunteer_time = db.Column(db.Float)
     note = db.Column(db.String(50))
+
     def __repr__(self):
         return '<Volunteer %r>' % self.legal_name
