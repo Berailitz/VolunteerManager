@@ -16,12 +16,33 @@ function setProjectNameMenu() {
 }
 
 function setJobNameMenu(project_name) {
-  let job_names = relationshipDict['project_id_dict'][String(project_name_to_id(project_name))]['job_id_dict'];
-  // console.log(project_name);
-  $('#job-name-menu').empty();
-  $('#job-name-input')[0].value = job_names[0];
-  $.each(job_names, (job_index, job_name) => $('#job-name-menu').append(`<li class="mdl-menu__item"  data-job-index="job-${job_index + 1}">${job_name}</li>`));
-   getmdlSelect.init('.getmdl-select');
+  if (project_name) {
+    let job_names = relationshipDict['project_id_dict'][String(project_name_to_id(project_name))]['job_id_dict'];
+    // console.log(project_name);
+    $('#job-name-menu').empty();
+    $('#job-name-input')[0].value = job_names[0];
+    $.each(job_names, (job_index, job_name) => $('#job-name-menu').append(`<li class="mdl-menu__item"  data-job-index="job-${job_index + 1}">${job_name}</li>`));
+  } else {
+    $('#job-name-menu').empty();
+    $('#job-name-input')[0].value = '';
+  }
+  getmdlSelect.init('.getmdl-select');
+}
+
+function showLegalName(params) {
+  $.getJSON('/api/volunteers', {
+    'token': Cookies.get('token'),
+    'query_type': 'one',
+    'student_id': $('#student-id-input')[0].value
+  }, function (raeData) {
+    setToken(raeData['token']);
+    if (raeData['status']) {
+      showToast(`ERROR: 查无此人: ${raeData['data']['msg']}`);
+    } else {
+      $('#legal-name-menu').empty();
+      $('#legal-name-input')[0].value = raeData['data']['info']['legal_name'];
+    }
+  });
 }
 
 function search() {
@@ -35,12 +56,12 @@ function search() {
     'record_id': record_id,
     'query_type': 'one',
     'token': Cookies.get('token')
-  }, function (rawResponse) {
-    setToken(rawResponse['token']);
-    if (rawResponse['status']) {
-      showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
+  }, function (raeData) {
+    setToken(raeData['token']);
+    if (raeData['status']) {
+      showToast(`ERROR: 查询失败: ${raeData['data']['msg']}`);
     } else {
-      rawRecord = rawResponse['data']['records'][0]
+      rawRecord = raeData['data']['records'][0]
       console.log(rawRecord);
       rawRecord = decodeLine(rawRecord);
       $.each(infoList, function (infoIndex, infoName) {
@@ -63,6 +84,7 @@ function update() {
   currentRecord = encodeLine(currentRecord);
   $.post('/api/records', {
     'token': Cookies.get('token'),
+    'query_type': 'one',
     'data': JSON.stringify(currentRecord)
   }, function (rawData) {
     setToken(rawResponse['token']);

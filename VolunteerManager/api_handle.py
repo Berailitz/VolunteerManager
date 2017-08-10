@@ -114,19 +114,21 @@ class record_api(Resource):
                 raise e
             return {'status': 1, 'data': {'msg': '查无此记录'}}
         try:
-            the_job = get_jobs(args)
-            the_vol = get_volunteers(args)
+            if args['student_id']:
+                the_vol = get_volunteers(args)
+                the_rec.user_id = the_vol.user_id
+            if args['job_id']:
+                the_job = get_jobs(args)
+                the_rec.project_id = the_job.project_id
+                the_rec.job_id = the_job.job_id
         except Exception as e:
             if not check_NoResultFound(e, args):
                 logging.exception(e)
                 raise e
             return {'status': 1, 'data': {'msg': '志愿项目或志愿者参数错误'}}
-        the_rec.user_id = the_vol.user_id
-        the_rec.project_id = the_job.project_id
-        the_rec.job_id = the_job.job_id
-        the_rec.job_date = args['job_date']
-        the_rec.working_time = args['working_time']
-        the_rec.record_note = args['record_note']
+        for key in ['job_date', 'working_time', 'record_note']:
+            if args[key]:
+                setattr(the_rec, key, args[key])
         the_rec.operator_id = admin.admin_id
         db.session.commit()
         return {'status': 0, 'data': {'msg': f'已更新(ID:{the_rec.record_id})'}}
