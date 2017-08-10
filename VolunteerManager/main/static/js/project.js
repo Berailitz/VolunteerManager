@@ -62,19 +62,19 @@ function search() {
   if (job_name != '所有岗位') {
       payload['job_id'] = job_name_to_id(payload['project_id'], job_name);
   }
-  $.getJSON("/api/records", payload, function (rawResponse) {
-    setToken(rawResponse['token']);
-    if (rawResponse['status']) {
-      showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
+  $.getJSON("/api/records", payload, function (RawData) {
+    setToken(RawData['token']);
+    if (RawData['status']) {
+      showToast(`ERROR: 查询失败: ${RawData['data']['msg']}`);
     } else {
-      let count = rawResponse['data']['records'].length;
+      let count = RawData['data']['records'].length;
       tableLines.splice(0, count);
       // $.each(infoList, function (infoIndex, infoName) {
       //   $('#' + infoName.replace('_', '-') + '-box').parent().addClass('is-dirty');
-      //   $('#' + infoName.replace('_', '-') + '-box')[0].value = rawResponse['data']['info'][infoName];
+      //   $('#' + infoName.replace('_', '-') + '-box')[0].value = RawData['data']['info'][infoName];
       // });
       if (count) {
-        $.each(rawResponse['data']['records'], function (line_index, raw_line) {
+        $.each(RawData['data']['records'], function (line_index, raw_line) {
           tableLines[line_index] = decodeLine(raw_line);
           // console.log(tableLines[line_index]);
         });
@@ -95,15 +95,15 @@ function loadData(page, length) {
     'length': length,
     'query_type': 'all',
     'token': Cookies.get('token')
-  }, function (rawResponse) {
-    setToken(rawResponse['token']);
-    if (rawResponse['status']) {
-      showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
+  }, function (RawData) {
+    setToken(RawData['token']);
+    if (RawData['status']) {
+      showToast(`ERROR: 查询失败: ${RawData['data']['msg']}`);
     } else {
-      console.log(rawResponse);
-      setToken(rawResponse['token']);
+      console.log(RawData);
+      setToken(RawData['token']);
       tableLines.splice(0, tableLines.length);
-      $.each(rawResponse['data'], function (lineIndex, rawLine) {
+      $.each(RawData['data'], function (lineIndex, rawLine) {
         tableLines[lineIndex] = decodeLine(rawLine);
         // console.log(line);
       });

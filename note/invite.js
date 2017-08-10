@@ -6,9 +6,9 @@ function MyInvite(ProjectID = 0, JobID = 0, VolunteerIDs = []){
         $.post(
             'http://www.bv2008.cn/app/opp/opp.my.php?m=invite&item=recruit&opp_id=' + ProjectID + '&job_id=' + JobID,
             {stype:'local', uid: VolunteerIDs},
-            function(RawResponse) {
+            function(RawData) {
                 try{
-                    var ResponseJSON = $.evalJSON(RawResponse);
+                    var ResponseJSON = $.evalJSON(RawData);
                     console.log("Succeeded inviting @ " + VolunteerIDs + " " + ResponseJSON.msg)
                 }
                 catch(e){
