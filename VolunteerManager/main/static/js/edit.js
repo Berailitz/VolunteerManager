@@ -47,7 +47,7 @@ function showLegalName(params) {
   });
 }
 
-function search() {
+function search_record() {
   record_id = $('#record-id-input')[0].value;
   if (record_id && !$.isNumeric(record_id)) {
     showToast('ERROR: 记录ID不为整数');
@@ -80,7 +80,7 @@ function search() {
   showToast('查询中', 800);
 }
 
-function update() {
+function update_record() {
   let currentRecord = new Object();
   $.each(infoList, function (infoIndex, infoName) {
     currentValue = $('#' + infoName.replace('_', '-') + '-input')[0].value;
@@ -103,6 +103,26 @@ function update() {
       $('#record-id-input')[0].focus();
     }
   })
+}
+
+function delete_record() {
+  $.ajax({
+    url: '/api/records',
+    type: 'DELETE',
+    data: {'token': Cookies.get('token'), 'record_id': record_id},
+    success: function (rawData) {
+      setToken(rawData['token']);
+      if (rawData['status']) {
+        showToast(`ERROR #${record_id}删除失败: ${rawData['data']['msg']}`);
+      } else {
+        showToast(`#${record_id}删除成功`);
+        $.each(infoList, function (infoIndex, infoName) {
+          $('#' + infoName.replace('_', '-') + '-input').parent().removeClass('is-dirty');
+          $('#' + infoName.replace('_', '-') + '-input')[0].value = '';
+        });
+      }
+    }
+  });
 }
 
 function iniConf() {
