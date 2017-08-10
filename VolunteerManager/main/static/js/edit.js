@@ -38,9 +38,9 @@ function showLegalName(params) {
   }, function (raeData) {
     setToken(raeData['token']);
     if (raeData['status']) {
+      $('#legal-name-input')[0].value = '';
       showToast(`ERROR: 查无此人: ${raeData['data']['msg']}`);
     } else {
-      $('#legal-name-menu').empty();
       $('#legal-name-input')[0].value = raeData['data']['info']['legal_name'];
     }
   });
@@ -53,7 +53,6 @@ function search() {
     $('#record-id-input')[0].focus();
     return;
   }
-  showToast('查询中', 700);
   $.each(infoList, function (infoIndex, infoName) {
     $('#' + infoName.replace('_', '-') + '-input').parent().removeClass('is-dirty');
     $('#' + infoName.replace('_', '-') + '-input')[0].value = '';
