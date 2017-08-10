@@ -77,7 +77,7 @@ def export_to_excel(export_type, folder_path=AppConfig.DOWNLOAD_PATH, sql_url=Ap
     filename = '%s_%s_%s.xlsx' % (export_type, current_time, generate_random_string(6))
     real_folder = path.join(module_dir, folder_path)
     if create_folder:
-        os.makedirs(create_folder, exist_ok=True)
+        os.makedirs(real_folder, exist_ok=True)
     real_path = path.join(real_folder, filename)
     data_frame.to_excel(real_path, sheet_name=export_type)
     return filename
