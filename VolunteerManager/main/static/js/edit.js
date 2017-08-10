@@ -109,7 +109,7 @@ function delete_record() {
   $.ajax({
     url: '/api/records',
     type: 'DELETE',
-    data: {'token': Cookies.get('token'), 'record_id': record_id},
+    data: {'token': Cookies.get('token'), 'data': JSON.stringify({'record_id': record_id})},
     success: function (rawData) {
       setToken(rawData['token']);
       if (rawData['status']) {
