@@ -19,10 +19,10 @@ function setProjectNameMenu() {
 function setJobNameMenu() {
   project_name = $('#project-name-input')[0].value
   if (project_name) {
-    let job_names = relationshipDict['project_id_dict'][String(project_name_to_id(project_name))]['job_id_dict'];
+    let job_names = Object.keys(relationshipDict['project_id_dict'][String(project_name_to_id(project_name))]['job_name_dict']);
     // console.log(project_name);
     $('#job-name-menu').empty();
-    $('#job-name-input')[0].value = Object.keys(job_names)[0];
+    $('#job-name-input')[0].value = job_names[0];
     $.each(job_names, (job_index, job_name) => $('#job-name-menu').append(`<li class="mdl-menu__item"  data-job-index="job-${job_index + 1}">${job_name}</li>`));
   } else {
     $('#job-name-menu').empty();
