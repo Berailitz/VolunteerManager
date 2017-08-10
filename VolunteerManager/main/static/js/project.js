@@ -42,7 +42,7 @@ function setProjectNameMenu() {
 }
 
 function setJobNameMenu(project_name) {
-  let job_names = project_name == '所有志愿项目' ? [] : relationshipDict['project_id_dict'][String(project_name_to_id(project_name))]['job_id_dict'];
+  let job_names = project_name == '所有志愿项目' ? [] : Object.keys(relationshipDict['project_id_dict'][String(project_name_to_id(project_name))]['job_name_dict']);
   // console.log(project_name);
   $('#job-name-menu').empty();
   $('#job-name-menu').append(`<li class="mdl-menu__item" data-job-index="job-0">所有岗位</li>`);
