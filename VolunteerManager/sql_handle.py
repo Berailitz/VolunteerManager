@@ -43,7 +43,6 @@ def query_items(table_object, valid_key_list, arg_dict, target_key_list=None):
 def select_type(query_result, arg_dict, query_type):
     MAX_ITEMS_COUNT_PER_PAGE = AppConfig.MAX_ITEMS_COUNT_PER_PAGE
     if query_type in ['one', 'all', 'first']:
-        logging.info(getattr(query_result, query_type))
         return getattr(query_result, query_type)()
     elif query_type == 'page':
         return query_result.paginate(get_arg(arg_dict['page'], 1), get_arg(arg_dict['length'], MAX_ITEMS_COUNT_PER_PAGE), False).items
