@@ -27,10 +27,7 @@ def item_to_dict(item, const_removed={}):
 def query_items(table_object, valid_key_list, arg_dict, target_key_list=None):
     """PRIVATE: Query items in `table_object`, with args in `arg_dict`, whose keys should be in both
     `valid_key_list` and non-None `target_key_list`, when `target_key_list` is set to None, all keys
-    in `valid_key_list` will be queried. A list (which can be empty) is returned with `query_type` of
-    `page` and `all`, an item otherwise. With `query_type` `one`, error `sqlalchemy.orm.exc.NoResultFound`
-    and `sqlalchemy.orm.exc.MultipleResultsFound` may be raised accordingly. Be CAUTIOUS wih `query_type`,
-    when a list/page of up to 200 items is returned by default."""
+    in `valid_key_list` will be queried."""
     query_object = table_object.query
     if not target_key_list:
         target_key_list = arg_dict.keys()
@@ -41,6 +38,10 @@ def query_items(table_object, valid_key_list, arg_dict, target_key_list=None):
     return query_object
 
 def select_type(query_result, arg_dict, query_type):
+    """return query_result.query_type() or query_result.paginate(...) accordingly. A list (which can be empty)
+    is returned with `query_type` of `page` and `all`, an item otherwise. With `query_type` `one`, error
+    `sqlalchemy.orm.exc.NoResultFound` and `sqlalchemy.orm.exc.MultipleResultsFound` may be raised accordingly.
+     Be CAUTIOUS wih `query_type`, when a list/page of up to 200 items is returned (by default)."""
     MAX_ITEMS_COUNT_PER_PAGE = AppConfig.MAX_ITEMS_COUNT_PER_PAGE
     if query_type in ['one', 'all', 'first']:
         return getattr(query_result, query_type)()
@@ -57,7 +58,7 @@ def get_volunteers(arg_dict, query_type='all', target_key_list=None):
     return select_type(query_object, arg_dict, query_type)
 
 def get_records(arg_dict, query_type='all', target_key_list=None, const_status_type_list=[1]):
-    """get record object(s)"""
+    """get record object(s) with `record_status` of `1` by default"""
     record_keys = ['record_id', 'user_id', 'project_id', 'job_id', 'working_date', 'working_time', 'record_note']
     record_keys += ['operator_id', 'operation_time', 'record_status']
     query_object = query_items(Record, record_keys, arg_dict, target_key_list)
@@ -77,7 +78,8 @@ def get_tokens(arg_dict, query_type='all', target_key_list=None):
     return select_type(query_object, arg_dict, query_type)
 
 def export_to_excel(export_type, folder_path=AppConfig.DOWNLOAD_PATH, sql_url=AppConfig.SQLALCHEMY_DATABASE_URI, create_folder=True):
-    """export sql table to disk, with relative path folder_path, which may be recursively created if `create_folder` is True (Default)"""
+    """export sql table to disk, with relative path folder_path, which may be recursively created
+    if `create_folder` is True (Default)"""
     engine = create_engine(sql_url)
     if export_type == 'all_in_one':
         data_frame = pandas.read_sql_query(AppConfig.ALL_IN_ONE_SQL_QUERY_COMMAND, engine)
