@@ -9,7 +9,7 @@ function download() {
     };
     export_type = type_dict[$('#table-name-input')[0].value];
     $.getJSON('/api/download', {'token': Cookies.get('token'), 'export_type': export_type}, function (rawData) {
-        setToken(rawResponse['token']);
+        setToken(rawData['token']);
         if (rawData['status']) {
             showToast('ERROR: 下载失败');
         } else {
@@ -25,7 +25,7 @@ function cleanup() {
         type: 'DELETE',
         data: {'token': Cookies.get('token')},
         success: function (rawData) {
-            setToken(rawResponse['token']);
+            setToken(rawData['token']);
             if (rawData['status']) {
                 showToast(`ERROR: 清除失败: ${rawData['data']['msg']}`);
             } else {
