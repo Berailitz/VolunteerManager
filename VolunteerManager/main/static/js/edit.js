@@ -87,9 +87,9 @@ function update() {
     'query_type': 'one',
     'data': JSON.stringify(currentRecord)
   }, function (rawData) {
-    setToken(rawResponse['token']);
-    if (rawResponse['status']) {
-      showToast(`ERROR: 提交失败: ${rawResponse['data']['msg']}`);
+    setToken(rawData['token']);
+    if (rawData['status']) {
+      showToast(`ERROR: 提交失败: ${rawData['data']['msg']}`);
     } else {
       showToast('修改成功');
       $('#record-id-input')[0].focus();
