@@ -31,47 +31,49 @@ def query_items(table_object, valid_key_list, arg_dict, target_key_list=None):
     `page` and `all`, an item otherwise. With `query_type` `one`, error `sqlalchemy.orm.exc.NoResultFound`
     and `sqlalchemy.orm.exc.MultipleResultsFound` may be raised accordingly. Be CAUTIOUS wih `query_type`,
     when a list/page of up to 200 items is returned by default."""
-    MAX_ITEMS_COUNT_PER_PAGE = AppConfig.MAX_ITEMS_COUNT_PER_PAGE
     query_object = table_object.query
     if not target_key_list:
         target_key_list = arg_dict.keys()
-    query_type = arg_dict['query_type'] if 'query_type' in arg_dict.keys() else 'all'
     for (key, value) in arg_dict.items():
         if value and key in valid_key_list and key in target_key_list:
             query_object = query_object.filter(getattr(table_object, key) == value)
             # logging.info(query_object.all())
-    if query_type == 'one':
-        return query_object.one()
+    return query_object
+
+def select_type(query_result, arg_dict, query_type):
+    MAX_ITEMS_COUNT_PER_PAGE = AppConfig.MAX_ITEMS_COUNT_PER_PAGE
+    if query_type in ['one', 'all', 'first']:
+        return getattr(query_result, query_type)()
     elif query_type == 'page':
-        return query_object.paginate(get_arg(arg_dict['page'], 1), get_arg(arg_dict['length'], MAX_ITEMS_COUNT_PER_PAGE), False).items
-    elif query_type == 'all':
-        return query_object.all()
-    elif query_type == 'first':
-        return query_object.first()
+        return query_result.paginate(get_arg(arg_dict['page'], 1), get_arg(arg_dict['length'], MAX_ITEMS_COUNT_PER_PAGE), False).items
     else:
         raise ValueError(f'Invalid query_type: {query_type}')
 
-def get_volunteers(arg_dict, target_key_list=None):
+def get_volunteers(arg_dict, target_key_list=None, query_type='all'):
     """get volunteer object(s)"""
     volunteer_keys = ['user_id', 'volunteer_id', 'username', 'student_id', 'legal_name', 'phone']
     volunteer_keys += ['email', 'gender', 'age', 'volunteer_time', 'note']
-    return query_items(Volunteer, volunteer_keys, arg_dict, target_key_list)
+    query_object = query_items(Volunteer, volunteer_keys, arg_dict, target_key_list)
+    return select_type(query_object, arg_dict, query_type)
 
-def get_records(arg_dict, target_key_list=None):
+def get_records(arg_dict, target_key_list=None, query_type='all'):
     """get record object(s)"""
     record_keys = ['record_id', 'user_id', 'project_id', 'job_id', 'job_date', 'working_time', 'record_note']
     record_keys += ['operator_id', 'operation_date', 'record_status']
-    return query_items(Record, record_keys, arg_dict, target_key_list)
+    query_object = query_items(Record, record_keys, arg_dict, target_key_list)
+    return select_type(query_object, arg_dict, query_type)
 
-def get_jobs(arg_dict, target_key_list=None):
+def get_jobs(arg_dict, target_key_list=None, query_type='all'):
     """get job object(s)"""
     job_keys = ['project_id', 'project_name', 'job_id', 'job_name', 'job_start', 'job_end', 'director', 'location', 'note']
-    return query_items(Job, job_keys, arg_dict, target_key_list)
+    query_object = query_items(Job, job_keys, arg_dict, target_key_list)
+    return select_type(query_object, arg_dict, query_type)
 
-def get_tokens(arg_dict, target_key_list=None):
+def get_tokens(arg_dict, target_key_list=None, query_type='all'):
     """get token object(s)"""
     token_keys = ['admin_id', 'username', 'password', 'token', 'login_time']
-    return query_items(Token, token_keys, arg_dict, target_key_list)
+    query_object = query_items(Token, token_keys, arg_dict, target_key_list)
+    return select_type(query_object, arg_dict, query_type)
 
 def export_to_excel(export_type, folder_path=AppConfig.DOWNLOAD_PATH, sql_url=AppConfig.SQLALCHEMY_DATABASE_URI, create_folder=True):
     """export sql table to disk, with relative path folder_path, which may be recursively created if `create_folder` is True (Default)"""
