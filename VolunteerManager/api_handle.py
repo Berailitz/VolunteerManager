@@ -128,7 +128,7 @@ class record_api(Resource):
                 raise e
             return {'status': 1, 'data': {'msg': '志愿项目或志愿者参数错误'}}
         for key in ['job_date', 'working_time', 'record_note']:
-            if args[key]:
+            if key in args and args[key]:
                 setattr(the_rec, key, args[key])
         the_rec.operator_id = admin.admin_id
         db.session.commit()
