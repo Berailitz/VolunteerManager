@@ -60,8 +60,8 @@ def get_volunteers(arg_dict, query_type='all', target_key_list=None):
 
 def get_records(arg_dict, query_type='all', target_key_list=None, const_status_type_list=[1]):
     """get record object(s)"""
-    record_keys = ['record_id', 'user_id', 'project_id', 'job_id', 'job_date', 'working_time', 'record_note']
-    record_keys += ['operator_id', 'operation_date', 'record_status']
+    record_keys = ['record_id', 'user_id', 'project_id', 'job_id', 'working_date', 'working_time', 'record_note']
+    record_keys += ['operator_id', 'operation_time', 'record_status']
     query_object = query_items(Record, record_keys, arg_dict, target_key_list)
     query_object.filter(Record.record_status.in_(const_status_type_list))
     return select_type(query_object, arg_dict, query_type)

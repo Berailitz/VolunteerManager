@@ -33,7 +33,7 @@ let htmlTable = new Handsontable(container, {
       },
     },
     {
-      data: 'job_date',
+      data: 'working_date',
       type: 'date',
       dateFormat: 'YYYY-MM-DD',
     },
@@ -76,13 +76,13 @@ let htmlTable = new Handsontable(container, {
 });
 
 class RecordLine {
-  constructor(student_id='', legal_name='', working_time='', project_name='', job_name='', job_date='', record_note='', record_status='') {
+  constructor(student_id='', legal_name='', working_time='', project_name='', job_name='', working_date='', record_note='', record_status='') {
     this.student_id = student_id;
     this.legal_name = legal_name;
     this.working_time = working_time;
     this.project_name = project_name;
     this.job_name = job_name;
-    this.job_date = job_date;
+    this.working_date = working_date;
     this.record_note = record_note;
     this.record_status = record_status;
   }
