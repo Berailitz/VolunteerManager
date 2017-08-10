@@ -53,6 +53,11 @@ function search() {
     $('#record-id-input')[0].focus();
     return;
   }
+  showToast('查询中', 700);
+  $.each(infoList, function (infoIndex, infoName) {
+    $('#' + infoName.replace('_', '-') + '-input').parent().removeClass('is-dirty');
+    $('#' + infoName.replace('_', '-') + '-input')[0].value = '';
+  });
   $.getJSON("/api/records", {
     'record_id': record_id,
     'query_type': 'one',
@@ -66,8 +71,6 @@ function search() {
       console.log(rawRecord);
       rawRecord = decodeLine(rawRecord);
       $.each(infoList, function (infoIndex, infoName) {
-        $('#' + infoName.replace('_', '-') + '-input').parent().removeClass('is-dirty');
-        $('#' + infoName.replace('_', '-') + '-input')[0].value = '';
         $('#' + infoName.replace('_', '-') + '-input').parent().addClass('is-dirty');
         $('#' + infoName.replace('_', '-') + '-input')[0].value = rawRecord[infoName] ? rawRecord[infoName] : '';
       });
