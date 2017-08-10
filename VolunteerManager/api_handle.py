@@ -106,6 +106,7 @@ class record_api(Resource):
         logging.info(raw_args)
         args = json.loads(raw_args['data'])
         args['query_type'] = 'one'
+        logging.info(args)
         try:
             the_rec = get_records(args, ['record_id'])
         except Exception as e:
