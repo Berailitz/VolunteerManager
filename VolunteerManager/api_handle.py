@@ -166,6 +166,25 @@ class RecordApi(Resource):
         db.session.commit()
         return {'status': 0, 'data': {'msg': f'已录入(ID:{new_rec.record_id})'}}
 
+    @staticmethod
+    @load_token(False)
+    def delete(admin):
+        """DELETE method, return msg at /data/msg"""
+        parser = reqparse.RequestParser()
+        parser.add_argument('data', type=str)
+        raw_args = parser.parse_args()
+        logging.info(raw_args)
+        args = json.loads(raw_args['data'])
+        try:
+            the_rec = get_records({'record_id': int(args['record_id'])}, 'one', None)
+        except orm.exc.NoResultFound as identifier:
+            logging.warning('%r', identifier)
+            return {'status': 1, 'data': {'msg': '查无此记录'}}
+        the_rec.operator_id = admin.admin_id
+        the_rec.record_status = -1
+        db.session.commit()
+        return {'status': 0, 'data': {'msg': f'已删除(ID:{the_rec.record_id})'}}
+
 class RelationshipApi(Resource):
     """handle /api/relationship"""
     @staticmethod
