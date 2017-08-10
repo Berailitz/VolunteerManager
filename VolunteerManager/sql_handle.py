@@ -40,7 +40,6 @@ def query_items(table_object, valid_key_list, arg_dict, target_key_list=None):
             # logging.info(query_object.all())
     return query_object
 
-@fun_logger('simplify query_items')
 def select_type(query_result, arg_dict, query_type):
     MAX_ITEMS_COUNT_PER_PAGE = AppConfig.MAX_ITEMS_COUNT_PER_PAGE
     if query_type in ['one', 'all', 'first']:
@@ -63,7 +62,6 @@ def get_records(arg_dict, query_type='all', target_key_list=None, const_status_t
     record_keys = ['record_id', 'user_id', 'project_id', 'job_id', 'working_date', 'working_time', 'record_note']
     record_keys += ['operator_id', 'operation_time', 'record_status']
     query_object = query_items(Record, record_keys, arg_dict, target_key_list)
-    logging.info(query_object.all())
     query_object = query_object.filter(Record.record_status.in_(const_status_type_list))
     return select_type(query_object, arg_dict, query_type)
 
