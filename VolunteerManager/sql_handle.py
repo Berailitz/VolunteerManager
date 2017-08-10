@@ -58,14 +58,13 @@ def get_volunteers(arg_dict, query_type='all', target_key_list=None):
     query_object = query_items(Volunteer, volunteer_keys, arg_dict, target_key_list)
     return select_type(query_object, arg_dict, query_type)
 
-@fun_logger('const_status_type_list')
 def get_records(arg_dict, query_type='all', target_key_list=None, const_status_type_list=[1]):
     """get record object(s)"""
     record_keys = ['record_id', 'user_id', 'project_id', 'job_id', 'working_date', 'working_time', 'record_note']
     record_keys += ['operator_id', 'operation_time', 'record_status']
     query_object = query_items(Record, record_keys, arg_dict, target_key_list)
     logging.info(query_object.all())
-    query_object.filter(Record.record_status.in_(const_status_type_list))
+    query_object = query_object.filter(Record.record_status.in_(const_status_type_list))
     return select_type(query_object, arg_dict, query_type)
 
 def get_jobs(arg_dict, query_type='all', target_key_list=None):
