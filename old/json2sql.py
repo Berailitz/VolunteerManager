@@ -1,4 +1,4 @@
-'''import json to sql'''
+"""import json to sql"""
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 
@@ -13,7 +13,7 @@ from sqlalchemy.orm import sessionmaker
 ROW_BASE = declarative_base()
 
 def set_logger(log_file_path):
-    '''set logger'''
+    """set logger"""
     logging.basicConfig(
         level=logging.INFO,
         format='[%(levelname)s] %(asctime)s %(filename)s:%(lineno)d %(message)s',
@@ -29,7 +29,7 @@ def set_logger(log_file_path):
     logging.info("Start ....")
 
 class Connector(object):
-    '''communicate with sql'''
+    """communicate with sql"""
     def __init__(self, url, ifecho=False):
         self.engine = create_engine(url, echo=ifecho)
         self.session = None
@@ -49,7 +49,7 @@ class Connector(object):
         logging.info("Rollbacked and disconnected.")
 
     def import_json(self, json_file_path="volunteer_list_int.json", interval=0.01):
-        '''import volunteers from json file to sql'''
+        """import volunteers from json file to sql"""
         with open(json_file_path, "r") as json_file:
             volunteer_list = json.load(json_file)
         logging.info("Scanning volunteers from json file: " + str(len(volunteer_list)))
@@ -65,7 +65,7 @@ class Connector(object):
         print('Import from json file finished')
 
     def query_volunteers(self):
-        '''query for volunteers'''
+        """query for volunteers"""
         return self.session.query(Volunteer)
 
 if __name__ == '__main__':
@@ -95,7 +95,7 @@ db = SQLAlchemy(app)
 api = Api(app)
 
 class Job(db.Model):
-    '''record object'''
+    """record object"""
     __tablename__ = 'jobs'
     project_id = db.Column(db.Integer)
     project_name = db.Column(db.String(20))
@@ -112,7 +112,7 @@ class Job(db.Model):
         return '<Job %r@%r>' % (self.job_name, project_name)
 
 class Record(db.Model):
-    '''record object'''
+    """record object"""
     __tablename__ = 'records'
     record_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
@@ -140,7 +140,7 @@ class Record(db.Model):
 rec = Record
 
 class Volunteer(db.Model):
-    '''vlounteer object'''
+    """vlounteer object"""
     __tablename__ = 'volunteers'
     user_id = db.Column(db.Integer, primary_key=True)
     volunteer_id = db.Column(db.Integer)

@@ -1,4 +1,4 @@
-'''remove quotation mark'''
+"""remove quotation mark"""
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 
@@ -11,7 +11,7 @@ def str2int(strnum):
         return strnum
 
 def main():
-    '''main function'''
+    """main function"""
     with open("volunteer_list.json", 'r', encoding='utf8') as raw_file:
         raw_list = json.load(raw_file)
     new_list = list()

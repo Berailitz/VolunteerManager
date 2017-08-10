@@ -1,4 +1,4 @@
-'''define all apis under /api/'''
+"""define all apis under /api/"""
 #!/usr/env/python3
 # -*- coding: UTF-8 -*-
 
@@ -17,7 +17,7 @@ from .sql_handle import export_to_excel, item_to_dict, get_jobs, get_records, ge
 from .tables import db, Record
 
 def create_api():
-    '''return api object at startup'''
+    """return api object at startup"""
     api = Api()
     api.add_resource(TokenApi, '/api/tokens')
     api.add_resource(VolunteerApi, '/api/volunteers')
@@ -28,9 +28,9 @@ def create_api():
     return api
 
 class TokenApi(Resource):
-    '''handle /api/tokens'''
+    """handle /api/tokens"""
     def get(self):
-        '''GET method, get token with password or new token by get_current_user'''
+        """GET method, get token with password or new token by get_current_user"""
         parser = reqparse.RequestParser()
         parser.add_argument('username', type=str)
         parser.add_argument('password', type=str)
@@ -44,10 +44,10 @@ class TokenApi(Resource):
             return {'status': 1, 'data': {'msg': '鉴权失败'}}
 
 class VolunteerApi(Resource):
-    '''handle /api/volunteers'''
+    """handle /api/volunteers"""
     @load_token()
     def get(admin, self):
-        '''GET method, get volunteer info, ONE per call, return dict at /data/info'''
+        """GET method, get volunteer info, ONE per call, return dict at /data/info"""
         args = parse_all_args(reqparse.RequestParser())
         try:
             the_volunteer = get_volunteers(args)
@@ -59,10 +59,10 @@ class VolunteerApi(Resource):
         return {'status': 0, 'data': {'info': volunteer_dict}}
 
 class JobApi(Resource):
-    '''handle /api/jobs'''
+    """handle /api/jobs"""
     @load_token()
     def get(admin, self):
-        '''GET method，return job list at /data'''
+        """GET method，return job list at /data"""
         args = parse_all_args(reqparse.RequestParser())
         try:
             job_all = get_jobs(args)
@@ -73,10 +73,10 @@ class JobApi(Resource):
         return {'status': 0, 'data': job_list}
 
 class RecordApi(Resource):
-    '''handle /api/records'''
+    """handle /api/records"""
     @load_token()
     def get(admin, self):
-        '''GET method, return record list at /data/records'''
+        """GET method, return record list at /data/records"""
         args = parse_all_args(reqparse.RequestParser())
         try:
             record_all = get_records(args)
@@ -104,7 +104,7 @@ class RecordApi(Resource):
 
     @load_token(False)
     def post(admin, self):
-        '''POST method, return msg at /data/msg'''
+        """POST method, return msg at /data/msg"""
         parser = reqparse.RequestParser()
         parser.add_argument('data', type=str)
         raw_args = parser.parse_args()
@@ -137,7 +137,7 @@ class RecordApi(Resource):
 
     @load_token(False)
     def put(admin, self):
-        '''PUT method, return msg at /data/msg'''
+        """PUT method, return msg at /data/msg"""
         parser = reqparse.RequestParser()
         parser.add_argument('data', type=str)
         raw_args = parser.parse_args()
@@ -161,10 +161,10 @@ class RecordApi(Resource):
         return {'status': 0, 'data': {'msg': f'已录入(ID:{new_rec.record_id})'}}
 
 class RelationshipApi(Resource):
-    '''handle /api/relationship'''
+    """handle /api/relationship"""
     @load_token()
     def get(admin, self):
-        '''GET method, return relationship dict at /data/, receive no argument but `token`'''
+        """GET method, return relationship dict at /data/, receive no argument but `token`"""
         project_id_dict = dict()
         project_name_dict = dict()
         projects_id_2_name = dict(set(map(lambda pro: (pro.project_id, pro.project_name), get_jobs({'query_type': 'all'}))))
@@ -180,10 +180,10 @@ class RelationshipApi(Resource):
         return {'status': 0, 'data': {'project_id_dict': project_id_dict, 'project_name_dict': project_name_dict}}
 
 class ExcelApi(Resource):
-    '''handle /api/download'''
+    """handle /api/download"""
     @load_token()
     def get(admin, self):
-        '''GET method, return download url at /data/download_url, may take some time'''
+        """GET method, return download url at /data/download_url, may take some time"""
         parser = reqparse.RequestParser()
         parser.add_argument('export_type', type=str)
         raw_args = parser.parse_args()
@@ -200,7 +200,7 @@ class ExcelApi(Resource):
 
     @load_token()
     def delete(admin, self):
-        '''DELETE method, return msg at /data/msg'''
+        """DELETE method, return msg at /data/msg"""
         module_dir = path.split(path.realpath(__file__))[0]
         download_folder = AppConfig.DOWNLOAD_PATH
         download_path = path.join(module_dir, download_folder)

@@ -1,4 +1,4 @@
-'''define all tables'''
+"""define all tables"""
 #!/usr/env/python3
 # -*- coding: UTF-8 -*-
 
@@ -7,7 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 class Token(db.Model):
-    '''token table'''
+    """token table"""
     __tablename__ = 'tokens'
     admin_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(20))
@@ -20,7 +20,7 @@ class Token(db.Model):
         return '<Token %r>' % self.username
 
 class Job(db.Model):
-    '''job table'''
+    """job table"""
     __tablename__ = 'jobs'
     project_id = db.Column(db.Integer)
     project_name = db.Column(db.String(20))
@@ -37,7 +37,7 @@ class Job(db.Model):
         return '<Job %r@%r>' % (self.job_name, self.project_name)
 
 class Record(db.Model):
-    '''record table'''
+    """record table"""
     __tablename__ = 'records'
     record_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer)
@@ -51,7 +51,7 @@ class Record(db.Model):
     record_status = db.Column(db.Integer)
 
     def __init__(self, user_id=0, project_id=0, job_id=0, job_date='', working_time=0, record_note='', operator_id=0):
-        '''initialize a record object, default values may be invalid'''
+        """initialize a record object, default values may be invalid"""
         self.user_id = user_id
         self.project_id = project_id
         self.job_id = job_id
@@ -64,7 +64,7 @@ class Record(db.Model):
         return '<Record %r>' % self.record_id
 
 class Volunteer(db.Model):
-    '''volunteer table'''
+    """volunteer table"""
     __tablename__ = 'volunteers'
     user_id = db.Column(db.Integer, primary_key=True)
     volunteer_id = db.Column(db.Integer)

@@ -1,4 +1,4 @@
-'''handle authentication'''
+"""handle authentication"""
 #!/usr/env/python3
 # -*- coding: UTF-8 -*-
 
@@ -18,7 +18,7 @@ from .tables import db
 bcrypt = Bcrypt()
 
 def check_token(token):
-    '''PRIVATE: check and clear overdue token, return original <admin> or None for invalid or OVERDUE ones'''
+    """PRIVATE: check and clear overdue token, return original <admin> or None for invalid or OVERDUE ones"""
     try:
         admin = get_tokens({'token': token, 'query_type': 'one'}, ['token'])
         # logging.info('%r: token: %r.', admin, token)
@@ -31,7 +31,7 @@ def check_token(token):
         return None
 
 def check_password(username, password):
-    '''PRIVATE: check password, return original <admin> or None'''
+    """PRIVATE: check password, return original <admin> or None"""
     try:
         admin = get_tokens({'username': username, 'query_type': 'one'}, ['username'])
         # logging.info('username: %r, password: %r.', username, password)
@@ -42,7 +42,7 @@ def check_password(username, password):
         return None
 
 def authenticate(**credential):
-    '''PRIVATE: check token and then password, return original <admin> or None'''
+    """PRIVATE: check token and then password, return original <admin> or None"""
     if 'token' in credential and credential['token']:
         return check_token(credential['token'])
     elif 'username' in credential and 'password' in credential and credential['username'] and credential['password']:
@@ -50,7 +50,7 @@ def authenticate(**credential):
     return None
 
 def get_current_user(**credential):
-    '''check token and then password from dict, return <admin> with token UPDATED or None, invoking `authenticate`'''
+    """check token and then password from dict, return <admin> with token UPDATED or None, invoking `authenticate`"""
     admin = authenticate(**credential)
     if admin:
         admin.token = generate_random_string(AppConfig.TOKEN_LENGTH)
@@ -59,7 +59,7 @@ def get_current_user(**credential):
     return None
 
 def check_cookie(current_request):
-    '''check token in cookie of current_request, return <admin> with token UPDATED or None, invoking `authenticate`'''
+    """check token in cookie of current_request, return <admin> with token UPDATED or None, invoking `authenticate`"""
     try:
         current_token = current_request.cookies.get('token')
         current_user = authenticate(token=current_token)
@@ -74,11 +74,11 @@ def check_cookie(current_request):
 
 # @fun_logger('login')
 def admin_only(public_view='/'):
-    '''decorated functions should NEVER change column `tokens`, redirect the unauthorized to `public_view`, invoking `check_cookie`'''
+    """decorated functions should NEVER change column `tokens`, redirect the unauthorized to `public_view`, invoking `check_cookie`"""
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kw):
-            '''update token or set invalid token to ``'''
+            """update token or set invalid token to ``"""
             admin = check_cookie(request)
             if admin:
                 response = func(*args, **kw)
@@ -92,11 +92,11 @@ def admin_only(public_view='/'):
 
 # @fun_logger('login')
 def guest_only(restricted_view='/record'):
-    '''decorated functions should NEVER change column `tokens`, redirect the authorized to `restricted_view`, invoking `check_cookie`'''
+    """decorated functions should NEVER change column `tokens`, redirect the authorized to `restricted_view`, invoking `check_cookie`"""
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kw):
-            '''update token or set invalid token to ``'''
+            """update token or set invalid token to ``"""
             admin = check_cookie(request)
             if admin:
                 response = make_response(redirect(restricted_view))
@@ -110,12 +110,12 @@ def guest_only(restricted_view='/record'):
 
 # @fun_logger('login')
 def load_token(update_token=True, error_status_code=1):
-    '''decorated functions should NEVER change column `tokens` and have <admin> as first argument,
-    update token by default, return msg and error_status_code at /status'''
+    """decorated functions should NEVER change column `tokens` and have <admin> as first argument,
+    update token by default, return msg and error_status_code at /status"""
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kw):
-            '''parser `token` from request, return immediately for invalid token or invoke decorated function'''
+            """parser `token` from request, return immediately for invalid token or invoke decorated function"""
             parser = reqparse.RequestParser()
             parser.add_argument('token', type=str)
             # logging.info(parser.parse_args())

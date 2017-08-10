@@ -1,4 +1,4 @@
-'''main module including create_app()'''
+"""main module including create_app()"""
 #!/usr/env/python3
 # -*- coding: UTF-8 -*-
 
@@ -12,7 +12,7 @@ from .main.views import create_main_blueprint
 from .tables import db
 
 def create_app():
-    '''create initialized flask app, compatible with uwsgi'''
+    """create initialized flask app, compatible with uwsgi"""
     app = Flask(__name__)
     app.config.from_object(AppConfig)
     toolbar = DebugToolbarExtension()
