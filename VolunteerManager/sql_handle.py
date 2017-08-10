@@ -9,7 +9,7 @@ import time
 import pandas
 from sqlalchemy import create_engine
 from .config import AppConfig
-from .mess import generate_random_string
+from .mess import generate_random_string, fun_logger
 from .restful_helper import get_arg
 from .tables import Token, Job, Record, Volunteer
 
@@ -40,9 +40,11 @@ def query_items(table_object, valid_key_list, arg_dict, target_key_list=None):
             # logging.info(query_object.all())
     return query_object
 
+@fun_logger('simplify query_items')
 def select_type(query_result, arg_dict, query_type):
     MAX_ITEMS_COUNT_PER_PAGE = AppConfig.MAX_ITEMS_COUNT_PER_PAGE
     if query_type in ['one', 'all', 'first']:
+        logging.info(getattr(query_result, query_type))
         return getattr(query_result, query_type)()
     elif query_type == 'page':
         return query_result.paginate(get_arg(arg_dict['page'], 1), get_arg(arg_dict['length'], MAX_ITEMS_COUNT_PER_PAGE), False).items
