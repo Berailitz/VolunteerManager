@@ -1,3 +1,4 @@
+'''handle authentication'''
 #!/usr/env/python3
 # -*- coding: UTF-8 -*-
 
@@ -7,77 +8,77 @@ import logging
 from flask import redirect, request, make_response
 from flask_bcrypt import Bcrypt
 from flask_restful import reqparse
+from flask_sqlalchemy import orm
+from .config import AppConfig
 from .mess import fun_logger, generate_random_string
 from .restful_helper import get_arg
-from .sql_handle import get_tokens, check_NoResultFound
+from .sql_handle import get_tokens
 from .tables import db
 
 bcrypt = Bcrypt()
+
 def check_token(token):
+    '''PRIVATE: check and clear overdue token, return original <admin> or None for invalid or OVERDUE ones'''
     try:
         admin = get_tokens({'token': token, 'query_type': 'one'}, ['token'])
-        logging.info('%r: token: %r.', admin, token)
+        # logging.info('%r: token: %r.', admin, token)
         if datetime.datetime.now() > admin.login_time + datetime.timedelta(days=7):
             admin.token = ''
             return None
-        else:
-            return admin
-    except Exception as e:
-        if not check_NoResultFound(e, {'token': token, 'query_type': 'one'}):
-            logging.exception(e)
-            raise e
+        return admin
+    except orm.exc.NoResultFound as identifier:
+        logging.exception('%r: %r', identifier, identifier.args)
         return None
 
 def check_password(username, password):
+    '''PRIVATE: check password, return original <admin> or None'''
     try:
         admin = get_tokens({'username': username, 'query_type': 'one'}, ['username'])
-        logging.info('username: %r, password: %r.', username, password)
+        # logging.info('username: %r, password: %r.', username, password)
         if bcrypt.check_password_hash(admin.password, password):
             return admin
-    except Exception as e:
-        if not check_NoResultFound(e, {'username': username, 'query_type': 'one'}):
-            logging.exception(e)
-            raise e
+    except orm.exc.NoResultFound as identifier:
+        logging.exception('%r: %r', identifier, identifier.args)
         return None
 
 def authenticate(**credential):
-    '''check credential and return user or None'''
+    '''PRIVATE: check token and then password, return original <admin> or None'''
     if credential['token']:
         return check_token(credential['token'])
     elif credential['username'] and credential['password']:
         return check_password(credential['username'], credential['password'])
-    else:
-        return None
+    return None
 
 def get_current_user(**credential):
-    '''check credential and return current user with new token'''
+    '''check token and then password from dict, return <admin> with token UPDATED or None, invoking authenticate'''
     admin = authenticate(**credential)
     if admin:
-        admin.token = generate_random_string(32)
+        admin.token = generate_random_string(AppConfig.TOKEN_LENGTH)
         db.session.commit()
         return admin
-    else:
-        return None
+    return None
 
-def check_cookie(request):
-    '''check cookie of request and return current user with new token'''
+def check_cookie(current_request):
+    '''check token in cookie of current_request, return <admin> with token UPDATED or None, invoking authenticate'''
     try:
-        current_token = request.cookies.get('token')
-        current_user = get_current_user(token=current_token)
+        current_token = current_request.cookies.get('token')
+        current_user = authenticate(token=current_token)
         if current_user:
+            current_user.token = generate_random_string(AppConfig.TOKEN_LENGTH)
+            db.session.commit()
             return current_user
-        else:
-            return None
-    except KeyError as key_error:
-        logging.info(key_error)
+        return None
+    except KeyError as identifier:
+        logging.warning('%r: %r', identifier, identifier.args)
         return None
 
-@fun_logger('login')
+# @fun_logger('login')
 def admin_only(public_view='/'):
-    '''decorated functions should NEVER change table `tokens`'''
+    '''decorated functions should NEVER change column `tokens`, redirect the unauthorized to `public_view`'''
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kw):
+            '''update token or set invalid token to ``'''
             admin = check_cookie(request)
             if admin:
                 response = func(*args, **kw)
@@ -89,12 +90,13 @@ def admin_only(public_view='/'):
         return wrapper
     return decorator
 
-@fun_logger('login')
+# @fun_logger('login')
 def guest_only(restricted_view='/record'):
-    '''decorated functions should NEVER change table `tokens`'''
+    '''decorated functions should NEVER change column `tokens`, redirect the authorized to `restricted_view`'''
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kw):
+            '''update token or set invalid token to ``'''
             admin = check_cookie(request)
             if admin:
                 response = make_response(redirect(restricted_view))
@@ -108,16 +110,16 @@ def guest_only(restricted_view='/record'):
 
 # @fun_logger('login')
 def load_token(update_token=True, error_status_code=1):
-    '''decorated functions should NEVER change table `tokens`'''
+    '''decorated functions should NEVER change column `tokens` and have <admin> as first argument,
+    update token by default, return msg and error_status_code at /status'''
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kw):
+            '''parser `token` from request, return immediately for invalid token or invoke decorated function'''
             parser = reqparse.RequestParser()
             parser.add_argument('token', type=str)
-            # logging.info('%r', request.args)
-            # logging.info('%r', request.data)
-            logging.info(parser.parse_args())
-            admin = get_arg(parser.parse_args()['token'], None, lambda token: check_token(token))
+            # logging.info(parser.parse_args())
+            admin = get_arg(parser.parse_args()['token'], None, check_token)
             if admin:
                 if update_token:
                     admin.token = generate_random_string(32)
