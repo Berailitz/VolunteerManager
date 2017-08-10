@@ -1,4 +1,4 @@
-'''Manager class for bv2008.cn'''
+"""Manager class for bv2008.cn"""
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 import json
@@ -9,7 +9,7 @@ import requests
 from bs4 import BeautifulSoup
 
 def set_logger(log_file_path):
-    '''set logger'''
+    """set logger"""
     logging.basicConfig(
         level=logging.INFO,
         format='[%(levelname)s] %(asctime)s %(filename)s:%(lineno)d %(message)s',
@@ -31,7 +31,7 @@ class Manager(object):
         # self.login()
 
     def post(self, url, referer='', **kw):
-        '''customized post'''
+        """customized post"""
         if not referer:
             referer = 'http://www.bv2008.cn'
         headers = {
@@ -47,7 +47,7 @@ class Manager(object):
         return post_response
 
     def get(self, url, referer='', **kw):
-        '''customized get'''
+        """customized get"""
         if not referer:
             referer = 'http://www.bv2008.cn'
         headers = {
@@ -63,7 +63,7 @@ class Manager(object):
         return get_response
 
     def login(self, username, encrypted_password):
-        '''login with default password'''
+        """login with default password"""
         if not username or not encrypted_password:
             logging.error("[Failed]No username or password specified.")
             exit()
@@ -79,7 +79,7 @@ class Manager(object):
 
     @staticmethod
     def translate_json(raw_list):
-        '''remove quotation mark'''
+        """remove quotation mark"""
         new_list = list()
         for line in raw_list:
             line[0] = int(line[0])
@@ -91,7 +91,7 @@ class Manager(object):
         return new_list
 
     def scan(self, interval=0.5, is_random=1):
-        '''scan for all volunteers'''
+        """scan for all volunteers"""
         volunteer_list = list()
         url = r"http://www.bv2008.cn/app/org/member.mini.php?type=joined&p="
         homepage = self.get(url + '1')
@@ -114,7 +114,7 @@ class Manager(object):
 
     @staticmethod
     def prase_list_soap(soup):
-        '''return volunteers on the page'''
+        """return volunteers on the page"""
         volunteer_list = list()
         for member_item in [x for x in soup.select("tr") if not x.select("th")]:
             member_info = list()
@@ -158,7 +158,7 @@ class Manager(object):
         return volunteer_list
 
     def invite(self, project_id, job_id, volunteer_id_list):
-        '''invite volunteers to a project'''
+        """invite volunteers to a project"""
         invite_url = r'http://www.bv2008.cn/app/opp/opp.my.php?m=invite&item=recruit&opp_id=' + str(project_id) + '&job_id=' + str(job_id)
         invite_payload = {'stype':'local', 'uid[]': volunteer_id_list}
         invite_response = self.post(invite_url, data=invite_payload)
@@ -166,7 +166,7 @@ class Manager(object):
         return invite_response
 
     def record(self, project_id, job_id, id_type, record_text):
-        '''add records in text'''
+        """add records in text"""
         # id_type: 1 for user id, 3 for volunteer id, 4 for legal id
         record_url = r'http://www.bv2008.cn/app/opp/opp.my.php?manage_type=0&m=import_hour&item=hour&opp_id=' + str(project_id)
         record_payload = {'content': record_text, 'vol_type': id_type, 'opp_id': project_id, 'job_id': job_id}
@@ -186,7 +186,7 @@ class Manager(object):
         return record_response
 
 def main():
-    '''main function'''
+    """main function"""
     set_logger("log.txt")
     encrypted_password = r"VsNl91lWRJpjkVCTVL4j/pa2w1Ij+U0JqNHIoWCYiGZy5+246J+1UDIs+aplYoH4DiHVfk+jkzGDijqc6ZLsb8mhrj"
     encrypted_password = encrypted_password + r"WOO/CdZ7tD5rn5+Wd6yFgXnRoiaZGAiaAxiPONZuVce11IyOyISchMapiV8b4G8GyREbEg+pcRuhz5Y3Q="

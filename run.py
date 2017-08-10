@@ -1,4 +1,4 @@
-'''start main app'''
+"""start main app"""
 #!/usr/env/python3
 # -*- coding: UTF-8 -*-
 
@@ -8,7 +8,7 @@ from VolunteerManager import app, mess
 application = app.create_app()
 
 def main():
-    '''main func'''
+    """main func"""
     mess.set_logger('log.txt')
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)

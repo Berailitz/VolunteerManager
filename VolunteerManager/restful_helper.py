@@ -1,9 +1,9 @@
-'''handle restful related problems'''
+"""handle restful related problems"""
 #!/usr/env/python3
 # -*- coding: UTF-8 -*-
 
 def parse_all_args(parser):
-    '''prase all args, `None` by default, return args dict'''
+    """prase all args, `None` by default, return args dict"""
     parser.add_argument('job_id', type=int)
     parser.add_argument('legal_name', type=str)
     parser.add_argument('length', type=int)
@@ -18,7 +18,7 @@ def parse_all_args(parser):
     return parser.parse_args()
 
 def get_arg(current, default=None, call_back=lambda arg: arg):
-    '''check whether a value is None (or equal to False), return default value, None by default, or call_back(value)'''
+    """check whether a value is None (or equal to False), return default value, None by default, or call_back(value)"""
     if current:
         return call_back(current)
     return default

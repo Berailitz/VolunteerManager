@@ -1,9 +1,9 @@
-'''config of this app'''
+"""config of this app"""
 #!/usr/env/python3
 # -*- coding: UTF-8 -*-
 
 class AppConfig(object):
-    '''config class'''
+    """config class"""
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://xh:xh@localhost/xh?charset=utf8'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
@@ -20,5 +20,5 @@ class AppConfig(object):
 
     @staticmethod
     def init_app(app):
-        '''ensure that restful response should be encode with utf8'''
+        """ensure that restful response should be encode with utf8"""
         app.config.update(RESTFUL_JSON=dict(ensure_ascii=False))
