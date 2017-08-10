@@ -201,8 +201,9 @@ class excel_api(Resource):
         download_folder = AppConfig.DOWNLOAD_PATH
         download_path = path.join(module_dir, download_folder)
         try:
-            shutil.rmtree(download_path)
-            os.mkdir(download_path)
+            if path.exists(download_path):
+                shutil.rmtree(download_path)
+                os.mkdir(download_path)
             return {'status': 0}
         except Exception as identifier:
             return {'status': 1, 'data': {'msg': str(identifier)}}
