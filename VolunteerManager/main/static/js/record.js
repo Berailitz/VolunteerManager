@@ -141,14 +141,14 @@ function loadOnlineData(page, length) {
     'length': length,
     'query_type': 'page',
     'token': Cookies.get('token')
-  }, function(rawResponse) {
-      setToken(rawResponse['token']);
-      if (rawResponse['status']) {
-        showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
+  }, function(RawData) {
+      setToken(RawData['token']);
+      if (RawData['status']) {
+        showToast(`ERROR: 查询失败: ${RawData['data']['msg']}`);
       } else {
-        // console.log(rawResponse);
+        // console.log(RawData);
         tableLines.splice(0, tableLines.length);
-        $.each(rawResponse['data'], function(LineIndex, rawLine) {
+        $.each(RawData['data'], function(LineIndex, rawLine) {
           rawLine.record_status = '已录入';
           tableLines[LineIndex] = rawLine
           console.log(rawLine);
@@ -186,14 +186,14 @@ function submitAll() {
           'type': 'PUT',
           'dataType': 'json',
           'data': {'data': JSON.stringify(encodeLine(LineData)), 'token': Cookies.get('token')},
-          'success': function (rawResponse, TextStatus, jqXHR) {
-            setToken(rawResponse['token']);
-            if (rawResponse['status']) {
-              showToast(`ERROR: 查询失败: ${rawResponse['data']['msg']}`);
-              LineData['record_status'] = rawResponse['data']['msg'];
+          'success': function (RawData, TextStatus, jqXHR) {
+            setToken(RawData['token']);
+            if (RawData['status']) {
+              showToast(`ERROR: 查询失败: ${RawData['data']['msg']}`);
+              LineData['record_status'] = RawData['data']['msg'];
             } else {
-              // console.log(rawResponse['data']);
-              LineData['record_status'] = rawResponse['data']['msg'];
+              // console.log(RawData['data']);
+              LineData['record_status'] = RawData['data']['msg'];
             }
             htmlTable.loadData(tableLines);
           }
