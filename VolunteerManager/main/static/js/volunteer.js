@@ -28,12 +28,12 @@ let htmlTable = new Handsontable(container, {
 });
 
 function search() {
-  let student_id = $('#student-id-box')[0].value;
-  let legal_name = $('#legal-name-box')[0].value;
+  let student_id = $('#student-id-input')[0].value;
+  let legal_name = $('#legal-name-input')[0].value;
   resetTable();
   if (student_id && !$.isNumeric(student_id)) {
     showToast('ERROR: 学号不为整数');
-    $('#student-id-box')[0].focus();
+    $('#student-id-input')[0].focus();
     return;
   }
   $.getJSON("/api/volunteers", {
@@ -50,12 +50,12 @@ function search() {
       tableLines.splice(0, tableLines.length);
       if (rawResponse['status'] == 1) {
         tableLines = [[]];
-        $('#student-id-box')[0].focus();
+        $('#student-id-input')[0].focus();
         showToast('ERROR: 查无此人', 800);
       } else {
         $.each(infoList, function (infoIndex, infoName) {
-          $('#' + infoName.replace('_', '-') + '-box').parent().addClass('is-dirty');
-          $('#' + infoName.replace('_', '-') + '-box')[0].value = rawResponse['data']['info'][infoName] ? rawResponse['data']['info'][infoName] : '';
+          $('#' + infoName.replace('_', '-') + '-input').parent().addClass('is-dirty');
+          $('#' + infoName.replace('_', '-') + '-input')[0].value = rawResponse['data']['info'][infoName] ? rawResponse['data']['info'][infoName] : '';
         });
         $.getJSON('/api/records', {
           'user_id': rawResponse['data']['info']['user_id'],
@@ -69,7 +69,7 @@ function search() {
             console.log(rawResponse['data']['records']);
             if (rawResponse['data']['records'].length == 0) {
               showToast('ERROR: 查无记录', 800);
-              $('#student-id-box')[0].focus();
+              $('#student-id-input')[0].focus();
               return;
             }
             $.each(rawResponse['data']['records'], function (line_index, raw_line) {
@@ -116,11 +116,11 @@ function resetTable() {
   htmlTable.render();
   htmlTable.selectCell(0, 0);
   $.each(infoList, function (infoIndex, infoName) {
-    $('#' + infoName.replace('_', '-') + '-box').parent().removeClass('is-dirty');
-    $('#' + infoName.replace('_', '-') + '-box')[0].value = '';
+    $('#' + infoName.replace('_', '-') + '-input').parent().removeClass('is-dirty');
+    $('#' + infoName.replace('_', '-') + '-input')[0].value = '';
   })
-  // $('#student-id-box')[0].value = '';
-  // $('#legal-name-box')[0].value = '';
+  // $('#student-id-input')[0].value = '';
+  // $('#legal-name-input')[0].value = '';
 }
 
 // loadData(1, 20);
