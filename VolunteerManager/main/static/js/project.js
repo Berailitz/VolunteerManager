@@ -89,30 +89,6 @@ function search() {
   showToast('查询中', 800);
 }
 
-function loadData(page, length) {
-  $.getJSON("/api/volunteers", {
-    'page': page,
-    'length': length,
-    'query_type': 'all',
-    'token': Cookies.get('token')
-  }, function (RawData) {
-    setToken(RawData['token']);
-    if (RawData['status']) {
-      showToast(`ERROR: 查询失败: ${RawData['data']['msg']}`);
-    } else {
-      console.log(RawData);
-      setToken(RawData['token']);
-      tableLines.splice(0, tableLines.length);
-      $.each(RawData['data'], function (lineIndex, rawLine) {
-        tableLines[lineIndex] = decodeLine(rawLine);
-        // console.log(line);
-      });
-      htmlTable.render();
-      htmlTable.selectCell(0, 0);
-    }
-  });
-}
-
 function resetTable() {
   tableLines = [[]];
   htmlTable.loadData(tableLines);
