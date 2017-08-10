@@ -108,7 +108,7 @@ class record_api(Resource):
         args['query_type'] = 'one'
         logging.info(args)
         try:
-            the_rec = get_records(args, ['record_id'])
+            the_rec = get_records({'record_id': int(args['record_id']), 'query_type': 'one'})
         except Exception as e:
             if not check_NoResultFound(e, args):
                 logging.exception(e)
