@@ -52,7 +52,7 @@ class VolunteerApi(Resource):
         try:
             the_volunteer = get_volunteers(args)
         except orm.exc.NoResultFound as identifier:
-            logging.warning('%r: %r', identifier, identifier.args)
+            logging.warning('%r', identifier)
             return {'status': 1, 'data': {'info': {}, 'msg': '查无此人'}}
         volunteer_dict = item_to_dict(the_volunteer, set())
         # logging.info((length * page_index, length * (page_index + 1)))
@@ -67,7 +67,7 @@ class JobApi(Resource):
         try:
             job_all = get_jobs(args)
         except orm.exc.NoResultFound as identifier:
-            logging.warning('%r: %r', identifier, identifier.args)
+            logging.warning('%r', identifier)
             return {'status': 1, 'data': {'info': {}, 'msg': '查无此项'}}
         job_list = list(map(lambda job_item: job_item.job_name, job_all))
         return {'status': 0, 'data': job_list}
@@ -81,7 +81,7 @@ class RecordApi(Resource):
         try:
             record_all = get_records(args)
         except orm.exc.NoResultFound as identifier:
-            logging.warning('%r: %r', identifier, identifier.args)
+            logging.warning('%r', identifier)
             return {'status': 1, 'data': {'msg': '查无此记录'}}
         if not isinstance(record_all, list):
             record_all = [record_all]
@@ -112,7 +112,7 @@ class RecordApi(Resource):
         try:
             the_rec = get_records({'record_id': int(args['record_id']), 'query_type': 'one'})
         except orm.exc.NoResultFound as identifier:
-            logging.warning('%r: %r', identifier, identifier.args)
+            logging.warning('%r', identifier)
             return {'status': 1, 'data': {'msg': '查无此记录'}}
         try:
             if 'student_id' in args and args['student_id']:
@@ -123,7 +123,7 @@ class RecordApi(Resource):
                 the_rec.project_id = the_job.project_id
                 the_rec.job_id = the_job.job_id
         except orm.exc.NoResultFound as identifier:
-            logging.warning('%r: %r', identifier, identifier.args)
+            logging.warning('%r', identifier)
             return {'status': 1, 'data': {'msg': '志愿项目或志愿者参数错误'}}
         for key in ['job_date', 'working_time', 'record_note']:
             if key in args and args[key]:
@@ -144,12 +144,12 @@ class RecordApi(Resource):
         try:
             the_vol = get_volunteers(args, ['student_id', 'legal_name'])
         except orm.exc.NoResultFound as identifier:
-            logging.warning('%r: %r', identifier, identifier.args)
+            logging.warning('%r', identifier)
             return {'status': 1, 'data': {'msg': '查无此人'}}
         try:
             the_job = get_jobs(args)
         except orm.exc.NoResultFound as identifier:
-            logging.warning('%r: %r', identifier, identifier.args)
+            logging.warning('%r', identifier)
             return {'status': 1, 'data': {'msg': '查无此项目'}}
         new_rec = Record(the_vol.user_id, the_job.project_id, the_job.job_id, args['job_date'], args['working_time'], args['record_note'])
         new_rec.operator_id = admin.admin_id

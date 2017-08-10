@@ -43,14 +43,14 @@ def check_password(username, password):
 
 def authenticate(**credential):
     '''PRIVATE: check token and then password, return original <admin> or None'''
-    if credential['token']:
+    if 'token' in credential and credential['token']:
         return check_token(credential['token'])
-    elif credential['username'] and credential['password']:
+    elif 'username' in credential and 'password' in credential and credential['username'] and credential['password']:
         return check_password(credential['username'], credential['password'])
     return None
 
 def get_current_user(**credential):
-    '''check token and then password from dict, return <admin> with token UPDATED or None, invoking authenticate'''
+    '''check token and then password from dict, return <admin> with token UPDATED or None, invoking `authenticate`'''
     admin = authenticate(**credential)
     if admin:
         admin.token = generate_random_string(AppConfig.TOKEN_LENGTH)
@@ -59,7 +59,7 @@ def get_current_user(**credential):
     return None
 
 def check_cookie(current_request):
-    '''check token in cookie of current_request, return <admin> with token UPDATED or None, invoking authenticate'''
+    '''check token in cookie of current_request, return <admin> with token UPDATED or None, invoking `authenticate`'''
     try:
         current_token = current_request.cookies.get('token')
         current_user = authenticate(token=current_token)
@@ -69,12 +69,12 @@ def check_cookie(current_request):
             return current_user
         return None
     except KeyError as identifier:
-        logging.warning('%r: %r', identifier, identifier.args)
+        logging.warning('%r', identifier)
         return None
 
 # @fun_logger('login')
 def admin_only(public_view='/'):
-    '''decorated functions should NEVER change column `tokens`, redirect the unauthorized to `public_view`'''
+    '''decorated functions should NEVER change column `tokens`, redirect the unauthorized to `public_view`, invoking `check_cookie`'''
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kw):
@@ -92,7 +92,7 @@ def admin_only(public_view='/'):
 
 # @fun_logger('login')
 def guest_only(restricted_view='/record'):
-    '''decorated functions should NEVER change column `tokens`, redirect the authorized to `restricted_view`'''
+    '''decorated functions should NEVER change column `tokens`, redirect the authorized to `restricted_view`, invoking `check_cookie`'''
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kw):
