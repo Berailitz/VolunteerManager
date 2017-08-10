@@ -29,7 +29,8 @@ def create_api():
 
 class TokenApi(Resource):
     """handle /api/tokens"""
-    def get(self):
+    @staticmethod
+    def get():
         """GET method, get token with password or new token by get_current_user"""
         parser = reqparse.RequestParser()
         parser.add_argument('username', type=str)
@@ -45,8 +46,9 @@ class TokenApi(Resource):
 
 class VolunteerApi(Resource):
     """handle /api/volunteers"""
+    @staticmethod
     @load_token()
-    def get(admin, self):
+    def get(admin):
         """GET method, get volunteer info, ONE per call, return dict at /data/info"""
         args = parse_all_args(reqparse.RequestParser())
         try:
@@ -60,8 +62,9 @@ class VolunteerApi(Resource):
 
 class JobApi(Resource):
     """handle /api/jobs"""
+    @staticmethod
     @load_token()
-    def get(admin, self):
+    def get(admin):
         """GET method，return job list at /data"""
         args = parse_all_args(reqparse.RequestParser())
         try:
@@ -74,8 +77,9 @@ class JobApi(Resource):
 
 class RecordApi(Resource):
     """handle /api/records"""
+    @staticmethod
     @load_token()
-    def get(admin, self):
+    def get(admin):
         """GET method, return record list at /data/records"""
         args = parse_all_args(reqparse.RequestParser())
         try:
@@ -102,8 +106,9 @@ class RecordApi(Resource):
         # logging.info(record_list)
         return {'data': {'records': record_list}}
 
+    @staticmethod
     @load_token(False)
-    def post(admin, self):
+    def post(admin):
         """POST method, return msg at /data/msg"""
         parser = reqparse.RequestParser()
         parser.add_argument('data', type=str)
@@ -135,8 +140,9 @@ class RecordApi(Resource):
         db.session.commit()
         return {'status': 0, 'data': {'msg': f'已更新(ID:{the_rec.record_id})'}}
 
+    @staticmethod
     @load_token(False)
-    def put(admin, self):
+    def put(admin):
         """PUT method, return msg at /data/msg"""
         parser = reqparse.RequestParser()
         parser.add_argument('data', type=str)
@@ -162,8 +168,9 @@ class RecordApi(Resource):
 
 class RelationshipApi(Resource):
     """handle /api/relationship"""
+    @staticmethod
     @load_token()
-    def get(admin, self):
+    def get(admin):
         """GET method, return relationship dict at /data/, receive no argument but `token`"""
         project_id_dict = dict()
         project_name_dict = dict()
@@ -181,8 +188,9 @@ class RelationshipApi(Resource):
 
 class ExcelApi(Resource):
     """handle /api/download"""
+    @staticmethod
     @load_token()
-    def get(admin, self):
+    def get(admin):
         """GET method, return download url at /data/download_url, may take some time"""
         parser = reqparse.RequestParser()
         parser.add_argument('export_type', type=str)
@@ -198,8 +206,9 @@ class ExcelApi(Resource):
         else:
             return {'status': 1, 'data': {'msg': '参数错误'}}
 
+    @staticmethod
     @load_token()
-    def delete(admin, self):
+    def delete(admin):
         """DELETE method, return msg at /data/msg"""
         module_dir = path.split(path.realpath(__file__))[0]
         download_folder = AppConfig.DOWNLOAD_PATH
