@@ -27,7 +27,7 @@ def check_token(token):
             return None
         return admin
     except orm.exc.NoResultFound as identifier:
-        logging.exception('%r: %r', identifier, identifier.args)
+        logging.warning('%r', identifier)
         return None
 
 def check_password(username, password):
@@ -38,7 +38,7 @@ def check_password(username, password):
         if bcrypt.check_password_hash(admin.password, password):
             return admin
     except orm.exc.NoResultFound as identifier:
-        logging.exception('%r: %r', identifier, identifier.args)
+        logging.warning('%r', identifier)
         return None
 
 def authenticate(**credential):

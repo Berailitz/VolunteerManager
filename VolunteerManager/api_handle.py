@@ -192,7 +192,7 @@ class ExcelApi(Resource):
             try:
                 filename = export_to_excel(export_type)
             except Exception as identifier:
-                logging.exception('%r: %r', identifier, identifier.args)
+                logging.exception('%r', identifier)
                 return {'status': 1, 'data': {'msg': '%r' % (identifier, )}}
             return {'status': 0, 'data': {'download_url': f'/static/temp/{filename}'}}
         else:
@@ -210,5 +210,5 @@ class ExcelApi(Resource):
                 os.mkdir(download_path)
             return {'status': 0}
         except Exception as identifier:
-            logging.exception('%r: %r', identifier, identifier.args)
+            logging.exception('%r', identifier)
             return {'status': 1, 'data': {'msg': str(identifier)}}
