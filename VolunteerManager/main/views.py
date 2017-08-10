@@ -39,4 +39,4 @@ def show_edit_page():
 
 @admin_only()
 def show_download_page():
-    return make_response(render_template('download.html', page_url='/download', page_title='表格下载'))
+    return make_response(render_template('download.html', page_url='/download', page_title='记录表格下载'))
