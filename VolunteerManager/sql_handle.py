@@ -51,27 +51,27 @@ def select_type(query_result, arg_dict, query_type):
     else:
         raise ValueError(f'Invalid query_type: {query_type}')
 
-def get_volunteers(arg_dict, target_key_list=None, query_type='all'):
+def get_volunteers(arg_dict, query_type='all', target_key_list=None):
     """get volunteer object(s)"""
     volunteer_keys = ['user_id', 'volunteer_id', 'username', 'student_id', 'legal_name', 'phone']
     volunteer_keys += ['email', 'gender', 'age', 'volunteer_time', 'note']
     query_object = query_items(Volunteer, volunteer_keys, arg_dict, target_key_list)
     return select_type(query_object, arg_dict, query_type)
 
-def get_records(arg_dict, target_key_list=None, query_type='all'):
+def get_records(arg_dict, query_type='all', target_key_list=None):
     """get record object(s)"""
     record_keys = ['record_id', 'user_id', 'project_id', 'job_id', 'job_date', 'working_time', 'record_note']
     record_keys += ['operator_id', 'operation_date', 'record_status']
     query_object = query_items(Record, record_keys, arg_dict, target_key_list)
     return select_type(query_object, arg_dict, query_type)
 
-def get_jobs(arg_dict, target_key_list=None, query_type='all'):
+def get_jobs(arg_dict, query_type='all', target_key_list=None):
     """get job object(s)"""
     job_keys = ['project_id', 'project_name', 'job_id', 'job_name', 'job_start', 'job_end', 'director', 'location', 'note']
     query_object = query_items(Job, job_keys, arg_dict, target_key_list)
     return select_type(query_object, arg_dict, query_type)
 
-def get_tokens(arg_dict, target_key_list=None, query_type='all'):
+def get_tokens(arg_dict, query_type='all', target_key_list=None):
     """get token object(s)"""
     token_keys = ['admin_id', 'username', 'password', 'token', 'login_time']
     query_object = query_items(Token, token_keys, arg_dict, target_key_list)
