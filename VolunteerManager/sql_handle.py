@@ -82,7 +82,7 @@ def get_tokens(arg_dict, query_type='all', target_key_list=None):
     return select_type(query_object, arg_dict, query_type)
 
 def export_to_excel(export_type, folder_path=AppConfig.DOWNLOAD_PATH, create_folder=True):
-    """export sql table to disk, with relative path folder_path, which may be recursively created
+    """export sql table to disk at relative path `folder_path`, which may be recursively created
     if `create_folder` is True (Default)"""
     if export_type == 'all_in_one':
         data_frame = pandas.read_sql_query(AppConfig.ALL_IN_ONE_SQL_QUERY_COMMAND, engine)
@@ -96,6 +96,22 @@ def export_to_excel(export_type, folder_path=AppConfig.DOWNLOAD_PATH, create_fol
         os.makedirs(real_folder, exist_ok=True)
     real_path = path.join(real_folder, filename)
     data_frame.to_excel(real_path, sheet_name=export_type)
+    return filename
+
+def export_to_json(table_name, folder_path=AppConfig.BACKUP_FOLDER, create_folder=True):
+    """backup sql table to json file at relative path `folder_path`, which may be recursively created
+    if `create_folder` is True (Default)"""
+    logging.info(f'Backup of table {table_name} to json file start')
+    data_frame = pandas.read_sql_table(table_name, engine)
+    current_time = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
+    module_dir = path.split(path.realpath(__file__))[0]
+    filename = '%s_%s_%s.xlsx' % (table_name, current_time, generate_random_string(6))
+    real_folder = path.join(module_dir, folder_path)
+    if create_folder:
+        os.makedirs(real_folder, exist_ok=True)
+    real_path = path.join(real_folder, filename)
+    data_frame.to_excel(real_path, sheet_name=table_name)
+    logging.info(f'Backup completed @ {real_path}')
     return filename
 
 def import_volunteers(data_list):
