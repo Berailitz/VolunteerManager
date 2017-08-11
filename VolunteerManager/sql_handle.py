@@ -122,3 +122,5 @@ def import_volunteers(data_list):
     data_frame.to_sql('temp', engine, if_exists='append', index=False, chunksize=100, dtype=column_type)
     logging.info('Merge data to main table `volunteers`')
     engine.execute(AppConfig.SYNC_VOLUNTEER_SQL_COMMAND)
+    logging.info('Truncate temp table `volunteers_temp`')
+    engine.execute(AppConfig.SYNC_TRUNCATE_TEMP_TABLE_COMMAND)
