@@ -46,7 +46,7 @@ def zip_a_file(raw_file_path, zip_file_path=None, open_mode='z', delete_after_zi
     `open_mode` is `w` (default), or appended if `open_mode` is `a`. Raw file will be deleted if `delete_after_zip`."""
     if not zip_file_path:
         zip_file_path = path.join(path.dirname(raw_file_path), path.basename(raw_file_path).split('.')[0] + '.zip')
-    os.makedirs(path.dirname(zip_file_path))
+    os.makedirs(path.dirname(zip_file_path), exist_ok=True)
     with zipfile.ZipFile(zip_file_path, open_mode) as zip_file_object:
         zip_file_object.write(raw_file_path)
     if delete_after_zip:
