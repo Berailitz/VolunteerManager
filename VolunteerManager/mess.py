@@ -40,7 +40,7 @@ def set_logger(log_path):
     logger.setLevel(logging.INFO)
     logging.info("Start ....")
 
-def zip_a_file(raw_file_path, zip_file_path=None, open_mode='z', delete_after_zip=False):
+def zip_a_file(raw_file_path, zip_file_path=None, open_mode='w', delete_after_zip=False):
     """ NOTE: All path must be absolute path. and Add `raw_file` into `zip_file`. `raw_file` must be readable and
     folder of `zip_file` will be created if not exist. File `zip_file_path` will be truncated if both it exists and
     `open_mode` is `w` (default), or appended if `open_mode` is `a`. Raw file will be deleted if `delete_after_zip`."""
