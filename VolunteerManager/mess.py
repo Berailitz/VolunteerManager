@@ -1,8 +1,11 @@
 """mess like fun_tools, logger"""
 import functools
 import logging
+import os
+import os.path as path
 import random
 import string
+import zipfile
 
 def fun_logger(text='Fun_logger'):
     """log function call and result with custom text head"""
@@ -36,3 +39,16 @@ def set_logger(log_path):
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
     logging.info("Start ....")
+
+def zip_a_file(raw_file_path, zip_file_path=None, open_mode='z', delete_after_zip=False):
+    """create a zip file at `zip_file`, and add `raw_file` into it. NOTE `raw_file` must be readable and
+    folder of `zip_file` will be created if not exist, and zip file will be truncated if exists and
+    `open_mode` is `w` (default), or appended if `open_mode` is `a`. Raw file will be deleted if `delete_after_zip`."""
+    if not zip_file_path:
+        zip_file_path = path.join(path.dirname(raw_file_path), path.basename(raw_file_path).split('.')[0] + '.zip')
+    os.makedirs(path.dirname(zip_file_path))
+    with zipfile.ZipFile(zip_file_path, open_mode) as zip_file_object:
+        zip_file_object.write(raw_file_path)
+    if delete_after_zip:
+        os.remove(raw_file_path)
+    return zip_file_path

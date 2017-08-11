@@ -10,7 +10,7 @@ import pandas
 import sqlalchemy
 from sqlalchemy import create_engine
 from .config import AppConfig
-from .mess import generate_random_string, fun_logger
+from .mess import generate_random_string, fun_logger, zip_a_file
 from .restful_helper import get_arg
 from .tables import Token, Job, Record, Volunteer
 
@@ -98,20 +98,25 @@ def export_to_excel(export_type, folder_path=AppConfig.DOWNLOAD_PATH, create_fol
     data_frame.to_excel(real_path, sheet_name=export_type)
     return filename
 
-def export_to_json(table_name, folder_path=AppConfig.BACKUP_FOLDER, create_folder=True):
+def export_to_json(table_name, folder_path=AppConfig.BACKUP_FOLDER, create_folder=True, zip_instead_of_json=True):
     """backup sql table to json file at relative path `folder_path`, which may be recursively created
-    if `create_folder` is True (Default)"""
+    if `create_folder` is True (Default). Json file will be archived if `create_zip` is True (default).
+    If `zip_instead_of_json` is set to True (default), json file is deleted, with zip created in the same
+    directory."""
     logging.info(f'Backup of table {table_name} to json file start')
     data_frame = pandas.read_sql_table(table_name, engine)
     current_time = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
     module_dir = path.split(path.realpath(__file__))[0]
-    filename = '%s_%s_%s.xlsx' % (table_name, current_time, generate_random_string(6))
+    filename = '%s_%s_%s.json' % (table_name, current_time, generate_random_string(6))
     real_folder = path.join(module_dir, folder_path)
     if create_folder:
         os.makedirs(real_folder, exist_ok=True)
     real_path = path.join(real_folder, filename)
     data_frame.to_json(path_or_buf=real_path, orient='records', date_format='iso', force_ascii=False)
     logging.info(f'Backup completed @ {real_path}')
+    if zip_instead_of_json:
+        zip_path = zip_a_file(filename, delete_after_zip=zip_instead_of_json)
+        logging.info(f'Archive of json created at {zip_path}, and json deleted')
     return filename
 
 def import_volunteers(data_list):
