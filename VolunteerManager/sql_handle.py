@@ -110,7 +110,7 @@ def export_to_json(table_name, folder_path=AppConfig.BACKUP_FOLDER, create_folde
     if create_folder:
         os.makedirs(real_folder, exist_ok=True)
     real_path = path.join(real_folder, filename)
-    data_frame.to_excel(real_path, sheet_name=table_name)
+    data_frame.to_json(path_or_buf=real_path, orient='records', date_format='iso', force_ascii=False)
     logging.info(f'Backup completed @ {real_path}')
     return filename
 
