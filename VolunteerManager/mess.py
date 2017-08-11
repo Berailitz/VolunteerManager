@@ -47,7 +47,7 @@ def zip_a_file(raw_file_path, zip_file_path=None, open_mode='w', delete_after_zi
     if not zip_file_path:
         zip_file_path = path.join(path.dirname(raw_file_path), path.basename(raw_file_path).split('.')[0] + '.zip')
     os.makedirs(path.dirname(zip_file_path), exist_ok=True)
-    with zipfile.ZipFile(zip_file_path, open_mode) as zip_file_object:
+    with zipfile.ZipFile(zip_file_path, mode=open_mode, compression=zipfile.ZIP_DEFLATED) as zip_file_object:
         zip_file_object.write(raw_file_path)
     if delete_after_zip:
         os.remove(raw_file_path)
