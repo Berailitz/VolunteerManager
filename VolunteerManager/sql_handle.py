@@ -115,7 +115,7 @@ def export_to_json(table_name, folder_path=AppConfig.BACKUP_FOLDER, create_folde
     data_frame.to_json(path_or_buf=real_path, orient='records', date_format='iso', force_ascii=False)
     logging.info(f'Backup completed @ {real_path}')
     if zip_instead_of_json:
-        zip_path = zip_a_file(filename, delete_after_zip=zip_instead_of_json)
+        zip_path = zip_a_file(real_path, delete_after_zip=zip_instead_of_json)
         logging.info(f'Archive of json created at {zip_path}, and json deleted')
     return filename
 
