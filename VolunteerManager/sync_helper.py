@@ -8,7 +8,7 @@ import random
 import requests
 from bs4 import BeautifulSoup
 from .mess import str_to_int, strip_raw_data
-from .sql_handle import import_to_sql
+from .sql_handle import import_volunteers
 
 class SyncManager(object):
     """Manage volunteers on bv2008, whose `volunteer_list` is a list of objects. Call `login` before doing anything else."""
@@ -133,7 +133,7 @@ class SyncManager(object):
 
     def save_to_sql(self):
         """save records to sql invoking `import_to_sql` via `pandas`"""
-        import_to_sql(self.volunteer_list)
+        import_volunteers(self.volunteer_list)
 
     def invite(self, project_id, job_id, volunteer_id_list):
         """invite a list of volunteers to a project"""

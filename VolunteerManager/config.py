@@ -20,6 +20,18 @@ class AppConfig(object):
     SYNC_UAERNAME = 'scsfire'
     SYNC_ENCRYPTED_PASSWORD = r"VsNl91lWRJpjkVCTVL4j/pa2w1Ij+U0JqNHIoWCYiGZy5+246J+1UDIs+aplYoH4DiHVfk+jkzGDijqc6ZLsb8mhrj"
     SYNC_ENCRYPTED_PASSWORD += r"WOO/CdZ7tD5rn5+Wd6yFgXnRoiaZGAiaAxiPONZuVce11IyOyISchMapiV8b4G8GyREbEg+pcRuhz5Y3Q="
+    SYNC_TRUNCATE_TEMP_TABLE_COMMAND = "TRUNCATE `volunteers_temp`"
+    SYNC_VOLUNTEER_SQL_COMMAND = "INSERT INTO `volunteers`(`user_id`, `volunteer_id`, `username`, `student_id`, `class_index`, `legal"
+    SYNC_VOLUNTEER_SQL_COMMAND = "_name`, `phone`, `email`, `gender`, `age`, `volunteer_time`, `note`) SELECT `volunteers_temp`.`user_"
+    SYNC_VOLUNTEER_SQL_COMMAND = "id`, `volunteers_temp`.`volunteer_id`, `volunteers_temp`.`username`, `volunteers_temp`.`student_id`,"
+    SYNC_VOLUNTEER_SQL_COMMAND = " `volunteers_temp`.`class_index`, `volunteers_temp`.`legal_name`, `volunteers_temp`.`phone`,`volunte"
+    SYNC_VOLUNTEER_SQL_COMMAND = "ers_temp`.`email`, `volunteers_temp`.`gender`, `volunteers_temp`.`age`, `volunteers_temp`.`volunteer"
+    SYNC_VOLUNTEER_SQL_COMMAND = "_time`, `volunteers_temp`.`note` FROM `volunteers_temp` ON DUPLICATE KEY UPDATE `volunteer_id` = `vo"
+    SYNC_VOLUNTEER_SQL_COMMAND = "lunteers_temp`.`volunteer_id`, `username` = `volunteers_temp`.`username`, `student_id` = `volunteers"
+    SYNC_VOLUNTEER_SQL_COMMAND = "_temp`.`student_id`, `class_index` = `volunteers_temp`.`class_index`, `legal_name` = `volunteers_tem"
+    SYNC_VOLUNTEER_SQL_COMMAND = "p`.`legal_name`, `phone` = `volunteers_temp`.`phone`, `email` = `volunteers_temp`.`email`, `gender` "
+    SYNC_VOLUNTEER_SQL_COMMAND = "= `volunteers_temp`.`gender`, `age` = `volunteers_temp`.`age`, `volunteer_time` = `volunteers_temp`."
+    SYNC_VOLUNTEER_SQL_COMMAND = "`volunteer_time`, `note` = `volunteers_temp`.`note`;TRUNCATE `volunteers_temp`;"
 
     @staticmethod
     def init_app(app):
