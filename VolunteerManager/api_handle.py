@@ -29,6 +29,7 @@ def create_api():
     api.add_resource(RecordApi, '/api/records')
     api.add_resource(RelationshipApi, '/api/relationship')
     api.add_resource(ExcelApi, '/api/download')
+    api.add_resource(SyncApi, '/api/sync')
     return api
 
 class TokenApi(Resource):
