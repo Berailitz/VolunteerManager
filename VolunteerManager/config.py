@@ -10,6 +10,7 @@ class AppConfig(object):
     TEMPLATES_AUTO_RELOAD = True
     SECRET_KEY = '67gyubinjmokl,pl'
     DOWNLOAD_PATH = 'main/static/temp'
+    BACKUP_FOLDER = 'backup'
     TOKEN_LENGTH = 32
     MAX_ITEMS_COUNT_PER_PAGE = 200
     ALL_IN_ONE_SQL_QUERY_COMMAND = "SELECT `record_id`, `records`.`user_id`, `project_name`, `job_name`, `working_date`, `working_time`,"

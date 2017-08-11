@@ -1,4 +1,5 @@
 log.txt
+VolunteerManager/backup/
 VolunteerManager/main/static/temp/*
 
 # Byte-compiled / optimized / DLL files

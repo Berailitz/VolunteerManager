@@ -13,7 +13,7 @@ from .auth_handle import get_current_user, load_token
 from .config import AppConfig
 from .mess import fun_logger
 from .restful_helper import parse_all_args
-from .sql_handle import export_to_excel, get_jobs, get_records, get_tokens, get_volunteers, item_to_dict
+from .sql_handle import export_to_excel, export_to_json, get_jobs, get_records, get_tokens, get_volunteers, item_to_dict
 from .sync_helper import SyncManager
 from .tables import db, Record
 
@@ -247,6 +247,7 @@ class SyncApi(Resource):
     @staticmethod
     def get():
         """DEBUG"""
+        export_to_json('volunteers')
         sync_helper.login(AppConfig.SYNC_UAERNAME, AppConfig.SYNC_ENCRYPTED_PASSWORD)
         sync_helper.scan(2, 20)
         sync_helper.save_to_sql()
