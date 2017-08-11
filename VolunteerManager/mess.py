@@ -17,6 +17,8 @@ def fun_logger(text='Fun_logger'):
     return decorator
 
 generate_random_string = lambda length: ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
+str_to_int = lambda raw_string: int(raw_string.strip())
+strip_raw_data = lambda raw_data: str(raw_data).strip()
 
 def set_logger(log_path):
     """log into log file at `log_path`, at level `INFO`"""

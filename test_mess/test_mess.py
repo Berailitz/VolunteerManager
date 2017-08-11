@@ -20,18 +20,14 @@ def set_logger(log_file_path):
     logging.getLogger().setLevel(logging.INFO)
     logging.info("Start ....")
 
-def test():
-    """main func"""
+def exec_test(env_list=None):
+    """test with eval"""
+    logging.info('env_list: %r', env_list)
     i = 1
-    while(True):
+    while True:
         try:
             command = input(f'IN[{i}]: ')
-            result = eval(command)
-            logging.info(f'OUT[{i}]: {result}')
+            exec(command)
             i += 1
         except Exception as identifier:
             logging.exception(identifier)
-
-if __name__ == '__main__':
-    set_logger('log.txt')
-    test()
