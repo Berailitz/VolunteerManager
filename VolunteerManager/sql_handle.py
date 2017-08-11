@@ -14,7 +14,8 @@ from .restful_helper import get_arg
 from .tables import Token, Job, Record, Volunteer
 
 def item_to_dict(item, const_removed={}):
-    """transfer sqlalchemy object to a serializable dict"""
+    """transfer sqlalchemy object to a serializable dict, with all value transfered to `string`,
+    remove columns in set `const_removed`"""
     item_dict = item.__dict__.copy()
     del item_dict['_sa_instance_state']
     for removed_attr in const_removed:
