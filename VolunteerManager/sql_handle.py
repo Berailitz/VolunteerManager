@@ -99,8 +99,8 @@ def export_to_excel(export_type, folder_path=AppConfig.DOWNLOAD_PATH, create_fol
     return filename
 
 def import_to_sql(data_list):
-    """DEBUG: import `data_list` to sql, table `temp`, which will be dropped and recreated.
-    NOTE: TODO: rows should be merged into table `volunteers` later."""
+    """DEBUG: import `data_list` to sql table `temp`, which should be empty to avoid conflict while
+    being `appended` with new rows. NOTE: TODO: rows should be merged into table `volunteers` later."""
     data_frame = pandas.DataFrame(data_list)
     column_type = {
         'user_id': sqlalchemy.types.Integer,
@@ -116,4 +116,4 @@ def import_to_sql(data_list):
         'volunteer_time': sqlalchemy.types.Float,
         'note': sqlalchemy.types.String(50)
     }
-    data_frame.to_sql('temp', engine, if_exists='replace', index=False, chunksize=100, dtype=column_type)
+    data_frame.to_sql('temp', engine, if_exists='append', index=False, chunksize=100, dtype=column_type)
