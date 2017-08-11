@@ -13,10 +13,12 @@ from .auth_handle import get_current_user, load_token
 from .config import AppConfig
 from .mess import fun_logger
 from .restful_helper import parse_all_args
-from .sql_handle import export_to_excel, item_to_dict, get_jobs, get_records, get_tokens, get_volunteers
+from .sql_handle import export_to_excel, get_jobs, get_records, get_tokens, get_volunteers, item_to_dict
+from .sync_helper import SyncManager
 from .tables import db, Record
 
 get_query_type = lambda args: args['query_type'] if args['query_type'] else 'all'
+sync_helper = SyncManager()
 
 def create_api():
     """return api object at startup"""
@@ -238,3 +240,13 @@ class ExcelApi(Resource):
         except Exception as identifier:
             logging.exception('%r', identifier)
             return {'status': 1, 'data': {'msg': str(identifier)}}
+
+class SyncApi(Resource):
+    """handle sync requests with `bv2008.cn`"""
+    @staticmethod
+    def get():
+        """DEBUG"""
+        sync_helper.login(AppConfig.SYNC_UAERNAME, AppConfig.SYNC_ENCRYPTED_PASSWORD)
+        sync_helper.scan(2, 20)
+        sync_helper.save_to_sql()
+        return sync_helper.volunteer_list

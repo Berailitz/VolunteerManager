@@ -17,6 +17,9 @@ class AppConfig(object):
     ALL_IN_ONE_SQL_QUERY_COMMAND += " FROM `records` LEFT JOIN `volunteers` ON `records`.`user_id` = `volunteers`.`user_id` LEFT JOIN "
     ALL_IN_ONE_SQL_QUERY_COMMAND += "`tokens` ON `records`.`operator_id` = `tokens`.`admin_id` LEFT JOIN `jobs` ON `records`.`project_id`"
     ALL_IN_ONE_SQL_QUERY_COMMAND += " = `jobs`.`project_id` AND `records`.`job_id` = `jobs`.`job_id`"
+    SYNC_UAERNAME = 'scsfire'
+    SYNC_ENCRYPTED_PASSWORD = r"VsNl91lWRJpjkVCTVL4j/pa2w1Ij+U0JqNHIoWCYiGZy5+246J+1UDIs+aplYoH4DiHVfk+jkzGDijqc6ZLsb8mhrj"
+    SYNC_ENCRYPTED_PASSWORD += r"WOO/CdZ7tD5rn5+Wd6yFgXnRoiaZGAiaAxiPONZuVce11IyOyISchMapiV8b4G8GyREbEg+pcRuhz5Y3Q="
 
     @staticmethod
     def init_app(app):

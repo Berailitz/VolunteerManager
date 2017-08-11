@@ -7,11 +7,14 @@ import os
 import os.path as path
 import time
 import pandas
+import sqlalchemy
 from sqlalchemy import create_engine
 from .config import AppConfig
 from .mess import generate_random_string, fun_logger
 from .restful_helper import get_arg
 from .tables import Token, Job, Record, Volunteer
+
+engine = create_engine(AppConfig.SQLALCHEMY_DATABASE_URI)
 
 def item_to_dict(item, const_removed={}):
     """transfer sqlalchemy object to a serializable dict, with all value transfered to `string`,
@@ -78,10 +81,9 @@ def get_tokens(arg_dict, query_type='all', target_key_list=None):
     query_object = query_items(Token, token_keys, arg_dict, target_key_list)
     return select_type(query_object, arg_dict, query_type)
 
-def export_to_excel(export_type, folder_path=AppConfig.DOWNLOAD_PATH, sql_url=AppConfig.SQLALCHEMY_DATABASE_URI, create_folder=True):
+def export_to_excel(export_type, folder_path=AppConfig.DOWNLOAD_PATH, create_folder=True):
     """export sql table to disk, with relative path folder_path, which may be recursively created
     if `create_folder` is True (Default)"""
-    engine = create_engine(sql_url)
     if export_type == 'all_in_one':
         data_frame = pandas.read_sql_query(AppConfig.ALL_IN_ONE_SQL_QUERY_COMMAND, engine)
     else:
@@ -95,3 +97,23 @@ def export_to_excel(export_type, folder_path=AppConfig.DOWNLOAD_PATH, sql_url=Ap
     real_path = path.join(real_folder, filename)
     data_frame.to_excel(real_path, sheet_name=export_type)
     return filename
+
+def import_to_sql(data_list):
+    """DEBUG: import `data_list` to sql, table `temp`, which will be dropped and recreated.
+    NOTE: TODO: rows should be merged into table `volunteers` later."""
+    data_frame = pandas.DataFrame(data_list)
+    column_type = {
+        'user_id': sqlalchemy.types.Integer,
+        'volunteer_id': sqlalchemy.types.Integer,
+        'username': sqlalchemy.types.String(20),
+        'student_id': sqlalchemy.types.String(20),
+        'class_index': sqlalchemy.types.String(12),
+        'legal_name': sqlalchemy.types.String(40),
+        'phone': sqlalchemy.types.String(20),
+        'email': sqlalchemy.types.String(50),
+        'gender': sqlalchemy.types.String(1),
+        'age': sqlalchemy.types.Integer,
+        'volunteer_time': sqlalchemy.types.Float,
+        'note': sqlalchemy.types.String(50)
+    }
+    data_frame.to_sql('temp', engine, if_exists='replace', index=False, chunksize=100, dtype=column_type)
