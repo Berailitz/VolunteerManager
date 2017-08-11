@@ -67,7 +67,7 @@ class Volunteer(db.Model):
     """volunteer table"""
     __tablename__ = 'volunteers'
     user_id = db.Column(db.Integer, primary_key=True)
-    volunteer_id = db.Column(db.Integer)
+    volunteer_id = db.Column(db.String(20))
     username = db.Column(db.String(20))
     student_id = db.Column(db.String(20))
     class_index = db.Column(db.String(12))

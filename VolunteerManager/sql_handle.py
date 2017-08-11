@@ -104,7 +104,7 @@ def import_to_sql(data_list):
     data_frame = pandas.DataFrame(data_list)
     column_type = {
         'user_id': sqlalchemy.types.Integer,
-        'volunteer_id': sqlalchemy.types.Integer,
+        'volunteer_id': sqlalchemy.types.String(20),
         'username': sqlalchemy.types.String(20),
         'student_id': sqlalchemy.types.String(20),
         'class_index': sqlalchemy.types.String(12),
