@@ -2,6 +2,10 @@
 #!/usr/env/python3
 # -*- coding: UTF-8 -*-
 
+import logging
+from flask_sqlalchemy import orm
+from .tables import AppStatus, db
+
 class AppConfig(object):
     """config class"""
     DEBUG = True
@@ -38,3 +42,30 @@ class AppConfig(object):
     def init_app(app):
         """ensure that restful response should be encode with utf8"""
         app.config.update(RESTFUL_JSON=dict(ensure_ascii=False))
+
+class AppStatusDict(object):
+    """set and get `app_status` by `status_key`
+    `is_syncing_volunteers`: `finished`, `underway`, `error`
+    `syncing_process_volunteers`: `accumulated_volunteer_count`/`expected_volunteer_count`"""
+    @staticmethod
+    def __getitem__(status_key):
+        """get `status_value` by `status_key`, return None if not exist, while '' is a valid value"""
+        try:
+            status_value = AppStatus.query.filter(AppStatus.status_key == status_key).one().status_value
+            return status_value
+        except orm.exc.NoResultFound as identifier:
+            logging.error(f'No such `status_key` {status_key}.')
+            return None
+
+    @staticmethod
+    def __setitem__(status_key, status_value):
+        """set `status_value` by `status_key`, create it if not exist"""
+        try:
+            AppStatus.query.filter(AppStatus.status_key == status_key).one().status_value = status_value
+        except orm.exc.NoResultFound as identifier:
+            logging.error(f'No such `status_key` {status_key}, which will be created.')
+            new_status = AppStatus(status_key, status_value)
+            db.session.add(new_status)
+        db.session.commit()
+
+app_status_dict = AppStatusDict()
