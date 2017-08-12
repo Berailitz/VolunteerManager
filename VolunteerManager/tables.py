@@ -8,7 +8,7 @@ db = SQLAlchemy()
 
 class AppStatus(db.Model):
     """`app_status` table"""
-    __tablename__ = 'tokens'
+    __tablename__ = 'app_status'
     status_key = db.Column(db.String(40), primary_key=True)
     status_value = db.Column(db.String(40))
 
