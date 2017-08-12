@@ -73,8 +73,8 @@ def check_cookie(current_request):
         return None
 
 # @fun_logger('login')
-def admin_only(public_view='/'):
-    """decorated functions should NEVER change column `tokens`, redirect the unauthorized to `public_view`, invoking `check_cookie`"""
+def admin_only_view(public_view='/'):
+    """decorated view should NEVER change column `tokens`, redirect the unauthorized to `public_view`, invoking `check_cookie`"""
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kw):
@@ -91,8 +91,8 @@ def admin_only(public_view='/'):
     return decorator
 
 # @fun_logger('login')
-def guest_only(restricted_view='/record'):
-    """decorated functions should NEVER change column `tokens`, redirect the authorized to `restricted_view`, invoking `check_cookie`"""
+def guest_only_view(restricted_view='/record'):
+    """decorated view should NEVER change column `tokens`, redirect the authorized to `restricted_view`, invoking `check_cookie`"""
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kw):
@@ -109,7 +109,7 @@ def guest_only(restricted_view='/record'):
     return decorator
 
 # @fun_logger('login')
-def load_token(update_token=True, error_status_code=1):
+def load_token_api(update_token=True, error_status_code=1):
     """decorated functions should NEVER change column `tokens` and have <admin> as first argument,
     update token by default, return msg and error_status_code at /status"""
     def decorator(func):

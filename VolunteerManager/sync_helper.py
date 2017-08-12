@@ -7,8 +7,9 @@ import time
 import random
 import requests
 from bs4 import BeautifulSoup
+from .config import AppConfig
 from .mess import str_to_int, strip_raw_data
-from .sql_handle import import_volunteers
+from .sql_handle import export_to_json, import_volunteers
 
 class SyncManager(object):
     """Manage volunteers on bv2008, whose `volunteer_list` is a list of objects. Call `login` before doing anything else."""
@@ -170,3 +171,12 @@ class SyncManager(object):
         else:
             logging.error(f"Record: #{response_json['id']} ERROR{response_json['code']} {response_json['msg']}")
         return response_json
+
+sync_helper = SyncManager()
+
+def sync_volunteer_info():
+    """DEBUG: limitation of 20 volunteers. Backup sql to zipped json, scan volunteers and save to `volunteers`"""
+    export_to_json('volunteers')
+    sync_helper.login(AppConfig.SYNC_UAERNAME, AppConfig.SYNC_ENCRYPTED_PASSWORD)
+    sync_helper.scan(2, 20)
+    sync_helper.save_to_sql()

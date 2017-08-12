@@ -9,16 +9,15 @@ import os.path as path
 import shutil
 from flask_restful import Resource, Api, reqparse
 from flask_sqlalchemy import orm
-from .auth_handle import get_current_user, load_token
+from .auth_handle import get_current_user, load_token_api
 from .config import AppConfig
 from .mess import fun_logger
-from .restful_helper import parse_all_args
-from .sql_handle import export_to_excel, export_to_json, get_jobs, get_records, get_tokens, get_volunteers, item_to_dict
-from .sync_helper import SyncManager
+from .restful_helper import parse_all_args, parse_one_arg
+from .sql_handle import export_to_excel, get_jobs, get_records, get_tokens, get_volunteers, item_to_dict
+from .sync_helper import sync_volunteer_info
 from .tables import db, Record
 
 get_query_type = lambda args: args['query_type'] if args['query_type'] else 'all'
-sync_helper = SyncManager()
 
 def create_api():
     """return api object at startup"""
@@ -51,7 +50,7 @@ class TokenApi(Resource):
 class VolunteerApi(Resource):
     """handle /api/volunteers"""
     @staticmethod
-    @load_token()
+    @load_token_api()
     def get(admin):
         """GET method, get volunteer info, ONE per call, return dict at /data/info"""
         args = parse_all_args(reqparse.RequestParser())
@@ -67,7 +66,7 @@ class VolunteerApi(Resource):
 class JobApi(Resource):
     """handle /api/jobs"""
     @staticmethod
-    @load_token()
+    @load_token_api()
     def get(admin):
         """GET method，return job list at /data"""
         args = parse_all_args(reqparse.RequestParser())
@@ -82,7 +81,7 @@ class JobApi(Resource):
 class RecordApi(Resource):
     """handle /api/records"""
     @staticmethod
-    @load_token()
+    @load_token_api()
     def get(admin):
         """GET method, return record list at /data/records"""
         args = parse_all_args(reqparse.RequestParser())
@@ -111,15 +110,15 @@ class RecordApi(Resource):
         return {'data': {'records': record_list}}
 
     @staticmethod
-    @load_token(False)
+    @load_token_api(False)
     def post(admin):
-        """POST method, return msg at /data/msg"""
-        parser = reqparse.RequestParser()
-        parser.add_argument('data', type=str)
-        raw_args = parser.parse_args()
-        logging.info(raw_args)
-        args = json.loads(raw_args['data'])
-        # logging.info(args)
+        """edit method, return msg at /data/msg"""
+        raw_data = parse_one_arg(reqparse.RequestParser(), 'data', str)
+        if raw_data:
+            args = json.loads(raw_data)
+        else:
+            logging.error(f'Empty `data` received for posting record by {admin.username}.')
+            return {'status': 1, 'data': {'msg': '参数错误'}}
         try:
             the_rec = get_records({'record_id': int(args['record_id'])}, 'one', None)
         except orm.exc.NoResultFound as identifier:
@@ -144,14 +143,15 @@ class RecordApi(Resource):
         return {'status': 0, 'data': {'msg': f'已更新(ID:{the_rec.record_id})'}}
 
     @staticmethod
-    @load_token(False)
+    @load_token_api(False)
     def put(admin):
-        """PUT method, return msg at /data/msg"""
-        parser = reqparse.RequestParser()
-        parser.add_argument('data', type=str)
-        raw_args = parser.parse_args()
-        logging.info(raw_args)
-        args = json.loads(raw_args['data'])
+        """add record, return msg at /data/msg"""
+        raw_data = parse_one_arg(reqparse.RequestParser(), 'data', str)
+        if raw_data:
+            args = json.loads(raw_data)
+        else:
+            logging.error(f'Empty `data` received for putting record by {admin.username}.')
+            return {'status': 1, 'data': {'msg': '参数错误'}}
         try:
             the_vol = get_volunteers(args, 'one', ['student_id', 'legal_name'])
         except orm.exc.NoResultFound as identifier:
@@ -169,14 +169,15 @@ class RecordApi(Resource):
         return {'status': 0, 'data': {'msg': f'已录入(ID:{new_rec.record_id})'}}
 
     @staticmethod
-    @load_token(False)
+    @load_token_api(False)
     def delete(admin):
-        """DELETE method, return msg at /data/msg"""
-        parser = reqparse.RequestParser()
-        parser.add_argument('data', type=str)
-        raw_args = parser.parse_args()
-        logging.info(raw_args)
-        args = json.loads(raw_args['data'])
+        """delete record, return msg at /data/msg, delete records according to `/data/record_id` only"""
+        raw_data = parse_one_arg(reqparse.RequestParser(), 'data', str)
+        if raw_data:
+            args = json.loads(raw_data)
+        else:
+            logging.error(f'Empty `data` received for deleting record by {admin.username}.')
+            return {'status': 1, 'data': {'msg': '参数错误'}}
         try:
             the_rec = get_records({'record_id': int(args['record_id'])}, 'one', None)
         except orm.exc.NoResultFound as identifier:
@@ -190,7 +191,7 @@ class RecordApi(Resource):
 class RelationshipApi(Resource):
     """handle /api/relationship"""
     @staticmethod
-    @load_token()
+    @load_token_api()
     def get(admin):
         """GET method, return relationship dict at /data/, receive no argument but `token`"""
         project_id_dict = dict()
@@ -210,13 +211,10 @@ class RelationshipApi(Resource):
 class ExcelApi(Resource):
     """handle /api/download"""
     @staticmethod
-    @load_token()
+    @load_token_api()
     def get(admin):
-        """GET method, return download url at /data/download_url, may take some time"""
-        parser = reqparse.RequestParser()
-        parser.add_argument('export_type', type=str)
-        raw_args = parser.parse_args()
-        export_type = raw_args['export_type']
+        """download excel, return download url at /data/download_url, may take some time"""
+        export_type = parse_one_arg(reqparse.RequestParser(), 'export_type', str)
         if export_type:
             try:
                 filename = export_to_excel(export_type)
@@ -224,10 +222,12 @@ class ExcelApi(Resource):
                 logging.exception('%r', identifier)
                 return {'status': 1, 'data': {'msg': '%r' % (identifier, )}}
             return {'status': 0, 'data': {'download_url': f'/static/temp/{filename}'}}
-        return {'status': 1, 'data': {'msg': '参数错误'}}
+        else:
+            logging.error(f'Empty `export_type` received for excel api by {admin.username}.')
+            return {'status': 1, 'data': {'msg': '参数错误'}}
 
     @staticmethod
-    @load_token()
+    @load_token_api()
     def delete(admin):
         """DELETE method, return msg at /data/msg"""
         module_dir = path.split(path.realpath(__file__))[0]
@@ -245,10 +245,16 @@ class ExcelApi(Resource):
 class SyncApi(Resource):
     """handle sync requests with `bv2008.cn`"""
     @staticmethod
-    def get():
-        """DEBUG"""
-        export_to_json('volunteers')
-        sync_helper.login(AppConfig.SYNC_UAERNAME, AppConfig.SYNC_ENCRYPTED_PASSWORD)
-        sync_helper.scan(2, 20)
-        sync_helper.save_to_sql()
-        return sync_helper.volunteer_list
+    @load_token_api()
+    def get(admin):
+        """DEBUG: TODO: Add status check. Sync with bv2008.cn"""
+        sync_type = parse_one_arg(reqparse.RequestParser(), 'sync_type', str)
+        command_dict = {
+            'sync_volunteer_info': {'func': sync_volunteer_info, 'msg': '志愿者信息'}
+        }
+        if sync_type:
+            command_dict[sync_type]['func']()
+            return {'status': 0, 'data': {'msg': f"{command_dict[sync_type]['msg']}同步完成"}}
+        else:
+            logging.error(f'Empty `sync_type` received for sync api by {admin.username}.')
+            return {'status': 1, 'data': {'msg': '参数错误'}}
