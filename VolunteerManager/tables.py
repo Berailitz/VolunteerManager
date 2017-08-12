@@ -6,8 +6,21 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+class AppStatus(db.Model):
+    """`app_status` table"""
+    __tablename__ = 'tokens'
+    status_key = db.Column(db.String(40), primary_key=True)
+    status_value = db.Column(db.String(40))
+
+    def __init__(self, status_key, status_value):
+        self.status_key = status_key
+        self.status_value = status_value
+
+    def __repr__(self):
+        return '<AppStatus %r: %r>' % (self.status_key, self.status_value)
+
 class Token(db.Model):
-    """token table"""
+    """`token` table"""
     __tablename__ = 'tokens'
     admin_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(20))
@@ -20,7 +33,7 @@ class Token(db.Model):
         return '<Token %r>' % self.username
 
 class Job(db.Model):
-    """job table"""
+    """`job` table"""
     __tablename__ = 'jobs'
     project_id = db.Column(db.Integer)
     project_name = db.Column(db.String(20))
@@ -37,7 +50,7 @@ class Job(db.Model):
         return '<Job %r@%r>' % (self.job_name, self.project_name)
 
 class Record(db.Model):
-    """record table"""
+    """`record` table"""
     __tablename__ = 'records'
     record_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer)
@@ -64,7 +77,7 @@ class Record(db.Model):
         return '<Record %r>' % self.record_id
 
 class Volunteer(db.Model):
-    """volunteer table"""
+    """`volunteer` table"""
     __tablename__ = 'volunteers'
     user_id = db.Column(db.Integer, primary_key=True)
     volunteer_id = db.Column(db.String(20))

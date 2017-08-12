@@ -7,7 +7,7 @@ import time
 import random
 import requests
 from bs4 import BeautifulSoup
-from .config import AppConfig
+from .config import AppConfig, app_status_dict
 from .mess import str_to_int, strip_raw_data
 from .sql_handle import export_to_json, import_volunteers
 
@@ -58,7 +58,7 @@ class SyncManager(object):
             logging.error(f"Faied to login: {login_json['msg']}")
             return False
 
-    def scan(self, interval=2, max_volunteers_count=None):
+    def scan(self, interval=2, max_volunteers_count=None, save_on_the_fly=False):
         """NOTE: DEBUG: scan for all volunteers"""
         self.volunteer_list = list()
         scanning_url = "http://www.bv2008.cn/app/org/member.mini.php?type=joined&p={0}"
@@ -66,15 +66,23 @@ class SyncManager(object):
         main_soup = BeautifulSoup(scanning_homepage.text, "lxml")
         max_page = str_to_int(main_soup.select(".pagebar a")[-1].text)
         expected_volunteer_count = str_to_int(main_soup.select(".ptpage")[0].text.split(' ')[4])
+        accumulated_volunteer_count = 0
         logging.info(f"Start scanning for {expected_volunteer_count} volunteers @ {max_page} pages.")
         for page_index in range(1, max_page + 1):
             logging.info(f"Getting page {page_index}.")
             current_page = self.get(scanning_url.format(page_index))
-            self.volunteer_list += self.prase_list_soap(current_page.text)
-            time.sleep(2 * interval * random.random())
-            if max_volunteers_count and len(self.volunteer_list) > max_volunteers_count: # NOTE: for DEBUG
+            if save_on_the_fly:
+                self.volunteer_list = self.prase_list_soap(current_page.text)
+                accumulated_volunteer_count += len(self.volunteer_list)
+                self.save_to_sql()
+                app_status_dict['syncing_process_volunteers'] = f'{accumulated_volunteer_count}/{expected_volunteer_count}'
+            else:
+                self.volunteer_list += self.prase_list_soap(current_page.text)
+                accumulated_volunteer_count = len(self.volunteer_list)
+            if max_volunteers_count and accumulated_volunteer_count >= max_volunteers_count: # NOTE: for DEBUG
                 break
-        logging.info(f"Scanned {len(self.volunteer_list)}/{expected_volunteer_count} volunteer(s).")
+            time.sleep(2 * interval * random.random())
+        logging.info(f"Scanned {accumulated_volunteer_count}/{expected_volunteer_count} volunteer(s).")
 
     @staticmethod
     def prase_list_soap(raw_text):
@@ -127,14 +135,20 @@ class SyncManager(object):
             logging.error('No volunteer prased.')
         return volunteer_list
 
-    def save_to_json(self, json_path='volunteer_list.json'):
+    def save_to_json(self, json_path='volunteer_list.json', custom_volunteer_list=None):
         """save volunteer_list to json file, which will be truncating if it exists, or created otherwise."""
         with open(json_path, 'w', encoding='utf8') as json_file:
-            json.dump(self.volunteer_list, json_file, ensure_ascii=False)
+            if custom_volunteer_list:
+                json.dump(custom_volunteer_list, json_file, ensure_ascii=False)
+            else:
+                json.dump(self.volunteer_list, json_file, ensure_ascii=False)
 
-    def save_to_sql(self):
+    def save_to_sql(self, custom_volunteer_list=None):
         """save records to sql invoking `import_to_sql` via `pandas`"""
-        import_volunteers(self.volunteer_list)
+        if custom_volunteer_list:
+            import_volunteers(custom_volunteer_list)
+        else:
+            import_volunteers(self.volunteer_list)
 
     def invite(self, project_id, job_id, volunteer_id_list):
         """invite a list of volunteers to a project"""
@@ -176,7 +190,19 @@ sync_helper = SyncManager()
 
 def sync_volunteer_info():
     """DEBUG: limitation of 20 volunteers. Backup sql to zipped json, scan volunteers and save to `volunteers`"""
+    syncing_status = app_status_dict['is_syncing_volunteers']
+    operation_dict = {
+        'finished': sync_volunteer_execute,
+        'underway': lambda: '同步未结束',
+        'error': lambda: '同步出错',
+    }
+    return operation_dict[syncing_status]()
+
+def sync_volunteer_execute():
+    """PRIVATE: sync volunteers"""
+    app_status_dict['is_syncing_volunteers'] = 'underway'
     export_to_json('volunteers')
     sync_helper.login(AppConfig.SYNC_UAERNAME, AppConfig.SYNC_ENCRYPTED_PASSWORD)
-    sync_helper.scan(2, 20)
-    sync_helper.save_to_sql()
+    sync_helper.scan(2, max_volunteers_count=20, save_on_the_fly=True)
+    app_status_dict['is_syncing_volunteers'] = 'finished'
+    return None
