@@ -14,7 +14,7 @@ from .config import AppConfig
 from .mess import fun_logger
 from .restful_helper import parse_all_args, parse_one_arg
 from .sql_handle import export_to_excel, get_jobs, get_records, get_tokens, get_volunteers, item_to_dict
-from .sync_helper import sync_volunteer_info
+from .sync_helper import volunteer_syncer
 from .tables import db, Record
 
 get_query_type = lambda args: args['query_type'] if args['query_type'] else 'all'
@@ -249,12 +249,12 @@ class SyncApi(Resource):
     def get(admin):
         """DEBUG: TODO: Add status check. Sync with bv2008.cn"""
         sync_type = parse_one_arg(reqparse.RequestParser(), 'sync_type', str)
+        sync_command = parse_one_arg(reqparse.RequestParser(), 'sync_command', str)
         command_dict = {
-            'sync_volunteer_info': {'func': sync_volunteer_info, 'msg': '志愿者信息'}
+            'volunteer_info': volunteer_syncer.check_sync_command
         }
-        if sync_type:
-            command_dict[sync_type]['func']()
-            return {'status': 0, 'data': {'msg': f"{command_dict[sync_type]['msg']}同步完成"}}
+        if sync_type and sync_command:
+            return command_dict[sync_type](sync_command)
         else:
-            logging.error(f'Empty `sync_type` received for sync api by {admin.username}.')
+            logging.error(f'Empty `sync_type` or `sync_command` received for sync api by {admin.username}.')
             return {'status': 1, 'data': {'msg': '参数错误'}}

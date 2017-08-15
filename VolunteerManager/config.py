@@ -12,7 +12,7 @@ class AppConfig(object):
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://xh:xh@localhost/xh?charset=utf8'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     TEMPLATES_AUTO_RELOAD = True
-    SECRET_KEY = '67gyubinjmokl,pl'
+    SECRET_KEY = '67gyubinjmokl,plWRJpjkVCTVL'
     DOWNLOAD_PATH = 'main/static/temp'
     BACKUP_FOLDER = 'backup'
     TOKEN_LENGTH = 32
@@ -37,11 +37,17 @@ class AppConfig(object):
     SYNC_VOLUNTEER_SQL_COMMAND += "p`.`legal_name`, `phone` = `volunteers_temp`.`phone`, `email` = `volunteers_temp`.`email`, `gender` "
     SYNC_VOLUNTEER_SQL_COMMAND += "= `volunteers_temp`.`gender`, `age` = `volunteers_temp`.`age`, `volunteer_time` = `volunteers_temp`."
     SYNC_VOLUNTEER_SQL_COMMAND += "`volunteer_time`, `note` = `volunteers_temp`.`note`"
+    UNIVERSAL_DEBUG_TOKEN = 'wozhendeshilaidebugde' # IMPORTANT NOTE: FOR DEBUG ONLY
 
-    @staticmethod
-    def init_app(app):
+    def init_app(self, app):
         """ensure that restful response should be encode with utf8"""
         app.config.update(RESTFUL_JSON=dict(ensure_ascii=False))
+        if self.UNIVERSAL_DEBUG_TOKEN:
+            logging.warning(f'[ATTENTION] Use of `UNIVERSAL_DEBUG_TOKEN`: `{self.UNIVERSAL_DEBUG_TOKEN}`')
+
+    def __getattr__(self, attr):
+        logging.warning(f'Attempt to access inexistent attr of AppConfig `{attr}`')
+        return None
 
 class AppStatusDict(object):
     """set and get `app_status` by `status_key`

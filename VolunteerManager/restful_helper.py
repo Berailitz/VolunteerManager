@@ -17,10 +17,10 @@ def parse_all_args(parser):
     parser.add_argument('user_id', type=int)
     return parser.parse_args()
 
-def parse_one_arg(parser, arg_key, arg_type, default=None):
+def parse_one_arg(parser, arg_key, arg_type, default=None, call_back=lambda arg: arg):
     """prase all args, `None` by default, return args dict"""
     parser.add_argument(arg_key, type=arg_type)
-    return get_arg(parser.parse_args()[arg_key], default)
+    return get_arg(parser.parse_args()[arg_key], default, call_back)
 
 def get_arg(current, default=None, call_back=lambda arg: arg):
     """check whether a value is None (or equal to False), return default value, None by default, or call_back(value)"""
