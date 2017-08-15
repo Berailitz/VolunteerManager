@@ -141,7 +141,7 @@ class SyncManager(object):
             for key_of_int in ['user_id', 'age']:
                 member_info[key_of_int] = str_to_int(member_info[key_of_int])
             volunteer_list.append(member_info)
-            logging.info("Scanning: %s", member_info)
+            # logging.info("Scanning: %s", member_info)
         if volunteer_list:
             logging.info(f'Prased {len(volunteer_list)} volunteer(s).')
         else:
@@ -236,7 +236,7 @@ class VolunteerSyncer(object):
 
     def _start_command(self):
         """PRIVATE: start process"""
-        self.sync_volunteer_process = multiprocessing.Process(target=execute_volunteer_sync, daemon=True)
+        self.sync_volunteer_process = multiprocessing.Process(target=lambda: print(1), daemon=True)
         self.sync_volunteer_process.start()
         logging.info(f'Sync proces starts at {self.sync_volunteer_process.pid}.')
         return {'status': 0, 'data': {'msg': '同步已开始'}}
@@ -272,16 +272,12 @@ class VolunteerSyncer(object):
 
 def execute_volunteer_sync():
     """PRIVATE: sync volunteers"""
-    try:
-        sync_helper = SyncManager()
-        app_status_dict['is_syncing_volunteers'] = 'underway'
-        export_to_json('volunteers')
-        sync_helper.login(AppConfig.SYNC_UAERNAME, AppConfig.SYNC_ENCRYPTED_PASSWORD)
-        sync_helper.scan(2, save_on_the_fly='sql')
-        app_status_dict['is_syncing_volunteers'] = 'finished'
-        logging.info('Volunteer info Synchronized.')
-    except Exception as identifier:
-        logging.exception(identifier)
-    
+    sync_helper = SyncManager()
+    app_status_dict['is_syncing_volunteers'] = 'underway'
+    export_to_json('volunteers')
+    sync_helper.login(AppConfig.SYNC_UAERNAME, AppConfig.SYNC_ENCRYPTED_PASSWORD)
+    sync_helper.scan(2, save_on_the_fly='sql')
+    app_status_dict['is_syncing_volunteers'] = 'finished'
+    logging.info('Volunteer info Synchronized.')
 
 volunteer_syncer = VolunteerSyncer()
