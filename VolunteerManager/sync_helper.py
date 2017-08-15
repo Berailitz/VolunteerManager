@@ -92,6 +92,7 @@ class SyncManager(object):
                 break
             if app_status_dict['flag_syncing_volunteers'] == 'stop':
                 logging.warning('Syncing stopped due to: `flag_syncing_volunteers` == `stop`')
+                app_status_dict['flag_syncing_volunteers'] = 'stopped'
                 break
             time.sleep(2 * interval * random.random())
         logging.info(f"Scanned {accumulated_volunteer_count}/{expected_volunteer_count} volunteer(s).")
