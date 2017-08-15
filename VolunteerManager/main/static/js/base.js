@@ -50,6 +50,7 @@ $(document).on('pjax:success', function() {
   drawer.removeClass('is-visible');
   drawer.attr('aria-hidden', 'true');
   $('.mdl-layout__obfuscator').removeClass('is-visible');
+  $('.mdl-layout__drawer-button').attr('aria-expanded', 'false');
   // if this doesn’t happen, the drawer disappears
   // at an upgradeElement call
   layout.removeClass('is-upgraded');
