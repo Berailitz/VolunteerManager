@@ -63,7 +63,7 @@ class SyncManager(object):
             return False
 
     def scan(self, interval=2, max_volunteers_count=None, save_on_the_fly=None):
-        """NOTE: DEBUG: scan for all volunteers, save a page one time if `sql` or `json` in `save_on_the_fly`.
+        """NOTE: scan for all volunteers, save a page one time if `sql` or `json` in `save_on_the_fly`.
         Process exits if `flag_syncing_volunteers` == `stop`"""
         self.volunteer_list = list()
         scanning_url = "http://www.bv2008.cn/app/org/member.mini.php?type=joined&p={0}"
@@ -201,12 +201,12 @@ class SyncManager(object):
         return response_json
 
 class VolunteerSyncer(object):
-    """DEBUG: manager volunteer syncing process"""
+    """manager volunteer syncing process"""
     def __init__(self):
         self.sync_volunteer_process = None
 
     def check_sync_command(self, sync_command):
-        """DEBUG: limitation of 20 volunteers. Backup sql to zipped json, scan volunteers and save to `volunteers`"""
+        """Backup sql to zipped json, scan volunteers and save to `volunteers`"""
         command_dict = {
             'start': self.start,
             'force-start': lambda: self.start(force_start=True),
@@ -221,7 +221,7 @@ class VolunteerSyncer(object):
             return {'status': 1, 'data': {'msg': '同步指令错误'}}
 
     def start(self, force_start=True):
-        """DEBUG: check sync status `is_syncing_volunteers`"""
+        """check sync status `is_syncing_volunteers`"""
         operation_dict = {
             'finished': self._start_command,
             'underway': lambda: {'status': 1, 'data': {'msg': '同步尚未结束'}},
@@ -234,13 +234,13 @@ class VolunteerSyncer(object):
             return operation_dict[syncing_status]()
 
     def _start_command(self):
-        """DEBUG: PRIVATE: start process"""
+        """PRIVATE: start process"""
         self.sync_volunteer_process = multiprocessing.Process(target=execute_volunteer_sync, daemon=True)
         self.sync_volunteer_process.start()
         return {'status': 0, 'data': {'msg': '同步已开始'}}
 
     def stop(self):
-        """DEBUG: stop process by `flag_syncing_volunteers`"""
+        """stop process by `flag_syncing_volunteers`"""
         if self.sync_volunteer_process and self.sync_volunteer_process.is_alive():
             if app_status_dict['flag_syncing_volunteers'] == 'stop':
                 return {'status': 0, 'data': {'msg': '同步正在停止中'}}
@@ -274,7 +274,7 @@ def execute_volunteer_sync():
     app_status_dict['is_syncing_volunteers'] = 'underway'
     export_to_json('volunteers')
     sync_helper.login(AppConfig.SYNC_UAERNAME, AppConfig.SYNC_ENCRYPTED_PASSWORD)
-    sync_helper.scan(5, max_volunteers_count=40, save_on_the_fly='sql')
+    sync_helper.scan(2, save_on_the_fly='sql')
     app_status_dict['is_syncing_volunteers'] = 'finished'
 
 volunteer_syncer = VolunteerSyncer()
