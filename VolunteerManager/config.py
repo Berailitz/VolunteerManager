@@ -9,6 +9,8 @@ from .tables import AppStatus, db
 class AppConfig(object):
     """config class"""
     DEBUG = True
+    DEBUG_TB_INTERCEPT_REDIRECTS = False
+    DEBUG_TB_TEMPLATE_EDITOR_ENABLED = True
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://xh:xh@localhost/xh?charset=utf8'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     TEMPLATES_AUTO_RELOAD = True
