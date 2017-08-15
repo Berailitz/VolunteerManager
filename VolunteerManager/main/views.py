@@ -15,6 +15,7 @@ def create_main_blueprint():
     main_blueprint.add_url_rule('/volunteer', 'volunteer', show_volunteer_page)
     main_blueprint.add_url_rule('/edit', 'edit', show_edit_page)
     main_blueprint.add_url_rule('/download', 'download', show_download_page)
+    main_blueprint.add_url_rule('/advanced', 'advanced', show_advanced_page)
     return main_blueprint
 
 @guest_only_view()
@@ -40,3 +41,7 @@ def show_edit_page():
 @admin_only_view()
 def show_download_page():
     return make_response(render_template('download.html', page_url='/download', page_title='记录表格下载'))
+
+@admin_only_view()
+def show_advanced_page():
+    return make_response(render_template('advanced.html', page_url='/advanced', page_title='高级功能'))
