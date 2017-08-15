@@ -1,4 +1,4 @@
-'use strict;'
+// 'use strict;'
 
 function download() {
     let type_dict = {

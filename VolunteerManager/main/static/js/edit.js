@@ -1,4 +1,4 @@
-'use strict;'
+// 'use strict;'
 
 let infoList = ['legal_name', 'student_id', 'working_time', 'project_name', 'job_name', 'working_date', 'note', 'operator_name', 'operation_time'];
 let record_id;

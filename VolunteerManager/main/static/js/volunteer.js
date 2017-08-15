@@ -1,4 +1,4 @@
-'use strict;'
+// 'use strict;'
 
 let COLUMN_NAMES = ['记录ID', '志愿项目', '工作项目', '工作日期', '时长', '记录备注', '录入人', '录入时间'];
 let tableLines = [];

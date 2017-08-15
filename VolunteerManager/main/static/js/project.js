@@ -1,4 +1,4 @@
-'use strict;'
+// 'use strict;'
 
 const COLUMN_NAMES = ['记录ID', '姓名', '学号', '工作项目', '工作日期', '时长', '记录备注', '录入人', '录入时间'];
 let tableLines = [];

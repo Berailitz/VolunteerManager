@@ -60,6 +60,6 @@ $(document).on('pjax:success', function() {
     componentHandler.upgradeElement(element);
   });
   // re-bind PJAX
-  $(document).pjax('a.enable-pjax', '#pjax-container');
+  // $(document).pjax('a.enable-pjax', '#pjax-container');
  });
  
