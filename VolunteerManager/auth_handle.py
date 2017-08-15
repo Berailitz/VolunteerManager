@@ -129,7 +129,8 @@ def load_token_api(update_token=True, error_status_code=1):
                     admin.token = generate_random_string(32)
                     db.session.commit()
                 response_dict = func(admin, *args, **kw)
-                response_dict['token'] = admin.token
+                if admin:
+                    response_dict['token'] = admin.token
             else:
                 response_dict = {'status': error_status_code, 'data': {'msg': '鉴权失败'}}
             return response_dict
