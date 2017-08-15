@@ -1,0 +1,32 @@
+body
+{
+    font-family: '黑体';
+}
+
+#main-div
+{
+    font-family: '等线';
+    margin-top: 7%;
+    justify-content: center;
+}
+
+#submit-btn
+{
+    font-size: 15px;
+}
+
+#card-title
+{
+    padding-bottom: 0;
+}
+
+.mdl-card,.mdl-card__supporting-text
+{
+    overflow: initial;
+}
+
+#volunteer-info-card
+{
+    width: 400px;
+    min-height: 10px;
+}

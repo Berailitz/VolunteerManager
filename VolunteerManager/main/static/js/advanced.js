@@ -85,7 +85,7 @@ function check_sync_volunteer_info() {
     if (rawData['status']) {
       showToast(`ERROR: ${rawData['data']['msg']}`);
     } else {
-      showToast(`同步状态: ${rawData['data']['status']} @ ${rawData['data']['msg']}`, 2000);
+      showToast(`同步状态: ${rawData['data']['status']} @ ${rawData['data']['progress']}`, 2000);
     }
   });
 }
