@@ -273,7 +273,7 @@ def execute_volunteer_sync():
     app_status_dict['is_syncing_volunteers'] = 'underway'
     export_to_json('volunteers')
     sync_helper.login(AppConfig.SYNC_UAERNAME, AppConfig.SYNC_ENCRYPTED_PASSWORD)
-    sync_helper.scan(2, max_volunteers_count=20, save_on_the_fly='sql')
+    sync_helper.scan(5, max_volunteers_count=20, save_on_the_fly='sql')
     app_status_dict['is_syncing_volunteers'] = 'finished'
 
 volunteer_syncer = VolunteerSyncer()
