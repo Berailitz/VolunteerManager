@@ -238,7 +238,7 @@ class VolunteerSyncer(object):
         """PRIVATE: start process"""
         self.sync_volunteer_process = multiprocessing.Process(target=execute_volunteer_sync, daemon=True)
         self.sync_volunteer_process.start()
-        logging.info(f'Sync proces starts at {sync_volunteer_process.pid}.')
+        logging.info(f'Sync proces starts at {self.sync_volunteer_process.pid}.')
         return {'status': 0, 'data': {'msg': '同步已开始'}}
 
     def stop(self):
