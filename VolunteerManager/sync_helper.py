@@ -3,6 +3,7 @@
 # -*- coding: UTF-8 -*-
 import json
 import logging
+import multiprocessing
 import time
 import random
 import requests
@@ -11,11 +12,14 @@ from .config import AppConfig, app_status_dict
 from .mess import str_to_int, strip_raw_data
 from .sql_handle import export_to_json, import_volunteers
 
+sync_volunteer_process = None
+
 class SyncManager(object):
     """Manage volunteers on bv2008, whose `volunteer_list` is a list of objects. Call `login` before doing anything else."""
     def __init__(self):
         self.my_session = requests.Session()
         self.volunteer_list = list()
+        self.json_path = 'volunteer_list.json'
 
     @staticmethod
     def create_headers(referer):
@@ -58,8 +62,9 @@ class SyncManager(object):
             logging.error(f"Faied to login: {login_json['msg']}")
             return False
 
-    def scan(self, interval=2, max_volunteers_count=None, save_on_the_fly=False):
-        """NOTE: DEBUG: scan for all volunteers"""
+    def scan(self, interval=2, max_volunteers_count=None, save_on_the_fly=None):
+        """NOTE: DEBUG: scan for all volunteers, save a page one time if `sql` or `json` in `save_on_the_fly`.
+        Process exits if `flag_syncing_volunteers` == `stop`"""
         self.volunteer_list = list()
         scanning_url = "http://www.bv2008.cn/app/org/member.mini.php?type=joined&p={0}"
         scanning_homepage = self.get(scanning_url.format(1))
@@ -69,12 +74,18 @@ class SyncManager(object):
         accumulated_volunteer_count = 0
         logging.info(f"Start scanning for {expected_volunteer_count} volunteers @ {max_page} pages.")
         for page_index in range(1, max_page + 1):
+            if app_status_dict['flag_syncing_volunteers'] == 'stop':
+                logging.warning('Syncing stopped due to: `flag_syncing_volunteers` == `stop`')
+                exit()
             logging.info(f"Getting page {page_index}.")
             current_page = self.get(scanning_url.format(page_index))
             if save_on_the_fly:
                 self.volunteer_list = self.prase_list_soap(current_page.text)
                 accumulated_volunteer_count += len(self.volunteer_list)
-                self.save_to_sql()
+                if 'sql' in save_on_the_fly:
+                    self.save_to_sql()
+                elif 'json' in save_on_the_fly:
+                    self.save_to_json()
                 app_status_dict['syncing_process_volunteers'] = f'{accumulated_volunteer_count}/{expected_volunteer_count}'
             else:
                 self.volunteer_list += self.prase_list_soap(current_page.text)
@@ -135,8 +146,10 @@ class SyncManager(object):
             logging.error('No volunteer prased.')
         return volunteer_list
 
-    def save_to_json(self, json_path='volunteer_list.json', custom_volunteer_list=None):
+    def save_to_json(self, json_path=None, custom_volunteer_list=None):
         """save volunteer_list to json file, which will be truncating if it exists, or created otherwise."""
+        if not json_path:
+            json_path = self.json_path
         with open(json_path, 'w', encoding='utf8') as json_file:
             if custom_volunteer_list:
                 json.dump(custom_volunteer_list, json_file, ensure_ascii=False)
@@ -186,23 +199,81 @@ class SyncManager(object):
             logging.error(f"Record: #{response_json['id']} ERROR{response_json['code']} {response_json['msg']}")
         return response_json
 
-sync_helper = SyncManager()
+class VolunteerSyncer(object):
+    """DEBUG: manager volunteer syncing process"""
+    def __init__(self):
+        self.sync_volunteer_process = None
 
-def sync_volunteer_info():
-    """DEBUG: limitation of 20 volunteers. Backup sql to zipped json, scan volunteers and save to `volunteers`"""
-    syncing_status = app_status_dict['is_syncing_volunteers']
-    operation_dict = {
-        'finished': sync_volunteer_execute,
-        'underway': lambda: '同步未结束',
-        'error': lambda: '同步出错',
-    }
-    return operation_dict[syncing_status]()
+    def check_sync_command(self, sync_command):
+        """DEBUG: limitation of 20 volunteers. Backup sql to zipped json, scan volunteers and save to `volunteers`"""
+        command_dict = {
+            'start': self.start,
+            'force-start': lambda: self.start(force_start=True),
+            'stop': self.stop,
+            'force-stop': self.force_stop,
+            'check': self.check
+        }
+        if sync_command in command_dict.keys():
+            return command_dict[sync_command]()
+        else:
+            logging.error(f'No such `sync_command` "{sync_command}"')
+            return {'status': 1, 'data': {'msg': '同步指令错误'}}
 
-def sync_volunteer_execute():
+    def start(self, force_start=True):
+        """DEBUG: check sync status `is_syncing_volunteers`"""
+        operation_dict = {
+            'finished': self._start_command,
+            'underway': lambda: {'status': 1, 'data': {'msg': '同步尚未结束'}},
+            'error': lambda: {'status': 2, 'data': {'msg': '同步出现错误'}}
+        }
+        if force_start:
+            return operation_dict['finished']()
+        else:
+            syncing_status = app_status_dict['is_syncing_volunteers']
+            return operation_dict[syncing_status]()
+
+    def _start_command(self):
+        """DEBUG: PRIVATE: start process"""
+        self.sync_volunteer_process = multiprocessing.Process(target=execute_volunteer_sync, daemon=True)
+        self.sync_volunteer_process.start()
+        return {'status': 0, 'data': {'msg': '同步已开始'}}
+
+    def stop(self):
+        """DEBUG: stop process by `flag_syncing_volunteers`"""
+        if self.sync_volunteer_process and self.sync_volunteer_process.is_alive():
+            if app_status_dict['flag_syncing_volunteers'] == 'stop':
+                return {'status': 0, 'data': {'msg': '同步正在停止中'}}
+            else:
+                app_status_dict['flag_syncing_volunteers'] = 'stop'
+                return {'status': 0, 'data': {'msg': '同步即将停止'}}
+        else:
+            return {'status': 1, 'data': {'msg': '同步尚未开始或出错停止'}}
+
+    def force_stop(self):
+        """DEBUG: terminate process and set `is_syncing_volunteers` to `error`"""
+        if self.sync_volunteer_process and self.sync_volunteer_process.is_alive():
+            self.sync_volunteer_process.terminate()
+            app_status_dict['is_syncing_volunteers'] = 'error'
+            return {'status': 0, 'data': {'msg': '同步已被强制停止'}}
+        else:
+            return {'status': 1, 'data': {'msg': '同步尚未开始'}}
+
+    @staticmethod
+    def check():
+        """get precess status, `is_syncing_volunteers` and `syncing_process_volunteers`"""
+        return {'status': 0, 'data': {
+                'status': app_status_dict['is_syncing_volunteers'],
+                'progress': app_status_dict['syncing_process_volunteers']
+            }
+        }
+
+def execute_volunteer_sync():
     """PRIVATE: sync volunteers"""
+    sync_helper = SyncManager()
     app_status_dict['is_syncing_volunteers'] = 'underway'
     export_to_json('volunteers')
     sync_helper.login(AppConfig.SYNC_UAERNAME, AppConfig.SYNC_ENCRYPTED_PASSWORD)
-    sync_helper.scan(2, max_volunteers_count=20, save_on_the_fly=True)
+    sync_helper.scan(2, max_volunteers_count=20, save_on_the_fly='sql')
     app_status_dict['is_syncing_volunteers'] = 'finished'
-    return None
+
+volunteer_syncer = VolunteerSyncer()

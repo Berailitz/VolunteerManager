@@ -11,7 +11,7 @@ from flask_restful import reqparse
 from flask_sqlalchemy import orm
 from .config import AppConfig
 from .mess import fun_logger, generate_random_string
-from .restful_helper import get_arg
+from .restful_helper import get_arg, parse_one_arg
 from .sql_handle import get_tokens
 from .tables import db
 
@@ -108,20 +108,24 @@ def guest_only_view(restricted_view='/record'):
         return wrapper
     return decorator
 
-# @fun_logger('login')
 def load_token_api(update_token=True, error_status_code=1):
     """decorated functions should NEVER change column `tokens` and have <admin> as first argument,
-    update token by default, return msg and error_status_code at /status"""
+    update token by default, return `msg` and `error_status_code` at `/status`.
+    WARNING: `UNIVERSAL_DEBUG_TOKEN` will be treated as valid token."""
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kw):
             """parser `token` from request, return immediately for invalid token or invoke decorated function"""
-            parser = reqparse.RequestParser()
-            parser.add_argument('token', type=str)
+            token = parse_one_arg(reqparse.RequestParser(), 'token', str)
             # logging.info(parser.parse_args())
-            admin = get_arg(parser.parse_args()['token'], None, check_token)
-            if admin:
-                if update_token:
+            admin = get_arg(token, None, check_token)
+            if AppConfig.UNIVERSAL_DEBUG_TOKEN and token == AppConfig.UNIVERSAL_DEBUG_TOKEN:
+                is_debug_token = True
+                logging.warning(f'Debug token detected: `{token}`')
+            else:
+                is_debug_token = False
+            if admin or is_debug_token: # NOTE: FOR DEBUG ONLY
+                if update_token and not is_debug_token:
                     admin.token = generate_random_string(32)
                     db.session.commit()
                 response_dict = func(admin, *args, **kw)
