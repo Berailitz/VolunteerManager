@@ -41,3 +41,5 @@ function logout() {
   Cookies.remove('token');
   document.location.href = '/';
 }
+
+$(document).pjax('a.enable-pjax', '#pjax-container');
