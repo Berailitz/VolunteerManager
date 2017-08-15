@@ -245,8 +245,8 @@ class ExcelApi(Resource):
 class SyncApi(Resource):
     """handle sync requests with `bv2008.cn`"""
     @staticmethod
-    # @load_token_api()
-    def get():
+    @load_token_api()
+    def get(admin):
         """TODO: Add record syncer. Sync with bv2008.cn, currently volunteer info only"""
         sync_type = parse_one_arg(reqparse.RequestParser(), 'sync_type', str)
         sync_command = parse_one_arg(reqparse.RequestParser(), 'sync_command', str)
