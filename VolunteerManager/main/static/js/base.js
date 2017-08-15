@@ -43,3 +43,23 @@ function logout() {
 }
 
 $(document).pjax('a.enable-pjax', '#pjax-container');
+
+$(document).on('pjax:success', function() {
+  let layout = $('.mdl-layout');
+  let drawer = $('.mdl-layout__drawer');
+  drawer.removeClass('is-visible');
+  drawer.attr('aria-hidden', 'true');
+  $('.mdl-layout__obfuscator').removeClass('is-visible');
+  // if this doesn’t happen, the drawer disappears
+  // at an upgradeElement call
+  layout.removeClass('is-upgraded');
+  layout.removeClass('has-drawer');
+  layout.removeAttr('data-upgraded');
+  // upgrade all the elements!
+  $('*[class^=mdl]').each(function(index, element) {
+    componentHandler.upgradeElement(element);
+  });
+  // re-bind PJAX
+  $(document).pjax('a.enable-pjax', '#pjax-container');
+ });
+ 

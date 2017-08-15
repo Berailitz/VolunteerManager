@@ -41,6 +41,7 @@
 {% endif %}
             {% block main_div %}{% endblock %}
             {% block page_footer %}{% endblock %}
+            <script src="/static/js{{ page_url }}.js"></script>
 {% if not is_pjax %}
         </main>
         <div id="snackbar" aria-live="assertive" aria-atomic="true" aria-relevant="text" class="mdl-snackbar mdl-js-snackbar">
@@ -48,9 +49,6 @@
             <button type="button" class="mdl-snackbar__action"></button>
         </div>
     </div>
-    <footer>
-        <script src="/static/js{{ page_url }}.js"></script>
-    </footer>
 </body>
 </html>
 {% endif %}
