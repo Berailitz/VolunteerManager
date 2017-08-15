@@ -37,7 +37,7 @@
                 <div class="mdl-card__supporting-text">
                     <form action="#">
                         <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label getmdl-select getmdl-select__fullwidth">
-                            <input id="project-name-input" class="mdl-textfield__input" type="text" id="project-name-box" value="选择志愿项目" readonly tabIndex="1" onchange="setJobNameMenu(this.value);">
+                            <input id="project-name-input" class="mdl-textfield__input" type="text" id="project-name-box" value="选择志愿项目" readonly tabIndex="1" onchange="projectHandle.setJobNameMenu(this.value);">
                             <label for="project-name-box" class="mdl-textfield__label">项目</label>
                             <ul id="project-name-menu" for="project-name-box" class="mdl-menu mdl-menu--bottom-left mdl-js-menu">
                                 <li class="mdl-menu__item" data-project-index="project-0">所有志愿项目</li>
@@ -53,8 +53,8 @@
                     </form>
                 </div>
                 <div class="mdl-card__actions mdl-card--border">
-                    <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="search();">查询记录</button>
-                    <!-- <button class="mdl-button mdl-js-button mdl-button--accent mdl-js-ripple-effect" onclick="resetTable();">清空</button> -->
+                    <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="projectHandle.search();">查询记录</button>
+                    <!-- <button class="mdl-button mdl-js-button mdl-button--accent mdl-js-ripple-effect" onclick="projectHandle.resetTable();">清空</button> -->
                 </div>
             </div>
         </div>

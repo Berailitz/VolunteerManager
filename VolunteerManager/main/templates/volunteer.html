@@ -44,19 +44,19 @@
                     <div class="mdl-card__supporting-text">
                         <form action="#">
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                                <input value="2012110649" class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="student-id-input" onkeydown='if(event.keyCode==13){search();}'
+                                <input value="2012110649" class="mdl-textfield__input" type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="student-id-input" onkeydown='if(event.keyCode==13){volunteerHandle.search();}'
                                     autofocus>
                                 <label class="mdl-textfield__label" for="student-id-input">学号</label>
                             </div>
                             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                                <input value="徐盈盈" class="mdl-textfield__input" type="text" id="legal-name-input" onkeydown='if(event.keyCode==13){search();}'>
+                                <input value="徐盈盈" class="mdl-textfield__input" type="text" id="legal-name-input" onkeydown='if(event.keyCode==13){volunteerHandle.search();}'>
                                 <label class="mdl-textfield__label" for="legal-name-input">姓名</label>
                             </div>
                         </form>
                     </div>
                     <div class="mdl-card__actions mdl-card--border">
-                        <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="search();">查询</button>
-                        <!-- <button class="mdl-button mdl-js-button mdl-button--accent mdl-js-ripple-effect" onclick="resetTable();">清空</button> -->
+                        <button class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" onclick="volunteerHandle.search();">查询</button>
+                        <!-- <button class="mdl-button mdl-js-button mdl-button--accent mdl-js-ripple-effect" onclick="volunteerHandle.resetTable();">清空</button> -->
                     </div>
                 </div>
                 <!-- <div class="mdl-card mdl-shadow--2dp">
@@ -68,8 +68,8 @@
                         <p>2.右上角登陆右上角登陆右上角登陆右上角登陆右上角登陆右上角登陆右上角登陆</p>
                     </div>
                     <div class="mdl-card__actions mdl-card--border">
-                        <button id="submit-btn" class="mdl-button mdl-js-button mdl-button--primary mdl-js-ripple-effect" onclick="submitAll()">全部录入</button>
-                        <button id="reset-btn" class="mdl-button mdl-js-button mdl-button--accent mdl-js-ripple-effect" onclick="resetTable()">清空表格</button>
+                        <button id="submit-btn" class="mdl-button mdl-js-button mdl-button--primary mdl-js-ripple-effect" onclick="volunteerHandle.submitAll()">全部录入</button>
+                        <button id="reset-btn" class="mdl-button mdl-js-button mdl-button--accent mdl-js-ripple-effect" onclick="volunteerHandle.resetTable()">清空表格</button>
                     </div>
                 </div> -->
             </div>

@@ -1,4 +1,4 @@
-// 'use strict;'
+'use strict;'
 
 function start_sync_volunteer_info() {
   $.getJSON('/api/sync', {

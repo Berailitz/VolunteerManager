@@ -1,4 +1,4 @@
-// 'use strict;'
+'use strict;'
 
 function login() {
   showToast('登录中', 700);
