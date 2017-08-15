@@ -247,7 +247,7 @@ class SyncApi(Resource):
     @staticmethod
     @load_token_api()
     def get(admin):
-        """DEBUG: TODO: Add status check. Sync with bv2008.cn"""
+        """TODO: Add record syncer. Sync with bv2008.cn, currently volunteer info only"""
         sync_type = parse_one_arg(reqparse.RequestParser(), 'sync_type', str)
         sync_command = parse_one_arg(reqparse.RequestParser(), 'sync_command', str)
         command_dict = {
