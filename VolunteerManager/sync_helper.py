@@ -248,7 +248,7 @@ class VolunteerSyncer(object):
                 app_status_dict['flag_syncing_volunteers'] = 'stop'
                 return {'status': 0, 'data': {'msg': '同步即将停止'}}
         else:
-            return {'status': 1, 'data': {'msg': '同步尚未开始或出错停止'}}
+            return {'status': 0, 'data': {'msg': '同步尚未开始或出错停止'}}
 
     def force_stop(self):
         """DEBUG: terminate process and set `is_syncing_volunteers` to `error`"""
@@ -257,7 +257,7 @@ class VolunteerSyncer(object):
             app_status_dict['is_syncing_volunteers'] = 'error'
             return {'status': 0, 'data': {'msg': '同步已被强制停止'}}
         else:
-            return {'status': 1, 'data': {'msg': '同步尚未开始'}}
+            return {'status': 0, 'data': {'msg': '同步尚未开始'}}
 
     @staticmethod
     def check():
