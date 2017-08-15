@@ -4,20 +4,20 @@ let editHandle = (function () {
   let infoList = ['legal_name', 'student_id', 'working_time', 'project_name', 'job_name', 'working_date', 'note', 'operator_name', 'operation_time'];
   let record_id;
   
-  function encodeLine(rawLine) {
+  let encodeLine = function (rawLine) {
     rawLine['project_id'] = project_name_to_id(rawLine['project_name']);
     rawLine['job_id'] = job_name_to_id(rawLine['project_id'], rawLine['job_name']);
     return rawLine;
   }
   
-  function setProjectNameMenu() {
+  let setProjectNameMenu = function () {
     projectNameList = relationshipDict["project_name_dict"];
     $.each(projectNameList,
     (project_name, project_id) => $('#project-name-menu').append(`<li class="mdl-menu__item" tabindex="-1" data-project-index="project-${project_id + 1}">${project_name}</li>`));
      getmdlSelect.init('.getmdl-select');
   }
   
-  function setJobNameMenu() {
+  let setJobNameMenu = function () {
     project_name = $('#project-name-input')[0].value
     if (project_name) {
       let job_names = Object.keys(relationshipDict['project_id_dict'][String(project_name_to_id(project_name))]['job_name_dict']);
@@ -32,7 +32,7 @@ let editHandle = (function () {
     getmdlSelect.init('.getmdl-select');
   }
   
-  function showLegalName(params) {
+  let showLegalName = function (params) {
     $.getJSON('/api/volunteers', {
       'token': Cookies.get('token'),
       'query_type': 'one',
@@ -48,7 +48,7 @@ let editHandle = (function () {
     });
   }
   
-  function search_record() {
+  let search_record = function () {
     record_id = $('#record-id-input')[0].value;
     if (record_id && !$.isNumeric(record_id)) {
       showToast('ERROR: 记录ID不为整数');
@@ -81,7 +81,7 @@ let editHandle = (function () {
     showToast('查询中', 800);
   }
   
-  function update_record() {
+  let update_record = function () {
     let currentRecord = new Object();
     $.each(infoList, function (infoIndex, infoName) {
       currentValue = $('#' + infoName.replace('_', '-') + '-input')[0].value;
@@ -106,7 +106,7 @@ let editHandle = (function () {
     })
   }
   
-  function delete_record() {
+  let delete_record = function () {
     $.ajax({
       url: '/api/records',
       type: 'DELETE',
@@ -126,7 +126,7 @@ let editHandle = (function () {
     });
   }
   
-  function iniConf() {
+  let iniConf = function () {
     getRelationship.then(setProjectNameMenu);
   }
   

@@ -31,18 +31,18 @@ let projectHandle = (function () {
     stretchH: 'all',
   });
   
-  function iniConf() {
+  let iniConf = function () {
     getRelationship.then(setProjectNameMenu);
   }
   
-  function setProjectNameMenu() {
+  let setProjectNameMenu = function () {
     projectNameList = relationshipDict["project_name_dict"];
     $.each(projectNameList,
     (project_name, project_id) => $('#project-name-menu').append(`<li class="mdl-menu__item" tabindex="-1" data-project-index="project-${project_id + 1}">${project_name}</li>`));
      getmdlSelect.init('.getmdl-select');
   }
   
-  function setJobNameMenu(project_name) {
+  let setJobNameMenu  = function (project_name) {
     let job_names = project_name == '所有志愿项目' ? [] : Object.keys(relationshipDict['project_id_dict'][String(project_name_to_id(project_name))]['job_name_dict']);
     // console.log(project_name);
     $('#job-name-menu').empty();
@@ -52,7 +52,7 @@ let projectHandle = (function () {
      getmdlSelect.init('.getmdl-select');
   }
   
-  function search() {
+  let search = function () {
     let project_name = $('#project-name-input')[0].value;
     let job_name = $('#job-name-input')[0].value;
     let payload = {'query_type': 'all', 'token': Cookies.get('token')};
@@ -90,7 +90,7 @@ let projectHandle = (function () {
     showToast('查询中', 800);
   }
   
-  function resetTable() {
+  let resetTable = function () {
     tableLines = [[]];
     htmlTable.loadData(tableLines);
     htmlTable.render();

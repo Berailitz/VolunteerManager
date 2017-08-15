@@ -28,7 +28,7 @@ let volunteerHandle = (function () {
     // stretchH: 'all'
   });
   
-  function search() {
+  let search = function () {
     let student_id = $('#student-id-input')[0].value;
     let legal_name = $('#legal-name-input')[0].value;
     resetTable();
@@ -95,7 +95,7 @@ let volunteerHandle = (function () {
     showToast('查询中', 800);
   }
   
-  function resetTable() {
+  let resetTable = function () {
     tableLines = [[]];
     htmlTable.loadData(tableLines);
     htmlTable.render();

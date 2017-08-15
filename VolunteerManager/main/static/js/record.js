@@ -76,7 +76,7 @@ let recordHandle = (function () {
     },
   });
   
-  class RecordLine {
+  let RecordLine = class {
     constructor(student_id='', legal_name='', working_time='', project_name='', job_name='', working_date='', record_note='', record_status='') {
       this.student_id = student_id;
       this.legal_name = legal_name;
@@ -89,13 +89,13 @@ let recordHandle = (function () {
     }
   }
   
-  function appendRow(rowCount, afterIndex) {
+  let appendRow = function (rowCount, afterIndex) {
     // htmlTable.alter('insert_row', afterIndex ? afterIndex : htmlTable.countRows(), rowCount);
     tableLines.push(new RecordLine());
     htmlTable.loadData(tableLines);
   }
   
-  function checkEmpty(LineData) {
+  let checkEmpty = function (LineData) {
     let isLineEmpty = true;
     let exception_index = 'record_status' in LineData ? 'record_status' : 7;
     $.each(LineData, function (index, value) {
@@ -108,7 +108,7 @@ let recordHandle = (function () {
     return isLineEmpty;
   }
   
-  function checkFull(LineData) {
+  let checkFull = function (LineData) {
     let isLineFull = true;
     let exception_index = 'record_status' in LineData ? 'record_status' : 7;
     $.each(LineData, function (index, value) {
@@ -121,32 +121,32 @@ let recordHandle = (function () {
     return isLineFull;
   }
   
-  function deleteRow(rowCount = 1, afterIndex = htmlTable.countRows() - 1) {
+  let deleteRow = function (rowCount = 1, afterIndex = htmlTable.countRows() - 1) {
     tableLines.splice(afterIndex, rowCount);
     htmlTable.loadData(tableLines);
   }
   
-  function encodeLine(rawLine) {
+  let encodeLine = function (rawLine) {
     rawLine['project_id'] = project_name_to_id(rawLine['project_name']);
     rawLine['job_id'] = job_name_to_id(rawLine['project_id'], rawLine['job_name']);
     return rawLine;
   }
   
-  function getTestRecordline() {
+  let getTestRecordline = function () {
     return new RecordLine('2012110649', "徐盈盈", 1, "a", "a", "2017-08-16", "aa", "");
   }
   
-  function resetCurcor() {
+  let resetCurcor = function () {
     htmlTable.selectCell(0, 0);
   }
   
-  function resetTable() {
+  let resetTable = function () {
     tableLines = [new RecordLine()];
     htmlTable.loadData(tableLines);
     resetCurcor()
   }
   
-  function submitAll() {
+  let submitAll = function () {
     showToast('正在录入', 700);
     $.each(tableLines, function (LineIndex, LineData) {
       // console.log(LineData['record_status'] == '未录入' && !checkEmpty(LineData));
@@ -181,7 +181,7 @@ let recordHandle = (function () {
     resetCurcor();
   }
   
-  function tranferToItem(lineList) {
+  let tranferToItem = function (lineList) {
     return new RecordLine(...lineList);
   }
   

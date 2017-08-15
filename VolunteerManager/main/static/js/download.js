@@ -1,7 +1,7 @@
 'use strict;'
 
 let downloadHandle = (function () {
-    function download() {
+    let download = function () {
         let type_dict = {
             '活动记录补全版': 'all_in_one',
             '原始活动原始表格': 'records',
@@ -20,7 +20,7 @@ let downloadHandle = (function () {
         });
     }
     
-    function cleanup() {
+    let cleanup = function () {
         $.ajax({
             url: '/api/download',
             type: 'DELETE',
