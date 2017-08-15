@@ -277,5 +277,6 @@ def execute_volunteer_sync():
     sync_helper.login(AppConfig.SYNC_UAERNAME, AppConfig.SYNC_ENCRYPTED_PASSWORD)
     sync_helper.scan(2, save_on_the_fly='sql')
     app_status_dict['is_syncing_volunteers'] = 'finished'
+    logging.info('Volunteer info Synchronized.')
 
 volunteer_syncer = VolunteerSyncer()
