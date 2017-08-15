@@ -88,6 +88,7 @@ class SyncManager(object):
                 self.volunteer_list += self.prase_list_soap(current_page.text)
                 accumulated_volunteer_count = len(self.volunteer_list)
             if max_volunteers_count and accumulated_volunteer_count >= max_volunteers_count: # NOTE: for DEBUG
+                logging.info(f'Meets `accumulated_volunteer_count` {accumulated_volunteer_count}')
                 break
             if app_status_dict['flag_syncing_volunteers'] == 'stop':
                 logging.warning('Syncing stopped due to: `flag_syncing_volunteers` == `stop`')
