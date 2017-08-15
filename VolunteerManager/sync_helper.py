@@ -74,9 +74,6 @@ class SyncManager(object):
         accumulated_volunteer_count = 0
         logging.info(f"Start scanning for {expected_volunteer_count} volunteers @ {max_page} pages.")
         for page_index in range(1, max_page + 1):
-            if app_status_dict['flag_syncing_volunteers'] == 'stop':
-                logging.warning('Syncing stopped due to: `flag_syncing_volunteers` == `stop`')
-                exit()
             logging.info(f"Getting page {page_index}.")
             current_page = self.get(scanning_url.format(page_index))
             if save_on_the_fly:
@@ -91,6 +88,9 @@ class SyncManager(object):
                 self.volunteer_list += self.prase_list_soap(current_page.text)
                 accumulated_volunteer_count = len(self.volunteer_list)
             if max_volunteers_count and accumulated_volunteer_count >= max_volunteers_count: # NOTE: for DEBUG
+                break
+            if app_status_dict['flag_syncing_volunteers'] == 'stop':
+                logging.warning('Syncing stopped due to: `flag_syncing_volunteers` == `stop`')
                 break
             time.sleep(2 * interval * random.random())
         logging.info(f"Scanned {accumulated_volunteer_count}/{expected_volunteer_count} volunteer(s).")
