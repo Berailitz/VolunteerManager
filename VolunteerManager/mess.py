@@ -6,6 +6,7 @@ import os.path as path
 import random
 import string
 import zipfile
+from logging.handlers import RotatingFileHandler
 
 def fun_logger(text='Fun_logger'):
     """log function call and result with custom text head"""
@@ -33,10 +34,13 @@ def set_logger(log_path):
         filemode='a')
     console = logging.StreamHandler()
     console.setLevel(logging.INFO)
+    file_handler = RotatingFileHandler('python.log', maxBytes=1024 * 1024 * 100, backupCount=5, encoding='utf8')
+    file_handler.setLevel(logging.INFO)
     formatter = logging.Formatter('[%(levelname)s] %(asctime)s %(filename)s:%(lineno)d %(message)s')
     console.setFormatter(formatter)
     logging.getLogger('werkzeug').setLevel(logging.INFO)
     logging.getLogger('werkzeug').addHandler(console)
+    logging.getLogger('werkzeug').addHandler(file_handler)
     logging.info("Start ....")
 
 def zip_a_file(raw_file_path, zip_file_path=None, open_mode='w', delete_after_zip=False):
