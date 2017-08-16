@@ -123,7 +123,6 @@ def import_volunteers(data_list):
     """import `data_list` to sql table `temp`, which will be TRUNCATED to avoid conflict while
     being `appended` with new rows. These rows will be merged into table `volunteers` later."""
     data_frame = pandas.DataFrame(data_list)
-    logging.info('Truncate temp table `volunteers_temp`')
     engine.execute(AppConfig.SYNC_TRUNCATE_TEMP_TABLE_COMMAND)
     column_type = {
         'user_id': sqlalchemy.types.Integer,
@@ -139,9 +138,7 @@ def import_volunteers(data_list):
         'volunteer_time': sqlalchemy.types.Float,
         'note': sqlalchemy.types.String(50)
     }
-    logging.info('Insert data to temp table `volunteers_temp`')
     data_frame.to_sql('temp', engine, if_exists='append', index=False, chunksize=100, dtype=column_type)
-    logging.info('Merge data to main table `volunteers`')
     engine.execute(AppConfig.SYNC_VOLUNTEER_SQL_COMMAND)
-    logging.info('Truncate temp table `volunteers_temp`')
+    logging.info('Volunteers merged to main table `volunteers`')
     engine.execute(AppConfig.SYNC_TRUNCATE_TEMP_TABLE_COMMAND)
