@@ -95,7 +95,7 @@ class SyncManager(object):
                 app_status_dict['flag_syncing_volunteers'] = 'stopped'
                 break
             time.sleep(2 * interval * random.random())
-            logging.info(f"Scanned {accumulated_volunteer_count}/{expected_volunteer_count} volunteer(s).")
+            logging.info(f"Scanned {accumulated_volunteer_count}/{expected_volunteer_count} volunteers @ {page_index}/{max_page} pages.")
 
     @staticmethod
     def prase_list_soap(raw_text):
