@@ -25,7 +25,7 @@ body
     overflow: initial;
 }
 
-#volunteer-info-card
+.controller-card
 {
     width: 400px;
     min-height: 10px;
