@@ -283,10 +283,6 @@ def execute_volunteer_sync():
     app_status_dict['is_syncing_volunteers'] = 'finished'
     logging.info('Volunteer info Synchronized.')
 
-volunteer_syncer = VolunteerSyncer()
-if platform.system() == 'Linux':
-    signal.signal(signal.SIGCHLD, wait_process) # NOTE: Linux only, no need for windows
-
 def wait_process(signal_id, frame):
     """wait to remove defunct/zombie process"""
     syncer_list = [volunteer_syncer]
@@ -294,3 +290,7 @@ def wait_process(signal_id, frame):
         if not syncer.syncer_process.is_alive(): # NOTE: has the same effect with `os.waitpid(pid, 0)`, but don't know why...
             logging.info(f'Process {syncer.syncer_process.pid} of Syncer {syncer} has exited.')
             syncer.syncer_process = None
+
+volunteer_syncer = VolunteerSyncer()
+if platform.system() == 'Linux':
+    signal.signal(signal.SIGCHLD, wait_process) # NOTE: Linux only, no need for windows
