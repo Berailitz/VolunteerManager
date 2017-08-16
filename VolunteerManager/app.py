@@ -5,6 +5,7 @@
 import logging
 from flask import Flask
 from flask_debugtoolbar import DebugToolbarExtension
+from werkzeug.contrib.fixers import ProxyFix
 from .api_handle import create_api
 from .auth_handle import bcrypt
 from .config import AppConfig
@@ -27,6 +28,7 @@ def create_app():
     toolbar.init_app(app)
     main_blueprint = create_main_blueprint()
     app.register_blueprint(main_blueprint)
+    app.wsgi_app = ProxyFix(app.wsgi_app)
     logging.info('%r', app.view_functions)
     logging.info('%r', app.url_map)
     return app
