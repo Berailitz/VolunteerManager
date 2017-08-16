@@ -3,13 +3,12 @@
 # -*- coding: UTF-8 -*-
 
 import logging
-from VolunteerManager import app, mess
+from VolunteerManager import app
 
 application = app.create_app()
 
 def main():
     """main func"""
-    mess.set_logger('log.txt')
     logging.info('start...')
     application.run(port=9020, debug=True)
 
