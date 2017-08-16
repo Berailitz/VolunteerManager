@@ -40,7 +40,9 @@ def set_logger(log_path):
     console.setFormatter(formatter)
     logging.getLogger('werkzeug').setLevel(logging.INFO)
     logging.getLogger('werkzeug').addHandler(console)
+    logging.getLogger(None).addHandler(console)
     logging.getLogger('werkzeug').addHandler(file_handler)
+    logging.getLogger(None).addHandler(file_handler)
     logging.info("Start ....")
 
 def zip_a_file(raw_file_path, zip_file_path=None, open_mode='w', delete_after_zip=False):
