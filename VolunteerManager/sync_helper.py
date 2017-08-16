@@ -284,10 +284,13 @@ def execute_volunteer_sync():
     logging.info('Volunteer info Synchronized.')
 
 def wait_process(signal_id, frame):
-    """wait to remove defunct/zombie process"""
+    """Linux only, wait/check to avoid defunct/zombie process and unexpected incredible `Hangup`s of the main process
+    after subprocess exits (at `main` server only, with python 3.6.2, flask 0.12, break when multiprocessing
+    is used within Flask app)"""
     syncer_list = [volunteer_syncer]
     for syncer in syncer_list:
-        if not syncer.syncer_process.is_alive(): # NOTE: has the same effect with `os.waitpid(pid, 0)`, but don't know why...
+        if syncer.syncer_process and not syncer.syncer_process.is_alive():
+            # NOTE: `is_alive()` has the same effect with `os.waitpid(pid, 0)`, but I don't know why...
             logging.info(f'Process {syncer.syncer_process.pid} of Syncer {syncer} has exited.')
             syncer.syncer_process = None
 
