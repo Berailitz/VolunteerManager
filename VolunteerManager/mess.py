@@ -25,7 +25,7 @@ strip_raw_data = lambda raw_data: str(raw_data).strip()
 
 def set_logger(flask_app, log_path):
     """Adapt to Flask, log into log file at `log_path`, at level `INFO`"""
-    logging.basicConfig(
+    flask_app.logger.basicConfig(
         level=logging.INFO,
         format='[%(levelname)s] %(asctime)s %(filename)s:%(lineno)d %(message)s',
         datefmt='%Y %b %d %H:%M:%S',
@@ -35,8 +35,8 @@ def set_logger(flask_app, log_path):
     console.setLevel(logging.INFO)
     formatter = logging.Formatter('[%(levelname)s] %(asctime)s %(filename)s:%(lineno)d %(message)s')
     console.setFormatter(formatter)
-    flask_app.logger.addHandler(console)
     flask_app.logger.setLevel(logging.INFO)
+    flask_app.logger.addHandler(console)
     logging.info("Start ....")
 
 def zip_a_file(raw_file_path, zip_file_path=None, open_mode='w', delete_after_zip=False):
