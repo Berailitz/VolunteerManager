@@ -9,7 +9,7 @@ application = app.create_app()
 
 def main():
     """main func"""
-    mess.set_logger(application, 'log.txt')
+    mess.set_logger('log.txt')
     logging.info('start...')
     application.run(port=9020, debug=True)
 
