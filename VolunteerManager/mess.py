@@ -25,7 +25,7 @@ strip_raw_data = lambda raw_data: str(raw_data).strip()
 
 def set_logger(flask_app, log_path):
     """Adapt to Flask, log into log file at `log_path`, at level `INFO`"""
-    flask_app.logger.basicConfig(
+    logging.basicConfig(
         level=logging.INFO,
         format='[%(levelname)s] %(asctime)s %(filename)s:%(lineno)d %(message)s',
         datefmt='%Y %b %d %H:%M:%S',
