@@ -1,4 +1,5 @@
 """mess like fun_tools, logger"""
+import datetime
 import functools
 import logging
 import logging.handlers
@@ -29,7 +30,8 @@ def set_logger(log_path):
     logging.basicConfig(
         level=logging.INFO,
         format='[%(levelname)s] %(asctime)s %(filename)s:%(lineno)d %(message)s')
-    file_handler = logging.handlers.TimedRotatingFileHandler(log_path, when='midnight', interval=1, backupCount=10, encoding='utf8')
+    file_handler = logging.handlers.TimedRotatingFileHandler(
+        log_path, when='midnight', interval=1, backupCount=10, encoding='utf8', atTime=datetime.time(3, 30))
     file_handler.setFormatter(logging.Formatter('[%(levelname)s] %(asctime)s %(filename)s:%(lineno)d %(message)s'))
     logging.getLogger('werkzeug').setLevel(logging.INFO)
     logging.getLogger(None).addHandler(file_handler)
