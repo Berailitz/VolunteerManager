@@ -29,7 +29,7 @@ def set_logger(log_path):
     logging.basicConfig(
         level=logging.INFO,
         format='[%(levelname)s] %(asctime)s %(filename)s:%(lineno)d %(message)s')
-    file_handler = logging.handlers.RotatingFileHandler(log_path, maxBytes=1024 * 1024 * 100, backupCount=5, encoding='utf8')
+    file_handler = logging.handlers.TimedRotatingFileHandler(log_path, when='midnight', interval=1, backupCount=10, encoding='utf8')
     file_handler.setFormatter(logging.Formatter('[%(levelname)s] %(asctime)s %(filename)s:%(lineno)d %(message)s'))
     logging.getLogger('werkzeug').setLevel(logging.INFO)
     logging.getLogger(None).addHandler(file_handler)

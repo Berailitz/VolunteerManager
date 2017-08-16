@@ -3,6 +3,7 @@
 # -*- coding: UTF-8 -*-
 
 import logging
+import os
 from flask import Flask
 from flask_debugtoolbar import DebugToolbarExtension
 from werkzeug.contrib.fixers import ProxyFix
@@ -15,7 +16,7 @@ from .tables import db
 
 def create_app():
     """create initialized flask app, compatible with uwsgi"""
-    set_logger('log/log.txt')
+    set_logger(f'log/log_{os.getpid()}.txt')
     app = Flask(__name__)
     app.config.from_object(AppConfig)
     toolbar = DebugToolbarExtension()
