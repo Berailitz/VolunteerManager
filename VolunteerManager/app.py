@@ -9,10 +9,12 @@ from .api_handle import create_api
 from .auth_handle import bcrypt
 from .config import AppConfig
 from .main.views import create_main_blueprint
+from .mess import set_logger
 from .tables import db
 
 def create_app():
     """create initialized flask app, compatible with uwsgi"""
+    set_logger('log/log.txt')
     app = Flask(__name__)
     app.config.from_object(AppConfig)
     toolbar = DebugToolbarExtension()

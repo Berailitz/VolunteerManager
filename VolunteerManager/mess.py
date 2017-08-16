@@ -1,12 +1,12 @@
 """mess like fun_tools, logger"""
 import functools
 import logging
+import logging.handlers
 import os
 import os.path as path
 import random
 import string
 import zipfile
-from logging.handlers import RotatingFileHandler
 
 def fun_logger(text='Fun_logger'):
     """log function call and result with custom text head"""
@@ -28,18 +28,10 @@ def set_logger(log_path):
     """Adapt to Flask, log into log file at `log_path`, at level `INFO`"""
     logging.basicConfig(
         level=logging.INFO,
-        format='[%(levelname)s] %(asctime)s %(filename)s:%(lineno)d %(message)s',
-        datefmt='%Y %b %d %H:%M:%S',
-        filename=log_path,
-        filemode='a')
-    console = logging.StreamHandler()
-    console.setLevel(logging.INFO)
-    file_handler = RotatingFileHandler('python.log', maxBytes=1024 * 1024 * 100, backupCount=5, encoding='utf8')
-    file_handler.setLevel(logging.INFO)
-    formatter = logging.Formatter('[%(levelname)s] %(asctime)s %(filename)s:%(lineno)d %(message)s')
-    console.setFormatter(formatter)
+        format='[%(levelname)s] %(asctime)s %(filename)s:%(lineno)d %(message)s')
+    file_handler = logging.handlers.RotatingFileHandler(log_path, maxBytes=1024 * 1024 * 100, backupCount=5, encoding='utf8')
+    file_handler.setFormatter(logging.Formatter('[%(levelname)s] %(asctime)s %(filename)s:%(lineno)d %(message)s'))
     logging.getLogger('werkzeug').setLevel(logging.INFO)
-    logging.getLogger(None).addHandler(console)
     logging.getLogger(None).addHandler(file_handler)
     logging.info("Start ....")
 
