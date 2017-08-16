@@ -4,15 +4,15 @@
 import json
 import logging
 import multiprocessing
-import time
+import platform
 import random
+import signal
+import time
 import requests
 from bs4 import BeautifulSoup
 from .config import AppConfig, app_status_dict
 from .mess import str_to_int, strip_raw_data
 from .sql_handle import export_to_json, import_volunteers
-
-sync_volunteer_process = None
 
 class SyncManager(object):
     """Manage volunteers on bv2008, whose `volunteer_list` is a list of objects. Call `login` before doing anything else."""
@@ -204,7 +204,10 @@ class SyncManager(object):
 class VolunteerSyncer(object):
     """manager volunteer syncing process"""
     def __init__(self):
-        self.sync_volunteer_process = None
+        self.syncer_process = None
+
+    def __repr__(self):
+        return '<VolunteerSyncer>'
 
     def check_sync_command(self, sync_command):
         """Backup sql to zipped json, scan volunteers and save to `volunteers`"""
@@ -236,14 +239,14 @@ class VolunteerSyncer(object):
 
     def _start_command(self):
         """PRIVATE: start process"""
-        self.sync_volunteer_process = multiprocessing.Process(target=execute_volunteer_sync, daemon=True)
-        # self.sync_volunteer_process.start()
-        logging.info(f'Sync proces starts at {self.sync_volunteer_process.pid}.')
+        self.syncer_process = multiprocessing.Process(target=execute_volunteer_sync, daemon=True)
+        self.syncer_process.start()
+        logging.info(f'Sync proces starts at {self.syncer_process.pid}.')
         return {'status': 0, 'data': {'msg': '同步已开始'}}
 
     def stop(self):
         """stop process by `flag_syncing_volunteers`"""
-        if self.sync_volunteer_process and self.sync_volunteer_process.is_alive():
+        if self.syncer_process and self.syncer_process.is_alive():
             if app_status_dict['flag_syncing_volunteers'] == 'stop':
                 return {'status': 0, 'data': {'msg': '同步正在停止中'}}
             else:
@@ -254,8 +257,8 @@ class VolunteerSyncer(object):
 
     def force_stop(self):
         """DEBUG: terminate process and set `is_syncing_volunteers` to `error`"""
-        if self.sync_volunteer_process and self.sync_volunteer_process.is_alive():
-            self.sync_volunteer_process.terminate()
+        if self.syncer_process and self.syncer_process.is_alive():
+            self.syncer_process.terminate()
             app_status_dict['is_syncing_volunteers'] = 'error'
             return {'status': 0, 'data': {'msg': '同步已被强制停止'}}
         else:
@@ -281,3 +284,13 @@ def execute_volunteer_sync():
     logging.info('Volunteer info Synchronized.')
 
 volunteer_syncer = VolunteerSyncer()
+if platform.system() == 'Linux':
+    signal.signal(signal.SIGCHLD, wait_process) # NOTE: Linux only, no need for windows
+
+def wait_process(signal_id, frame):
+    """wait to remove defunct/zombie process"""
+    syncer_list = [volunteer_syncer]
+    for syncer in syncer_list:
+        if not syncer.syncer_process.is_alive(): # NOTE: has the same effect with `os.waitpid(pid, 0)`, but don't know why...
+            logging.info(f'Process {syncer.syncer_process.pid} of Syncer {syncer} has exited.')
+            syncer.syncer_process = None
