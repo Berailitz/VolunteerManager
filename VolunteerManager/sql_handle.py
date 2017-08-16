@@ -120,7 +120,7 @@ def export_to_json(table_name, folder_path=AppConfig.BACKUP_FOLDER, create_folde
     return filename
 
 def import_volunteers(data_list):
-    """import `data_list` to sql table `temp`, which will be TRUNCATED to avoid conflict while
+    """import `data_list` to sql table `volunteers_temp`, which will be TRUNCATED to avoid conflict while
     being `appended` with new rows. These rows will be merged into table `volunteers` later."""
     data_frame = pandas.DataFrame(data_list)
     engine.execute(AppConfig.SYNC_TRUNCATE_TEMP_TABLE_COMMAND)
@@ -138,7 +138,7 @@ def import_volunteers(data_list):
         'volunteer_time': sqlalchemy.types.Float,
         'note': sqlalchemy.types.String(50)
     }
-    data_frame.to_sql('temp', engine, if_exists='append', index=False, chunksize=100, dtype=column_type)
+    data_frame.to_sql('volunteers_temp', engine, if_exists='append', index=False, chunksize=100, dtype=column_type)
     engine.execute(AppConfig.SYNC_VOLUNTEER_SQL_COMMAND)
-    logging.info('Volunteers merged to main table `volunteers`')
+    logging.info('Volunteers at `volunteers_temp` merged to main table `volunteers`')
     engine.execute(AppConfig.SYNC_TRUNCATE_TEMP_TABLE_COMMAND)
