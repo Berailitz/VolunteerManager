@@ -122,7 +122,7 @@ class RecordApi(Resource):
         try:
             the_rec = get_records({'record_id': int(args['record_id'])}, 'one', None)
         except orm.exc.NoResultFound as identifier:
-            logging.warning(f'No such `record_id`: `{args['record_id']}`')
+            logging.warning(f"No such `record_id`: `{args['record_id']}`")
             return {'status': 1, 'data': {'msg': '查无此记录'}}
         try:
             if 'student_id' in args and args['student_id']:
@@ -181,7 +181,7 @@ class RecordApi(Resource):
         try:
             the_rec = get_records({'record_id': int(args['record_id'])}, 'one', None)
         except orm.exc.NoResultFound as identifier:
-            logging.warning(f'No such `record_id`: `{args['record_id']}`')
+            logging.warning(f"No such `record_id`: `{args['record_id']}`")
             return {'status': 1, 'data': {'msg': '查无此记录'}}
         the_rec.operator_id = admin.admin_id
         the_rec.record_status = -1
