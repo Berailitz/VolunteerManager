@@ -10,12 +10,12 @@ def create_main_blueprint():
     """create and return main blueprint, which should be registered later"""
     main_blueprint = Blueprint('main', __name__, template_folder='templates')
     main_blueprint.add_url_rule('/', 'index', show_index_page)
+    main_blueprint.add_url_rule('/advanced', 'advanced', show_advanced_page)
+    main_blueprint.add_url_rule('/download', 'download', show_download_page)
+    main_blueprint.add_url_rule('/edit', 'edit', show_edit_page)
     main_blueprint.add_url_rule('/project', 'project', show_project_page)
     main_blueprint.add_url_rule('/record', 'record', show_record_page)
     main_blueprint.add_url_rule('/volunteer', 'volunteer', show_volunteer_page)
-    main_blueprint.add_url_rule('/edit', 'edit', show_edit_page)
-    main_blueprint.add_url_rule('/download', 'download', show_download_page)
-    main_blueprint.add_url_rule('/advanced', 'advanced', show_advanced_page)
     return main_blueprint
 
 @guest_only_view()

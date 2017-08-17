@@ -167,7 +167,7 @@ class SyncManager(object):
 
     def invite(self, project_id, job_id, volunteer_id_list):
         """invite a list of volunteers to a project"""
-        invite_url = f'http://www.bv2008.cn/app/opp/opp.my.php?m=invite&item=recruit&opp_id{project_id}&job_id={job_id}'
+        invite_url = f'http://www.bv2008.cn/app/opp/opp.my.php?m=invite&item=recruit&opp_id={project_id}&job_id={job_id}'
         invite_payload = {'stype':'local', 'uid[]': volunteer_id_list}
         invite_response = self.post(invite_url, data=invite_payload)
         response_json = invite_response.json()
@@ -196,9 +196,9 @@ class SyncManager(object):
         record_response = self.post(record_url, data=record_payload)
         response_json = record_response.json()
         if response_json['code'] == 0:
-            logging.info(f"Record: #{response_json['id']} {response_json['msg']}")
+            logging.info(f"Record: #{response_json['id']} OK: {response_json['msg']}")
         else:
-            logging.error(f"Record: #{response_json['id']} ERROR{response_json['code']} {response_json['msg']}")
+            logging.error(f"Record: #{response_json['id']} ERROR{response_json['code']}: {response_json['msg']}")
         return response_json
 
 class VolunteerSyncer(object):
@@ -267,7 +267,9 @@ class VolunteerSyncer(object):
     @staticmethod
     def check():
         """get precess status, `is_syncing_volunteers` and `syncing_process_volunteers`"""
-        return {'status': 0, 'data': {
+        return {
+            'status': 0,
+            'data': {
                 'status': app_status_dict['is_syncing_volunteers'],
                 'progress': app_status_dict['syncing_process_volunteers']
             }
@@ -285,7 +287,7 @@ def execute_volunteer_sync():
 
 def wait_process(signal_id, frame):
     """Linux only, wait/check to avoid defunct/zombie process and unexpected incredible `Hangup`s of the main process
-    after subprocess exits (at `main` server only, with python 3.6.2, flask 0.12, break when multiprocessing
+    after subprocess exits (on `main` server only, with python 3.6.2, flask 0.12, break when multiprocessing
     is used within Flask app)"""
     syncer_list = [volunteer_syncer]
     for syncer in syncer_list:

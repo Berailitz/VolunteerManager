@@ -62,7 +62,7 @@ def check_cookie(current_request):
     """check token in cookie of current_request, return <admin> with token UPDATED or None, invoking `authenticate`"""
     try:
         current_token = current_request.cookies.get('token')
-        current_user = authenticate(token=current_token)
+        current_user = check_token(current_token)
         if current_user:
             current_user.token = generate_random_string(AppConfig.TOKEN_LENGTH)
             db.session.commit()
