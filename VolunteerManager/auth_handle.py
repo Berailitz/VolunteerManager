@@ -20,6 +20,7 @@ bcrypt = Bcrypt()
 def check_token(token):
     """PRIVATE: check and clear overdue token, return original <admin> or None for invalid or OVERDUE ones"""
     if not token:
+        logging.warning('No token detected.')
         return None
     try:
         admin = get_tokens({'token': token}, 'one', ['token'])
@@ -29,12 +30,13 @@ def check_token(token):
             return None
         return admin
     except orm.exc.NoResultFound as identifier:
-        logging.warning('%r', identifier)
+        logging.warning(f'No such token: `{token}`')
         return None
 
 def check_password(username, password):
     """PRIVATE: check password, return original <admin> or None"""
     if not username or not password:
+        logging.warning('No username or password detected.')
         return None
     try:
         admin = get_tokens({'username': username}, 'one', ['username'])
@@ -42,7 +44,7 @@ def check_password(username, password):
         if bcrypt.check_password_hash(admin.password, password):
             return admin
     except orm.exc.NoResultFound as identifier:
-        logging.warning('%r', identifier)
+        logging.warning(f'No such password: `{password}` for user `{username}`')
         return None
 
 def authenticate(**credential):
