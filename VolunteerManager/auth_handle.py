@@ -19,6 +19,8 @@ bcrypt = Bcrypt()
 
 def check_token(token):
     """PRIVATE: check and clear overdue token, return original <admin> or None for invalid or OVERDUE ones"""
+    if not token:
+        return None
     try:
         admin = get_tokens({'token': token}, 'one', ['token'])
         # logging.info('%r: token: %r.', admin, token)
@@ -32,6 +34,8 @@ def check_token(token):
 
 def check_password(username, password):
     """PRIVATE: check password, return original <admin> or None"""
+    if not username or not password:
+        return None
     try:
         admin = get_tokens({'username': username}, 'one', ['username'])
         # logging.info('username: %r, password: %r.', username, password)
