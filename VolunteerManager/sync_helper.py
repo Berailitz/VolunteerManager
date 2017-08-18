@@ -34,15 +34,27 @@ class SyncManager(object):
         }
         return headers
 
-    def post(self, url, referer='http://www.bv2008.cn', **kw):
+    def post(self, url, data, timeout=10, max_retries=10, referer='http://www.bv2008.cn', **kw):
         """customized post"""
-        post_response = self.my_session.post(url, headers=self.create_headers(referer), **kw)
+        for attempt_times in range(max_retries):
+            try:
+                post_response = self.my_session.post(url, headers=self.create_headers(referer), data=data, timeout=timeout, **kw)
+                break
+            except requests.Timeout as identifier:
+                attempt_times += 1
+                logging.warning(f'Syncer failed to POST `{str(data)}` to `{url}`: {str(identifier)}')
         post_response.encoding = "utf-8-sig"
         return post_response
 
-    def get(self, url, referer='http://www.bv2008.cn', **kw):
+    def get(self, url, timeout=10, max_retries=10, referer='http://www.bv2008.cn', **kw):
         """customized get"""
-        get_response = self.my_session.get(url, headers=self.create_headers(referer), **kw)
+        for attempt_times in range(max_retries):
+            try:
+                get_response = self.my_session.get(url, headers=self.create_headers(referer), timeout=timeout, **kw)
+                break
+            except requests.Timeout as identifier:
+                attempt_times += 1
+                logging.warning(f'Syncer failed to GET `{url}`: {str(identifier)}')
         get_response.encoding = "utf-8-sig"
         return get_response
 
