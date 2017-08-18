@@ -245,6 +245,7 @@ In Linux, `wait_process` will be called after syncer process exits to avoid defu
 - [ ] Add `class_index` after syncing
 - [ ] Add backup for Table `records`
 - [ ] Sync records
+- [ ] Fix Edge, 360
 
 ##Mess
 * Without `wait_process`, syncer process will 'hang up' after it exits (only on main server)
