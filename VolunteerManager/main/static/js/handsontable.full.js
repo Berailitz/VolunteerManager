@@ -29013,8 +29013,7 @@ var Viewport = function () {
       dummyElement.style.height = '1px';
       mainContainer.appendChild(dummyElement);
     //   fillWidth = dummyElement.offsetWidth;
-    fillWidth = mainContainer.offsetWidth;
-
+    mainContainer.parentElement.offsetWidth;
       this.containerWidth = fillWidth;
       mainContainer.removeChild(dummyElement);
 
