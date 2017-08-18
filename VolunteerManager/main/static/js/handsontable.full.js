@@ -29012,7 +29012,8 @@ var Viewport = function () {
       dummyElement.style.width = '100%';
       dummyElement.style.height = '1px';
       mainContainer.appendChild(dummyElement);
-      fillWidth = dummyElement.offsetWidth;
+    //   fillWidth = dummyElement.offsetWidth;
+    fillWidth = mainContainer.offsetWidth;
 
       this.containerWidth = fillWidth;
       mainContainer.removeChild(dummyElement);
