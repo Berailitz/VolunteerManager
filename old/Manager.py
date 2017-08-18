@@ -153,11 +153,11 @@ class Manager(object):
 
     def invite(self, project_id, job_id, volunteer_id_list):
         """invite a list of volunteers to a project"""
-        invite_url = f'http://www.bv2008.cn/app/opp/opp.my.php?m=invite&item=recruit&opp_id{project_id}&job_id={job_id}'
+        invite_url = f'http://www.bv2008.cn/app/opp/opp.my.php?m=invite&item=recruit&opp_id={project_id}&job_id={job_id}'
         invite_payload = {'stype':'local', 'uid[]': volunteer_id_list}
         invite_response = self.post(invite_url, data=invite_payload)
         response_json = invite_response.json()
-        logging.info(f"[Succeeded]Invite info: {response_json['msg']}")
+        logging.info(f"[Unknown]Invite result: {response_json['msg']}")
         return invite_response
 
     def import_record_text(self, project_id, job_id, id_type, record_text):
