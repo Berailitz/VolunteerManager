@@ -28936,9 +28936,9 @@ var Viewport = function () {
         overflow = (0, _element.getStyle)(this.instance.wtOverlays.leftOverlay.trimmingContainer, 'overflow');
 
         if (overflow == 'scroll' || overflow == 'hidden' || overflow == 'auto') {
-          // this is used in `scroll.html`
-          // TODO test me
-          return Math.max(width, trimmingContainer.clientWidth);
+          // this is used in `scroll.html`, TODO test me
+          //return Math.max(width, trimmingContainer.clientWidth);
+          return Math.min(width, trimmingContainer.clientWidth);
         }
       }
 
