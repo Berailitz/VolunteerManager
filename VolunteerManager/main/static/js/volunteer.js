@@ -24,7 +24,7 @@ let htmlTable = new Handsontable(container, {
   readOnly: true,
   rowHeaders: true,
   sortIndicator: true,
-  // stretchH: 'all'
+  stretchH: 'all'
 });
 
 function search() {
