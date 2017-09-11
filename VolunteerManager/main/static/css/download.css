@@ -22,5 +22,5 @@ body
 
 .mdl-card,.mdl-card__supporting-text
 {
-    overflow: initial;
+    overflow: visible !important;
 }

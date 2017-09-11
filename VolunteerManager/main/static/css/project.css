@@ -10,7 +10,7 @@ body
 
 .mdl-card,.mdl-card__supporting-text
 {
-    overflow: initial;
+    overflow: visible !important;
 }
 
 .mdl-menu__container.is-upgraded
