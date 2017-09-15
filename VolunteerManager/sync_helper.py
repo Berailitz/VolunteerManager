@@ -77,7 +77,7 @@ class SyncManager(object):
             logging.error(f"[Failed]Faied to login: {login_json['msg']}")
             return False
 
-    def scan(self, interval=2, max_volunteers_count=None, save_on_the_fly=None):
+    def scan(self, interval=AppConfig.VOLUNTEER_SPIDER_SCAN_INTERVAL, max_volunteers_count=None, save_on_the_fly=None):
         """NOTE: scan for all volunteers, save a page one time if `sql` or `json` in `save_on_the_fly`.
         Process exits if `flag_syncing_volunteers` == `stop`"""
         self.volunteer_list = list()
