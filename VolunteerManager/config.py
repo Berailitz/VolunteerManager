@@ -39,6 +39,7 @@ class AppConfig(object):
     SYNC_VOLUNTEER_SQL_COMMAND += "= `volunteers_temp`.`gender`, `age` = `volunteers_temp`.`age`, `volunteer_time` = `volunteers_temp`."
     SYNC_VOLUNTEER_SQL_COMMAND += "`volunteer_time`, `note` = `volunteers_temp`.`note`"
     UNIVERSAL_DEBUG_TOKEN = 'wozhendeshilaidebugde' # IMPORTANT NOTE: FOR DEBUG ONLY
+    VOLUNTEER_SPIDER_SCAN_INTERVAL = 8
 
     def init_app(self, app):
         """ensure that restful response should be encode with utf8"""
