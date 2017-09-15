@@ -32,12 +32,11 @@ class Manager(object):
     def __init__(self):
         self.my_session = requests.Session()
         self.volunteer_list = list()
-        # self.login()
+        self.json_path = 'volunteer_list.json'
 
-    def post(self, url, referer='', **kw):
-        """customized post"""
-        if not referer:
-            referer = 'http://www.bv2008.cn'
+    @staticmethod
+    def create_headers(referer):
+        """create http headers with custom `referer`"""
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win) AppleWebKit/537.36 (KHTML, like Gecko) Safari/537.36',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -46,23 +45,29 @@ class Manager(object):
             'Accept-Encoding': 'gzip, deflate',
             'Referer': referer,
         }
-        post_response = self.my_session.post(url, headers=headers, **kw)
+        return headers
+
+    def post(self, url, data, timeout=10, max_retries=10, referer='http://www.bv2008.cn', **kw):
+        """customized post"""
+        for attempt_times in range(max_retries):
+            try:
+                post_response = self.my_session.post(url, headers=self.create_headers(referer), data=data, timeout=timeout, **kw)
+                break
+            except requests.Timeout as identifier:
+                attempt_times += 1
+                logging.warning(f'Syncer failed to POST `{str(data)}` to `{url}`: {str(identifier)}')
         post_response.encoding = "utf-8-sig"
         return post_response
 
-    def get(self, url, referer='', **kw):
+    def get(self, url, timeout=10, max_retries=10, referer='http://www.bv2008.cn', **kw):
         """customized get"""
-        if not referer:
-            referer = 'http://www.bv2008.cn'
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64) AppleWebKit/537.36 (KHTML, like Gecko) Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Language': 'en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4',
-            'Connection': 'keep-alive',
-            'Accept-Encoding': 'gzip, deflate',
-            'Referer': referer,
-        }
-        get_response = self.my_session.get(url, headers=headers, **kw)
+        for attempt_times in range(max_retries):
+            try:
+                get_response = self.my_session.get(url, headers=self.create_headers(referer), timeout=timeout, **kw)
+                break
+            except requests.Timeout as identifier:
+                attempt_times += 1
+                logging.warning(f'Syncer failed to GET `{url}`: {str(identifier)}')
         get_response.encoding = "utf-8-sig"
         return get_response
 
@@ -73,13 +78,14 @@ class Manager(object):
             raise KeyError('No username or password specified.')
         login_url = 'http://www.bv2008.cn/app/user/login.php?m=login'
         login_payload = {"uname": username, "upass": encrypted_password}
-        login_response = self.post(login_url, data=login_payload)
+        login_response = self.post(login_url, login_payload)
         login_json = login_response.json()
         if login_json['code'] == 0:
-            logging.info("[Succeeded]Login in")
+            logging.info(f"[Succeeded]Login as {username}")
+            return True
         else:
-            logging.info("[Failed]Login in" + login_json['msg'])
-        return True
+            logging.error(f"[Failed]Faied to login: {login_json['msg']}")
+            return False
 
     def scan(self, interval=2, is_random=True):
         """scan for all volunteers"""
@@ -101,8 +107,10 @@ class Manager(object):
         logging.info("[Success]Scanning completed.")
         return self.volunteer_list
 
-    def save_to_json(self, json_path='volunteer_list.json'):
+    def save_to_json(self, json_path=None):
         """save volunteer_list to json file"""
+        if not json_path:
+            json_path = self.json_path
         with open(json_path, 'w', encoding='utf8') as json_file:
             json.dump(self.volunteer_list, json_file, ensure_ascii=False)
 
@@ -112,82 +120,96 @@ class Manager(object):
 
     @staticmethod
     def prase_list_soap(raw_text):
-        """return volunteers on the page"""
+        """receive text, return volunteers on the page, by `list` of `dict`s"""
         soup = BeautifulSoup(raw_text, "lxml")
         volunteer_list = list()
         for member_item in [x for x in soup.select("tr") if not x.select("th")]:
             member_info = dict()
-            member_info['user_id'] = str_to_int(member_item.select("input")[0]['value'])
-            member_info['volunteer_id'] = strip_raw_data(member_item.select("td")[1].text)
-            if len(member_item.select("td")[2].contents) == 3:
-                member_info['username'] = strip_raw_data(member_item.select("td")[2].contents[0])
-                member_info['student_id'] = strip_raw_data(member_item.select("td")[2].contents[-1])
-            elif member_item.select("td")[2].contents[0].name == 'br':
+            member_info['user_id'] = member_item.select("input")[0]['value']
+            td_list = member_item.select("td")
+            member_info['volunteer_id'] = td_list[1].text
+            if len(td_list[2].contents) == 3:
+                member_info['username'] = td_list[2].contents[0]
+                member_info['student_id'] = td_list[2].contents[-1]
+            elif td_list[2].contents[0].name == 'br':
                 member_info['username'] = ''
-                member_info['student_id'] = strip_raw_data(member_item.select("td")[2].contents[-1])
+                member_info['student_id'] = td_list[2].contents[-1]
             else:
-                member_info['username'] = strip_raw_data(member_item.select("td")[2].contents[0])
+                member_info['username'] = td_list[2].contents[0]
                 member_info['student_id'] = ''
-            member_info['legal_name'] = strip_raw_data(member_item.select("td")[3].text)
-            if len(member_item.select("td")[4].contents) == 3:
-                member_info['phone'] = strip_raw_data(member_item.select("td")[4].contents[0])
-                member_info['email'] = strip_raw_data(member_item.select("td")[4].contents[-1])
-            elif member_item.select("td")[4].contents[0].name == 'br':
+            member_info['legal_name'] = td_list[3].text
+            if len(td_list[4].contents) == 3:
+                member_info['phone'] = td_list[4].contents[0]
+                member_info['email'] = td_list[4].contents[-1]
+            elif td_list[4].contents[0].name == 'br':
                 member_info['phone'] = ''
-                member_info['email'] = strip_raw_data(member_item.select("td")[4].contents[-1])
+                member_info['email'] = td_list[4].contents[-1]
             else:
-                member_info['phone'] = strip_raw_data(member_item.select("td")[4].contents[0])
+                member_info['phone'] = td_list[4].contents[0]
                 member_info['email'] = ''
-            if strip_raw_data(member_item.select("td")[5].text)[0] in ['男', '女']:
-                member_info['gender'] = strip_raw_data(member_item.select("td")[5].text)[0]
+            gender_and_age = strip_raw_data(td_list[5].text)
+            if gender_and_age[0] in ['男', '女']:
+                member_info['gender'] = gender_and_age[0]
             else:
                 member_info['gender'] = ''
-            if strip_raw_data(member_item.select("td")[5].text).split('(')[-1].split(')')[0]:
-                member_info['age'] = str_to_int(strip_raw_data(member_item.select("td")[5].text).split('(')[1].split(')')[0])
+            if gender_and_age.split('(')[-1].split(')')[0]:
+                member_info['age'] = gender_and_age.split('(')[1].split(')')[0]
             else:
                 member_info['age'] = None
-            member_info['volunteer_time'] = float(strip_raw_data(member_item.select("td")[8].text))
+            member_info['volunteer_time'] = float(strip_raw_data(td_list[8].text))
+            for key_of_text in ['volunteer_id', 'username', 'student_id', 'legal_name', 'phone', 'email', 'gender']:
+                member_info[key_of_text] = strip_raw_data(member_info[key_of_text])
+            for key_of_int in ['user_id', 'age']:
+                member_info[key_of_int] = str_to_int(member_info[key_of_int])
             volunteer_list.append(member_info)
-            logging.info("[Success]Scanning: %s", member_info)
+            # logging.info("Scanning: %s", member_info)
+        if volunteer_list:
+            logging.info(f'Prased {len(volunteer_list)} volunteer(s).')
+        else:
+            logging.error('No volunteer prased.')
         return volunteer_list
 
     def invite(self, project_id, job_id, volunteer_id_list):
         """invite a list of volunteers to a project"""
         invite_url = f'http://www.bv2008.cn/app/opp/opp.my.php?m=invite&item=recruit&opp_id={project_id}&job_id={job_id}'
         invite_payload = {'stype':'local', 'uid[]': volunteer_id_list}
-        invite_response = self.post(invite_url, data=invite_payload)
+        invite_response = self.post(invite_url, invite_payload)
         response_json = invite_response.json()
-        logging.info(f"[Unknown]Invite result: {response_json['msg']}")
-        return invite_response
+        logging.info(f"[Unknown]Invite info: {response_json['msg']}")
+        return invite_response.json()
 
     def import_record_text(self, project_id, job_id, id_type, record_text):
-        """add records in text, may fail due to frequent imports within 3 hours"""
+        """#DEBUG#: add records in text, may fail due to frequent imports within 3 hours"""
         # id_type: 1 for user id, 3 for volunteer id, 4 for legal id
         record_url = f'http://www.bv2008.cn/app/opp/opp.my.php?manage_type=0&m=import_hour&item=hour&opp_id={project_id}'
         record_payload = {'content': record_text, 'vol_type': id_type, 'opp_id': project_id, 'job_id': job_id}
-        record_response = self.post(record_url, data=record_payload)
+        record_response = self.post(record_url, record_payload)
         response_json = record_response.json()
+        logging.info("import_record_text -> response_json: " + str(response_json)) # for debug
         if response_json['code'] == 0:
-            logging.info(f"[Succeeded]Record: {response_json['msg']}")
-        for recorded_item in response_json['data'][0]:
-            success_log = "[Failed]Record: #{vol_id} {hour_num} hour(s) for job #{job_id}, opp #{opp_id}: {msg}".format(**recorded_item)
-            logging.info(success_log)
-        for failed_item in response_json['failed'][0]:
-            error_log = "[Failed]Record: #{vol_id} {hour_num} hour(s) for job #{job_id}, opp #{opp_id}: {msg}".format(**failed_item)
-            logging.info(error_log)
-        return record_response
+            logging.info(f"[Unknown]Record: {response_json['msg']}")
+        if 'data' in response_json.keys():
+            for recorded_item in response_json['data']:
+                success_log = "[Successful]: #{vol_id} -> {hour_num} hours @ job #{job_id}, opp #{opp_id}: {msg}".format(**recorded_item)
+                logging.info(success_log)
+        if 'failed' in response_json.keys():
+            for failed_item in response_json['failed']:
+                error_log = "[Failed]: #{vol_id} -> {hour_num} hours @ job #{job_id}, opp #{opp_id}: {msg}".format(**failed_item)
+                logging.error(error_log)
+        return response_json
 
     def save_record_item(self, project_id, job_id, user_id, working_time, record_note):
         """save one record"""
         record_url = f'http://www.bv2008.cn/app/opp/opp.my.php?manage_type=0&m=save_hour&item=hour&opp_id={project_id}&job_id={job_id}'
-        record_payload = {'hour_num': working_time, 'memo': record_note, 'uid': user_id}
-        record_response = self.post(record_url, data=record_payload)
+        record_payload = {'hour_num': str(working_time), 'memo': str(record_note), 'uid[]': str(user_id)}
+        record_response = self.post(record_url, record_payload)
         response_json = record_response.json()
+        logging.info("save_record_item -> response_json: " + str(response_json)) # for debug
         if response_json['code'] == 0:
-            logging.info(f"[Succeeded]Record: #{response_json['id']} {response_json['msg']}")
+            logging.info(f"[Successful]Record: {response_json['msg']}")
         else:
             logging.info(f"[Failed]Record: #{response_json['id']} ERROR{response_json['code']} {response_json['msg']}")
-        return record_response
+        return response_json
 
 def main():
     """main function"""

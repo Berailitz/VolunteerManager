@@ -8,11 +8,14 @@ import platform
 import random
 import signal
 import time
+
 import requests
 from bs4 import BeautifulSoup
+
 from .config import AppConfig, app_status_dict
 from .mess import str_to_int, strip_raw_data
 from .sql_handle import export_to_json, import_volunteers
+
 
 class SyncManager(object):
     """Manage volunteers on bv2008, whose `volunteer_list` is a list of objects. Call `login` before doing anything else."""
@@ -61,17 +64,17 @@ class SyncManager(object):
     def login(self, username, encrypted_password):
         """login with encrypted password"""
         if not username or not encrypted_password:
-            logging.error('No username or password specified.')
+            logging.error('[Failed]No username or password specified.')
             raise KeyError('No username or password specified.')
         login_url = 'http://www.bv2008.cn/app/user/login.php?m=login'
         login_payload = {"uname": username, "upass": encrypted_password}
-        login_response = self.post(login_url, data=login_payload)
+        login_response = self.post(login_url, login_payload)
         login_json = login_response.json()
         if login_json['code'] == 0:
-            logging.info(f"Login as {username}")
+            logging.info(f"[Succeeded]Login as {username}")
             return True
         else:
-            logging.error(f"Faied to login: {login_json['msg']}")
+            logging.error(f"[Failed]Faied to login: {login_json['msg']}")
             return False
 
     def scan(self, interval=2, max_volunteers_count=None, save_on_the_fly=None):
@@ -181,36 +184,42 @@ class SyncManager(object):
         """invite a list of volunteers to a project"""
         invite_url = f'http://www.bv2008.cn/app/opp/opp.my.php?m=invite&item=recruit&opp_id={project_id}&job_id={job_id}'
         invite_payload = {'stype':'local', 'uid[]': volunteer_id_list}
-        invite_response = self.post(invite_url, data=invite_payload)
+        invite_response = self.post(invite_url, invite_payload)
         response_json = invite_response.json()
-        logging.info(f"Invite info: {response_json['msg']}")
-        return invite_response
+        logging.info(f"[Unknown]Invite info: {response_json['msg']}")
+        return response_json
 
     def import_record_text(self, project_id, job_id, id_type, record_text):
         """add records in text, may fail due to frequent imports within 3 hours"""
         # id_type: 1 for user id, 3 for volunteer id, 4 for legal id
         record_url = f'http://www.bv2008.cn/app/opp/opp.my.php?manage_type=0&m=import_hour&item=hour&opp_id={project_id}'
         record_payload = {'content': record_text, 'vol_type': id_type, 'opp_id': project_id, 'job_id': job_id}
-        record_response = self.post(record_url, data=record_payload)
+        record_response = self.post(record_url, record_payload)
         response_json = record_response.json()
+        logging.info("import_record_text -> response_json: " + str(response_json)) # for debug
         if response_json['code'] == 0:
-            logging.info(f"Record: {response_json['msg']}")
-        for recorded_item in response_json['data'][0]:
-            logging.info("Record: #%(vol_id)s %(hour_num)s hour(s) for job #%(job_id)s, opp #%(opp_id)s: %(msg)s", **recorded_item)
-        for error_item in response_json['ERROR'][0]:
-            logging.error("Record: #%(vol_id)s %(hour_num)s hour(s) for job #%(job_id)s, opp #%(opp_id)s: %(msg)s", **error_item)
+            logging.info(f"[Unknown]Record: {response_json['msg']}")
+        if 'data' in response_json.keys():
+            for recorded_item in response_json['data']:
+                success_log = "[Successful]: #{vol_id} -> {hour_num} hours @ job #{job_id}, opp #{opp_id}: {msg}".format(**recorded_item)
+                logging.info(success_log)
+        if 'failed' in response_json.keys():
+            for failed_item in response_json['failed']:
+                error_log = "[Failed]: #{vol_id} -> {hour_num} hours @ job #{job_id}, opp #{opp_id}: {msg}".format(**failed_item)
+                logging.error(error_log)
         return response_json
 
     def save_record_item(self, project_id, job_id, user_id, working_time, record_note):
         """save one record"""
         record_url = f'http://www.bv2008.cn/app/opp/opp.my.php?manage_type=0&m=save_hour&item=hour&opp_id={project_id}&job_id={job_id}'
-        record_payload = {'hour_num': working_time, 'memo': record_note, 'uid': user_id}
-        record_response = self.post(record_url, data=record_payload)
+        record_payload = {'hour_num': working_time, 'memo': record_note, 'uid[]': user_id}
+        record_response = self.post(record_url, record_payload)
         response_json = record_response.json()
+        logging.info("save_record_item -> response_json: " + str(response_json)) # for debug
         if response_json['code'] == 0:
-            logging.info(f"Record: #{response_json['id']} OK: {response_json['msg']}")
+            logging.info(f"[Successful]Record: {response_json['msg']}")
         else:
-            logging.error(f"Record: #{response_json['id']} ERROR{response_json['code']}: {response_json['msg']}")
+            logging.error(f"[Failed]Record: #{response_json['id']} ERROR{response_json['code']}: {response_json['msg']}")
         return response_json
 
 class VolunteerSyncer(object):
