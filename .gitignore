@@ -1,6 +1,7 @@
 log/
 VolunteerManager/backup/
 VolunteerManager/main/static/temp/*
+credentials.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
