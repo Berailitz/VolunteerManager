@@ -4,16 +4,17 @@
 
 import logging
 from flask_sqlalchemy import orm
+import credentials
 from .tables import AppStatus, db
 
 class AppConfig(object):
     """config class"""
     DEBUG = True
     DEBUG_TB_TEMPLATE_EDITOR_ENABLED = True
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://xh:xh@localhost/xh?charset=utf8'
+    SQLALCHEMY_DATABASE_URI = credentials.SQLALCHEMY_DATABASE_URI
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     TEMPLATES_AUTO_RELOAD = True
-    SECRET_KEY = '67gyubinjmokl,plWRJpjkVCTVL'
+    SECRET_KEY = credentials.SECRET_KEY
     DOWNLOAD_PATH = 'main/static/temp'
     BACKUP_FOLDER = 'backup'
     TOKEN_LENGTH = 32
@@ -23,9 +24,8 @@ class AppConfig(object):
     ALL_IN_ONE_SQL_QUERY_COMMAND += " FROM `records` LEFT JOIN `volunteers` ON `records`.`user_id` = `volunteers`.`user_id` LEFT JOIN "
     ALL_IN_ONE_SQL_QUERY_COMMAND += "`tokens` ON `records`.`operator_id` = `tokens`.`admin_id` LEFT JOIN `jobs` ON `records`.`project_id`"
     ALL_IN_ONE_SQL_QUERY_COMMAND += " = `jobs`.`project_id` AND `records`.`job_id` = `jobs`.`job_id`"
-    SYNC_UAERNAME = 'scsfire'
-    SYNC_ENCRYPTED_PASSWORD = r"VsNl91lWRJpjkVCTVL4j/pa2w1Ij+U0JqNHIoWCYiGZy5+246J+1UDIs+aplYoH4DiHVfk+jkzGDijqc6ZLsb8mhrj"
-    SYNC_ENCRYPTED_PASSWORD += r"WOO/CdZ7tD5rn5+Wd6yFgXnRoiaZGAiaAxiPONZuVce11IyOyISchMapiV8b4G8GyREbEg+pcRuhz5Y3Q="
+    SYNC_UAERNAME = credentials.SYNC_UAERNAME
+    SYNC_ENCRYPTED_PASSWORD = credentials.SYNC_ENCRYPTED_PASSWORD
     SYNC_TRUNCATE_TEMP_TABLE_COMMAND = "TRUNCATE `volunteers_temp`"
     SYNC_VOLUNTEER_SQL_COMMAND = "INSERT INTO `volunteers`(`user_id`, `volunteer_id`, `username`, `student_id`, `class_index`, `legal"
     SYNC_VOLUNTEER_SQL_COMMAND += "_name`, `phone`, `email`, `gender`, `age`, `volunteer_time`, `note`) SELECT `volunteers_temp`.`user_"
@@ -38,7 +38,7 @@ class AppConfig(object):
     SYNC_VOLUNTEER_SQL_COMMAND += "p`.`legal_name`, `phone` = `volunteers_temp`.`phone`, `email` = `volunteers_temp`.`email`, `gender` "
     SYNC_VOLUNTEER_SQL_COMMAND += "= `volunteers_temp`.`gender`, `age` = `volunteers_temp`.`age`, `volunteer_time` = `volunteers_temp`."
     SYNC_VOLUNTEER_SQL_COMMAND += "`volunteer_time`, `note` = `volunteers_temp`.`note`"
-    UNIVERSAL_DEBUG_TOKEN = 'wozhendeshilaidebugde' # IMPORTANT NOTE: FOR DEBUG ONLY
+    UNIVERSAL_DEBUG_TOKEN = credentials.UNIVERSAL_DEBUG_TOKEN # IMPORTANT NOTE: FOR DEBUG ONLY
     VOLUNTEER_SPIDER_SCAN_INTERVAL = 8
 
     def init_app(self, app):
