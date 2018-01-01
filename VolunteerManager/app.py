@@ -17,7 +17,7 @@ from .tables import db
 def create_app():
     """create initialized flask app, compatible with uwsgi"""
     set_logger(f'log/log_{os.getpid()}.txt')
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder=None)
     app.config.from_object(AppConfig)
     toolbar = DebugToolbarExtension()
     api = create_api()
