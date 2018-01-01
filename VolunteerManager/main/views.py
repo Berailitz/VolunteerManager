@@ -8,7 +8,7 @@ from ..mess import fun_logger
 
 def create_main_blueprint():
     """create and return main blueprint, which should be registered later"""
-    main_blueprint = Blueprint('main', __name__, template_folder='templates')
+    main_blueprint = Blueprint('main', __name__, static_folder="static", template_folder='templates')
     main_blueprint.add_url_rule('/', 'index', show_index_page)
     main_blueprint.add_url_rule('/advanced', 'advanced', show_advanced_page)
     main_blueprint.add_url_rule('/download', 'download', show_download_page)
