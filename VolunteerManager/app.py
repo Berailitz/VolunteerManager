@@ -14,9 +14,11 @@ from .main.views import create_main_blueprint
 from .mess import set_logger
 from .tables import db
 
-def create_app():
+def create_app(log_path='log'):
     """create initialized flask app, compatible with uwsgi"""
-    set_logger(f'log/log_{os.getpid()}.txt')
+    if not os.path.exists(log_path):
+        raise FileNotFoundError(f'Log path does not exist: `{log_path}`.')
+    set_logger(f'{log_path}/log_{os.getpid()}.txt')
     app = Flask(__name__, static_folder=None)
     app.config.from_object(AppConfig)
     toolbar = DebugToolbarExtension()
