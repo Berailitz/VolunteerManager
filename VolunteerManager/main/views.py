@@ -11,6 +11,7 @@ def create_main_blueprint():
     main_blueprint = Blueprint('main', __name__, static_folder="static", template_folder='templates')
     main_blueprint.add_url_rule('/', 'index', show_index_page)
     main_blueprint.add_url_rule('/advanced', 'advanced', show_advanced_page)
+    main_blueprint.add_url_rule('/code', 'code', show_code_page)
     main_blueprint.add_url_rule('/download', 'download', show_download_page)
     main_blueprint.add_url_rule('/edit', 'edit', show_edit_page)
     main_blueprint.add_url_rule('/project', 'project', show_project_page)
@@ -45,3 +46,7 @@ def show_download_page():
 @admin_only_view()
 def show_advanced_page():
     return make_response(render_template('advanced.html', page_url='/advanced', page_title='高级功能'))
+
+@admin_only_view()
+def show_code_page():
+    return make_response(render_template('code.html', page_url='/code', page_title='时长码管理'))
