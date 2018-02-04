@@ -1,8 +1,10 @@
 """Portable manager class for `bv2008.cn`"""
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
+import functools
 import json
 import logging
+import os
 import time
 import random
 import sys
@@ -21,6 +23,9 @@ except ImportError as bs4_import_error:
 
 str_to_int = lambda raw_string: int(raw_string.strip())
 strip_raw_data = lambda raw_data: str(raw_data).strip()
+SYNC_UAERNAME = 'scsfire'
+SYNC_ENCRYPTED_PASSWORD = r"VsNl91lWRJpjkVCTVL4j/pa2w1Ij+U0JqNHIoWCYiGZy5+246J+1UDIs+aplYoH4DiHVfk+jkzGDijqc6ZLsb8mhrj"
+SYNC_ENCRYPTED_PASSWORD += r"WOO/CdZ7tD5rn5+Wd6yFgXnRoiaZGAiaAxiPONZuVce11IyOyISchMapiV8b4G8GyREbEg+pcRuhz5Y3Q="
 
 def set_logger(log_file_path):
     """set logger"""
@@ -37,6 +42,20 @@ def set_logger(log_file_path):
     console.setFormatter(formatter)
     logging.getLogger('').addHandler(console)
     logging.info("Start ....")
+
+def auto_login(func):
+    """#DEBUG Login before call real method."""
+    @functools.wraps(func)
+    def wrapper(instance, *args, **kw):
+        """update token or set invalid token to ``"""
+        if instance.login(SYNC_UAERNAME, SYNC_ENCRYPTED_PASSWORD):
+            logging.info('Login to `bv2008.cn`.')
+            response = func(instance, *args, **kw)
+        else:
+            logging.error('Cannot login to `bv2008.cn`.')
+            response = None
+        return response
+    return wrapper
 
 class Manager(object):
     """Manage volunteers on bv2008, whose `volunteer_list` is a list of objects"""
@@ -222,6 +241,35 @@ class Manager(object):
             logging.info(f"[Failed]Record: #{response_json['id']} ERROR{response_json['code']} {response_json['msg']}")
         return response_json
 
+    @auto_login
+    def generate_hour_code(self, project_id, job_id, code_amount, code_hour, code_note='', code_uid=[]):
+        """#DEBUG `uid` or `uid[]` or None. #TODO: check response. `code_uid` is reserved (useless)."""
+        save_code_url = f'http://www.bv2008.cn/app/opp/opp.my.php'
+        save_code_params = {'manage_type': '0', 'm': 'save_hour_code', 'item': 'hour', 'opp_id': project_id, 'job_id': job_id}
+        save_code_payload = {'job_id': job_id, 'hc_total': code_amount, 'hc_hour': code_hour, 'memo': code_note, 'uid[]': code_uid}
+        save_code_response = self.post(save_code_url, data=save_code_payload, params=save_code_params)
+        response_json = save_code_response.json()
+        logging.debug(f'generate_hour_code->response_json: {response_json}')
+        if response_json['code'] == 0:
+            logging.info(f"[Successful]Record: {response_json['msg']}")
+        else:
+            logging.error(f"[Failed]Record: #{response_json['id']} ERROR{response_json['code']}: {response_json['msg']}")
+        return response_json
+
+    @auto_login
+    def get_hour_code(self, project_id, job_id, folder_path=''):
+        """#DEBUG #TODO: Download code file to temp folder."""
+        module_dir = os.path.split(os.path.realpath(__file__))[0]
+        current_time = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
+        filename = f'hour_code_{project_id}_{job_id}_{current_time}_LOCAL.xls'
+        real_path = os.path.join(module_dir, folder_path, filename)
+        download_url = f'http://www.bv2008.cn/app/opp/opp.my.php'
+        download_params = {'item': 'hour', 'opp_id': project_id, 'job_id': job_id, 'm': 'export_excel_hcode', 'manage_type': '0'}
+        excel_response = self.get(download_url, params=download_params)
+        with open(real_path, 'wb') as temp_file:
+            temp_file.write(excel_response.content)
+        return filename
+
 def main():
     """main function"""
     logging.info("Start")
@@ -236,10 +284,8 @@ def main():
     ########################只需修改上面几行############################
     ###################################################################
     time_to_sleep = 3
-    encrypted_password = r"VsNl91lWRJpjkVCTVL4j/pa2w1Ij+U0JqNHIoWCYiGZy5+246J+1UDIs+aplYoH4DiHVfk+jkzGDijqc6ZLsb8mhrj"
-    encrypted_password += r"WOO/CdZ7tD5rn5+Wd6yFgXnRoiaZGAiaAxiPONZuVce11IyOyISchMapiV8b4G8GyREbEg+pcRuhz5Y3Q="
     my_manager = Manager()
-    login_status = my_manager.login("scsfire", encrypted_password)
+    login_status = my_manager.login(SYNC_UAERNAME, SYNC_ENCRYPTED_PASSWORD)
     if not login_status:
         exit()
     my_manager.invite(my_project_id, my_job_id, my_volunteer_uid_list)
