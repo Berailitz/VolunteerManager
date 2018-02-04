@@ -11,14 +11,16 @@ from .api_handle import create_api
 from .auth_handle import bcrypt
 from .config import AppConfig
 from .main.views import create_main_blueprint
-from .mess import set_logger
+from .mess import get_current_time, set_logger
 from .tables import db
 
 def create_app(log_path='log'):
     """create initialized flask app, compatible with uwsgi"""
     if not os.path.exists(log_path):
         raise FileNotFoundError(f'Log path does not exist: `{log_path}`.')
-    set_logger(f'{log_path}/log_{os.getpid()}.txt')
+    log_path = f'{log_path}/log_{get_current_time()}_{os.getpid()}.txt'
+    set_logger(log_path)
+    logging.info(f'Logging to `{log_path}`')
     app = Flask(__name__, static_folder=None)
     app.config.from_object(AppConfig)
     toolbar = DebugToolbarExtension()
