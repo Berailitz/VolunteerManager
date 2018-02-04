@@ -4,7 +4,12 @@
 
 import logging
 from flask_sqlalchemy import orm
-from .credentials import *
+try:
+    from .credentials import *
+except ImportError as credentials_import_error:
+    print(credentials_import_error.msg)
+    credentials_import_error.msg = "Failed to import credentials. Please make sure `credentials.py` exists."
+    raise credentials_import_error
 from .tables import AppStatus, db
 
 class AppConfig(object):
