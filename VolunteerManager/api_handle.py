@@ -12,9 +12,9 @@ from flask_sqlalchemy import orm
 from .auth_handle import get_current_user, load_token_api
 from .config import AppConfig
 from .mess import fun_logger
-from .restful_helper import parse_all_args, parse_one_arg
+from .restful_helper import check_args, parse_all_args, parse_one_arg
 from .sql_handle import export_to_excel, get_jobs, get_records, get_tokens, get_volunteers, item_to_dict
-from .sync_helper import volunteer_syncer
+from .sync_helper import sync_manager, volunteer_syncer
 from .tables import db, Record
 
 get_query_type = lambda args: args['query_type'] if args['query_type'] else 'all'
@@ -29,6 +29,7 @@ def create_api():
     api.add_resource(RelationshipApi, '/api/relationship')
     api.add_resource(ExcelApi, '/api/download')
     api.add_resource(SyncApi, '/api/sync')
+    api.add_resource(HourCodeApi, '/api/code')
     return api
 
 class TokenApi(Resource):
@@ -258,3 +259,48 @@ class SyncApi(Resource):
         else:
             logging.error(f'Empty `sync_type` or `sync_command` received for sync api by {admin.username}.')
             return {'status': 1, 'data': {'msg': '参数错误'}}
+
+class HourCodeApi(Resource):
+    """handle hour code requests with `bv2008.cn`"""
+    @staticmethod
+    @load_token_api()
+    def put(admin):
+        """TODO: Generate hour code."""
+        expected_args = {
+            'project_id': int,
+            'job_id': int,
+            'code_amount': int,
+            'code_hour': int,
+            'code_note': str
+        }
+        received_args = parse_all_args(reqparse.RequestParser(), expected_args)
+        args_diff = check_args(received_args, expected_args)
+        if args_diff:
+            logging.error(f'Invalid params received for generating hour code by {admin.username}.')
+            return {'status': 1, 'data': {'msg': f'参数错误: {args_diff}'}}
+        else:
+            result = sync_manager.generate_hour_code(**received_args)
+            if result['code'] == 0:
+                return {'status': 0, 'data': {'msg': result['msg']}}
+            else:
+                return {'status': result['code'], 'data': {k:result[k] for k in result.keys() if k in ['id', 'msg']}}
+
+    @staticmethod
+    @load_token_api()
+    def get(admin):
+        """TODO: Download hour code."""
+        expected_args = {
+            'project_id': int,
+            'job_id': int
+        }
+        received_args = parse_all_args(reqparse.RequestParser(), expected_args)
+        args_diff = check_args(received_args, expected_args)
+        if args_diff:
+            logging.error(f'Invalid params received for downloading hour code file by {admin.username}.')
+            return {'status': 1, 'data': {'msg': f'参数错误: {args_diff}'}}
+        else:
+            local_filename = sync_manager.get_hour_code(**received_args)
+            if local_filename:
+                return {'status': 0, 'data': {'download_url': f'/static/temp/{local_filename}'}}
+            else:
+                return {'status': 1, 'data': {'msg': '时长码下载失败'}}

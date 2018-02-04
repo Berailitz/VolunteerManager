@@ -1,9 +1,11 @@
 """Manager class for bv2008.cn"""
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
+import functools
 import json
 import logging
 import multiprocessing
+import os
 import platform
 import random
 import signal
@@ -13,14 +15,27 @@ import requests
 from bs4 import BeautifulSoup
 
 from .config import AppConfig, app_status_dict
-from .mess import str_to_int, strip_raw_data
+from .mess import generate_random_string, get_current_time, str_to_int, strip_raw_data
 from .sql_handle import export_to_json, import_volunteers
 
+def auto_login(func):
+    """#DEBUG Login before call real method."""
+    @functools.wraps(func)
+    def wrapper(instance, *args, **kw):
+        """update token or set invalid token to ``"""
+        if instance.login(AppConfig.SYNC_UAERNAME, AppConfig.SYNC_ENCRYPTED_PASSWORD):
+            logging.info('Login to `bv2008.cn`.')
+            response = func(instance, *args, **kw)
+        else:
+            logging.error('Cannot login to `bv2008.cn`.')
+            response = None
+        return response
+    return wrapper
 
 class SyncManager(object):
     """Manage volunteers on bv2008, whose `volunteer_list` is a list of objects. Call `login` before doing anything else."""
     def __init__(self):
-        self.my_session = requests.Session()
+        self._my_session = requests.Session()
         self.volunteer_list = list()
         self.json_path = 'volunteer_list.json'
 
@@ -41,7 +56,7 @@ class SyncManager(object):
         """customized post"""
         for attempt_times in range(max_retries):
             try:
-                post_response = self.my_session.post(url, headers=self.create_headers(referer), data=data, timeout=timeout, **kw)
+                post_response = self._my_session.post(url, headers=self.create_headers(referer), data=data, timeout=timeout, **kw)
                 break
             except requests.Timeout as identifier:
                 attempt_times += 1
@@ -53,7 +68,7 @@ class SyncManager(object):
         """customized get"""
         for attempt_times in range(max_retries):
             try:
-                get_response = self.my_session.get(url, headers=self.create_headers(referer), timeout=timeout, **kw)
+                get_response = self._my_session.get(url, headers=self.create_headers(referer), timeout=timeout, **kw)
                 break
             except requests.Timeout as identifier:
                 attempt_times += 1
@@ -222,6 +237,37 @@ class SyncManager(object):
             logging.error(f"[Failed]Record: #{response_json['id']} ERROR{response_json['code']}: {response_json['msg']}")
         return response_json
 
+    @auto_login
+    def generate_hour_code(self, project_id, job_id, code_amount, code_hour, code_note='', code_uid=[]):
+        """#DEBUG `uid` or `uid[]` or None. #TODO: check response. `code_uid` is reserved (useless)."""
+        save_code_url = f'http://www.bv2008.cn/app/opp/opp.my.php'
+        save_code_params = {'manage_type': '0', 'm': 'save_hour_code', 'item': 'hour', 'opp_id': project_id, 'job_id': job_id}
+        save_code_payload = {'job_id': job_id, 'hc_total': code_amount, 'hc_hour': code_hour, 'memo': code_note, 'uid[]': code_uid}
+        logging.debug(f'save_code_params: {save_code_params}')
+        logging.debug(f'save_code_payload: {save_code_payload}')
+        save_code_response = self.post(save_code_url, data=save_code_payload, params=save_code_params)
+        response_json = save_code_response.json()
+        logging.debug(f'generate_hour_code->response_json: {response_json}')
+        if response_json['code'] == 0:
+            logging.info(f"[Successful]Record: {response_json['msg']}")
+        else:
+            logging.error(f"[Failed]Record: #{response_json['id']} ERROR{response_json['code']}: {response_json['msg']}")
+        return response_json
+
+    @auto_login
+    def get_hour_code(self, project_id, job_id, folder_path=AppConfig.DOWNLOAD_PATH):
+        """#DEBUG #TODO: Download code file to temp folder."""
+        module_dir = os.path.split(os.path.realpath(__file__))[0]
+        filename = f'hour_code_{project_id}_{job_id}_{get_current_time()}_{generate_random_string(6)}.xls'
+        real_path = os.path.join(module_dir, folder_path, filename)
+        download_url = f'http://www.bv2008.cn/app/opp/opp.my.php'
+        download_params = {'item': 'hour', 'opp_id': project_id, 'job_id': job_id, 'm': 'export_excel_hcode', 'manage_type': '0'}
+        logging.debug(f'download_params: {download_params}')
+        excel_response = self.get(download_url, params=download_params)
+        with open(real_path, 'wb') as temp_file:
+            temp_file.write(excel_response.content)
+        return filename
+
 class VolunteerSyncer(object):
     """manager volunteer syncing process"""
     def __init__(self):
@@ -317,6 +363,7 @@ def wait_process(signal_id, frame):
             logging.info(f'Process {syncer.syncer_process.pid} of Syncer {syncer} has exited.')
             syncer.syncer_process = None
 
+sync_manager = SyncManager()
 volunteer_syncer = VolunteerSyncer()
 if platform.system() == 'Linux':
     signal.signal(signal.SIGCHLD, wait_process) # NOTE: Linux only, no need for windows
