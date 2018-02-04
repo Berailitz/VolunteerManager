@@ -7,6 +7,7 @@ import os
 import os.path as path
 import random
 import string
+import time
 import zipfile
 
 def fun_logger(text='Fun_logger'):
@@ -24,6 +25,7 @@ def fun_logger(text='Fun_logger'):
 generate_random_string = lambda length: ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
 str_to_int = lambda raw_string: int(raw_string.strip())
 strip_raw_data = lambda raw_data: str(raw_data).strip()
+get_current_time = lambda: time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
 
 def set_logger(log_path):
     """Adapt to Flask, log into log file at `log_path`, at level `INFO`"""
