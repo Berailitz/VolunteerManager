@@ -13,7 +13,7 @@ from .config import AppConfig
 from .mess import fun_logger, generate_random_string
 from .restful_helper import get_arg, parse_one_arg
 from .sql_handle import get_tokens
-from .tables import db
+from .tables import db, Token
 
 bcrypt = Bcrypt()
 
@@ -127,7 +127,10 @@ def load_token_api(update_token=True, error_status_code=1):
             if AppConfig.UNIVERSAL_DEBUG_TOKEN and token == AppConfig.UNIVERSAL_DEBUG_TOKEN:
                 is_debug_token = True
                 logging.warning(f'Debug token detected: `{token}`')
-                admin = None
+                admin = Token()
+                admin.admin_id = -1
+                admin.token = token
+                admin.username = 'UNIVERSAL_DEBUG_TOKEN'
             else:
                 is_debug_token = False
                 admin = get_arg(token, None, check_token)
