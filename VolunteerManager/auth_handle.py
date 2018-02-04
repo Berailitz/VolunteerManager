@@ -124,13 +124,14 @@ def load_token_api(update_token=True, error_status_code=1):
             """parser `token` from request, return immediately for invalid token or invoke decorated function"""
             token = parse_one_arg(reqparse.RequestParser(), 'token', str)
             # logging.info(parser.parse_args())
-            admin = get_arg(token, None, check_token)
             if AppConfig.UNIVERSAL_DEBUG_TOKEN and token == AppConfig.UNIVERSAL_DEBUG_TOKEN:
                 is_debug_token = True
                 logging.warning(f'Debug token detected: `{token}`')
+                admin = None
             else:
                 is_debug_token = False
-            if admin or is_debug_token: # NOTE: FOR DEBUG ONLY
+                admin = get_arg(token, None, check_token)
+            if is_debug_token or admin: # NOTE: FOR DEBUG ONLY
                 if update_token and not is_debug_token:
                     admin.token = generate_random_string(32)
                     db.session.commit()
